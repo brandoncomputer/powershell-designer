@@ -112,6 +112,7 @@ SOFTWARE.
 		Slicked to topnode if control add error.
 	2.0.5 Fixed path issue when installing new version.
 	2.0.6 Fixed bug in path issue fix.
+	2.0.7 Github repository created
 		
 		
 BASIC MODIFICATIONS License

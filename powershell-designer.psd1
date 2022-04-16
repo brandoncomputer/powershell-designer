@@ -12,7 +12,7 @@
 RootModule = 'powershell-designer.psm1'
 
 # Version number of this module.
-ModuleVersion = '2.0.6'
+ModuleVersion = '2.0.7'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -98,10 +98,10 @@ PrivateData = @{
         # Tags = @()
 
         # A URL to the license for this module.
-         LicenseUri = 'https://github.com/brandoncomputer/vds/blob/main/powershell-designer/license.md'
+         LicenseUri = 'https://github.com/brandoncomputer/powershell-designer/blob/main/license.md'
 
         # A URL to the main website for this project.
-         ProjectUri = 'https://github.com/brandoncomputer/vds/tree/main/powershell-designer'
+         ProjectUri = 'https://github.com/brandoncomputer/powershell-designer'
 
         # A URL to an icon representing this module.
         # IconUri = ''
