@@ -119,7 +119,8 @@ SOFTWARE.
 	2.0.8 - 4/17/2022
 		Fixed adding ToolStrip items
 		Eliminated DialogShell info function calls
-		
+	2.0.9 - 4/18/2022 
+		Added sender [sender] and events [e] parameters to control events	
 		
 BASIC MODIFICATIONS License
 #This software has been modified from the original as tagged with #brandoncomputer
@@ -1807,7 +1808,7 @@ $sbGUI = {
 					
 #brandoncomputer_AddEventtoFastText
 					$FastText.GoEnd()
-					$FastText.SelectedText = "`$$ControlName.add_$($this.SelectedItem)({
+					$FastText.SelectedText = "`$$ControlName.add_$($this.SelectedItem)({param(`$sender, `$e)
 	
 })
 
