@@ -590,7 +590,7 @@ $global:tscale = ($screen/$vscreen)
                             } catch {Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered while moving mouse over selected control."}
                         })
                         $_.Value.Add_MouseUp({
-                            Move-SButtons -Object $Script:refs['PropertyGrid'].SelectedObject
+                         #   Move-SButtons -Object $Script:refs['PropertyGrid'].SelectedObject
                         })
                     })
 
