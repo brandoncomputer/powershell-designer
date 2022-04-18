@@ -3,8 +3,8 @@
     ===========================================================================
         FileName:  Calc.ps1
         Author:  brand
-        Created On:  2022/04/17
-        Last Updated:  2022/04/17
+        Created On:  2022/04/18
+        Last Updated:  2022/04/18
         Organization:
         Version:      v0.1
     ===========================================================================
@@ -17,9 +17,30 @@
 # ScriptBlock to Execute in STA Runspace
 $sbGUI = {
     param($BaseDir)
+Add-Type @"
+using System;
+using System.Collections.Generic;
+using System.Windows.Forms;
+using System.Runtime.InteropServices;
+public class psd {
+public static void SetCompat()
+{
+//	SetProcessDPIAware();
+Application.EnableVisualStyles();
+Application.SetCompatibleTextRenderingDefault(false);
+}
+[System.Runtime.InteropServices.DllImport("user32.dll")]
+public static extern bool SetProcessDPIAware();
+}
+"@  -ReferencedAssemblies System.Windows.Forms,System.Drawing,System.Drawing.Primitives,System.Net.Primitives,System.ComponentModel.Primitives,Microsoft.Win32.Primitives
+$script:tscale = 1
 
     #region Functions
 
+	$vscreen = [System.Windows.Forms.SystemInformation]::VirtualScreen.height
+[psd]::SetProcessDPIAware()
+	$screen = [System.Windows.Forms.SystemInformation]::VirtualScreen.height
+	$script:tscale = ($screen/$vscreen)
     function Update-ErrorLog {
         param(
             [System.Management.Automation.ErrorRecord]$ErrorRecord,
@@ -70,6 +91,42 @@ $sbGUI = {
             $Xml.Attributes | ForEach-Object {
                 $attrib = $_
                 $attribName = $_.ToString()
+				$attrib = $_
+				$attribName = $_.ToString()
+								
+				if ($attribName -eq 'Size'){
+					
+					$n = $attrib.Value.split(',')
+					$n[0] = ($n[0]/1) * $tscale
+					$n[1] = ($n[1]/1) * $tscale
+				if ("$($n[0]),$($n[1])" -ne ",") {
+					$attrib.Value = "$($n[0]),$($n[1])"
+				}
+				}
+				if ($attribName -eq 'Location'){
+					$n = $attrib.Value.split(',')
+					$n[0] = ($n[0]/1) * $tscale
+					$n[1] = ($n[1]/1) * $tscale
+				if ("$($n[0]),$($n[1])" -ne ",") {
+					$attrib.Value = "$($n[0]),$($n[1])"
+				}
+				}
+				if ($attribName -eq 'MaximumSize'){
+					$n = $attrib.Value.split(',')
+					$n[0] = ($n[0]/1) * $tscale
+					$n[1] = ($n[1]/1) * $tscale
+				if ("$($n[0]),$($n[1])" -ne ",") {
+					$attrib.Value = "$($n[0]),$($n[1])"
+				}
+				}
+				if ($attribName -eq 'MinimumSize'){
+					$n = $attrib.Value.split(',')
+					$n[0] = ($n[0]/1) * $tscale
+					$n[1] = ($n[1]/1) * $tscale
+				if ("$($n[0]),$($n[1])" -ne ",") {
+					$attrib.Value = "$($n[0]),$($n[1])"
+				}
+				}
 
                 if ( $Script:specialProps.Array -contains $attribName ) {
                     if ( $attribName -eq 'Items' ) {
@@ -333,9 +390,9 @@ $sbGUI = {
 
     try {
         ConvertFrom-WinFormsXML -Reference refs -Suppress -Xml @"
-  <Form Name="MainForm" FormBorderStyle="FixedToolWindow" MaximumSize="148, 229" Size="148, 229" Text="Admin Calculator">
-    <TextBox Name="TextBox1" Location="5, 5" MaxLength="0" TextAlign="Right" />
-    <ComboBox Name="ComboBox1" Location="5, 5" Size="120, 21" />
+  <Form Name="MainForm" FormBorderStyle="FixedToolWindow" MaximumSize="148, 229" Size="148, 229" Tag="DPIAware" Text="Admin Calculator">
+    <TextBox Name="TextBox1" Location="5, 5" MaxLength="0" Size="101, 31" TextAlign="Right" />
+    <ComboBox Name="ComboBox1" Location="5, 5" Size="120, 33" />
     <Button Name="ButtonCE" Location="5, 30" Size="30, 30" Text="CE" />
     <Button Name="ButtonBSP" Location="35, 30" Size="30, 30" Text="&lt;x" />
     <Button Name="ButtonXSQ" Location="65, 30" Size="30, 30" Text="x sq" />
@@ -348,7 +405,7 @@ $sbGUI = {
     <Button Name="Button5" Location="35, 90" Size="30, 30" Text="5" />
     <Button Name="Button6" Location="65, 90" Size="30, 30" Text="6" />
     <Button Name="ButtonMinus" Location="95, 90" Size="30, 30" Text="-" />
-    <Button Name="Button1" Location="5, 120" Size="30, 30" Text="1" />
+    <Button Name="Button1" Location="5, 120" Size="30, 30" Tag="Scale" Text="1" />
     <Button Name="Button2" Location="35, 120" Size="30, 30" Text="2" />
     <Button Name="Button3" Location="65, 120" Size="30, 30" Text="3" />
     <Button Name="ButtonPlus" Location="95, 120" Size="30, 30" Text="+" />

@@ -187,7 +187,7 @@ public class psd {
 	
 $vscreen = [System.Windows.Forms.SystemInformation]::VirtualScreen.height
 #[psd]::SetProcessDPIAware()
-[psd]::SetProcessDpiAwarenessContext(-1)
+[psd]::SetProcessDpiAwarenessContext(-2)
 $screen = [System.Windows.Forms.SystemInformation]::VirtualScreen.height
 $global:tscale = ($screen/$vscreen)
 
