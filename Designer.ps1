@@ -28,8 +28,8 @@ SOFTWARE.
         FileName:     Designer.ps1
         Modified:     Brandon Cunningham
         Created On:   1/15/2020
-        Last Updated: 4/18/2022
-        Version:      v2.0.9
+        Last Updated: 4/19/2022
+        Version:      v2.0.10
     ===========================================================================
 
     .DESCRIPTION
@@ -126,7 +126,9 @@ SOFTWARE.
 		Modern Visual Control Styles Added. Add the tag 'VisualStyle'
 		Fixed bugs with File>New
 		Adjustments to Size Buttons for window maximized. Added DesignerDPI.ps1 for clear text editing, adjusted math in that script for size buttons, but the controls will be squished at runtime (intentional, wontfix).
-		
+	2.0.10
+		Resolved issue with cancel on file open.
+		Dot sourced events.ps1 to calc.ps1 and added VisualStyle tag.
 BASIC MODIFICATIONS License
 #This software has been modified from the original as tagged with #brandoncomputer
 Original available at https://www.pswinformscreator.com/ for deeper comparison.
