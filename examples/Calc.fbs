@@ -20,9 +20,9 @@
     <Button Name="Button0" Root="Form|MainForm" Events="Click" />
     <Button Name="ButtonEq" Root="Form|MainForm" Events="Click" />
   </Events>
-  <Form Name="MainForm" FormBorderStyle="FixedToolWindow" MaximumSize="148, 229" Size="148, 229" Tag="DPIAware" Text="Admin Calculator">
-    <TextBox Name="TextBox1" Location="5, 5" MaxLength="0" Size="101, 31" TextAlign="Right" />
-    <ComboBox Name="ComboBox1" Location="5, 5" Size="120, 33" />
+  <Form Name="MainForm" FormBorderStyle="FixedToolWindow" MaximumSize="148, 229" Size="148, 229" Tag="DPIAware, VisualStyle" Text="Admin Calculator">
+    <TextBox Name="TextBox1" Location="5, 5" MaxLength="0" Size="101, 20" TextAlign="Right" />
+    <ComboBox Name="ComboBox1" Location="5, 5" Size="120, 21" />
     <Button Name="ButtonCE" Location="5, 30" Size="30, 30" Text="CE" />
     <Button Name="ButtonBSP" Location="35, 30" Size="30, 30" Text="&lt;x" />
     <Button Name="ButtonXSQ" Location="65, 30" Size="30, 30" Text="x sq" />

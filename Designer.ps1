@@ -1112,6 +1112,7 @@ $global:tscale = ($screen/$vscreen)
 
                         if ( $openDialog.ShowDialog() -eq 'OK' ) {
                             $fileName = $openDialog.FileName
+							 if ($openDialog.FileName) {
                             
                             New-Object -TypeName XML | ForEach-Object {
                                 $_.Load("$($fileName)")
@@ -1164,8 +1165,11 @@ $global:tscale = ($screen/$vscreen)
                                 $Script:refs['lst_AssignedEvents'].Enabled = $true
                             }
                         }
+						}
 
                         $Script:openingProject = $false
+						
+						 if ($openDialog.FileName) {
 
                         $Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].Visible = $true
                         $Script:refs['tpg_Form1'].Text = "$($openDialog.FileName -replace "^.*\\")"
@@ -1177,9 +1181,13 @@ $global:tscale = ($screen/$vscreen)
 					$projectName = $Script:refs['tpg_Form1'].Text
 					$generationPath = "$(Split-Path -Path $global:projectDirName)\$($projectName -replace "\..*$")"
 					
+						
+					
 					if (Test-Path -path "$generationPath\Events.ps1") {
 						$FastText.OpenFile("$generationPath\Events.ps1")
 					}
+					
+					 }
 					
                     } catch {Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered while opening $($fileName)."}
                     finally {

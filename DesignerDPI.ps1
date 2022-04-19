@@ -1111,7 +1111,7 @@ $global:tscale = ($screen/$vscreen)
 
                         if ( $openDialog.ShowDialog() -eq 'OK' ) {
                             $fileName = $openDialog.FileName
-                            
+								if ($openDialog.FileName) {
                             New-Object -TypeName XML | ForEach-Object {
                                 $_.Load("$($fileName)")
 
@@ -1163,7 +1163,10 @@ $global:tscale = ($screen/$vscreen)
                                 $Script:refs['lst_AssignedEvents'].Enabled = $true
                             }
                         }
-
+						}
+						
+						if ($openDialog.FileName) {
+						
                         $Script:openingProject = $false
 
                         $Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].Visible = $true
@@ -1178,6 +1181,7 @@ $global:tscale = ($screen/$vscreen)
 					
 					if (Test-Path -path "$generationPath\Events.ps1") {
 						$FastText.OpenFile("$generationPath\Events.ps1")
+					}
 					}
 					
                     } catch {Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered while opening $($fileName)."}
