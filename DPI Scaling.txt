@@ -4,6 +4,4 @@ Sometimes the export does not include a 'Size' properly in the XML if the contro
 To enable VisualStyle, add 'VisualStyle' to the Tag property on the Form.
 See Calc.fbs for an example.
 
-To launch the IDE in DPI aware mode, use a 'dpi' argument. Controls cannot be positioned in this mode.
-
 Tags are comma seperated.
