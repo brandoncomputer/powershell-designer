@@ -162,7 +162,7 @@ SOFTWARE.
 
 # ScriptBlock to Execute in STA Runspace
 $sbGUI = {
-	
+	    param($BaseDir,$DPI)
 	
 	Add-Type @"
 using System;
@@ -189,16 +189,19 @@ public class psd {
 
 [psd]::SetCompat()
 
-	
 $vscreen = [System.Windows.Forms.SystemInformation]::VirtualScreen.height
-#[psd]::SetProcessDPIAware()
-[psd]::SetProcessDpiAwarenessContext(-1)
+if ($DPI.trim() -eq "dpi")
+{
+[psd]::SetProcessDPIAware()
+}
+else{
+[psd]::SetProcessDpiAwarenessContext(-5)}
+
 $screen = [System.Windows.Forms.SystemInformation]::VirtualScreen.height
 $global:ctscale = ($screen/$vscreen)
 
 #$global:ctscale = 1
 
-    param($BaseDir)
 
     #region Functions
 
@@ -3411,7 +3414,8 @@ $rsGUI.ThreadOptions = 'ReuseThread'
 $rsGUI.Open()
 
     # Create the PSCommand, Load into Runspace, and BeginInvoke
-$cmdGUI = [Management.Automation.PowerShell]::Create().AddScript($sbGUI).AddParameter('BaseDir',$PSScriptRoot)
+	#$cmdGUI = [Management.Automation.PowerShell]::Create().AddScript($sbGUI).AddParameter('DPI',$args[0])
+$cmdGUI = [Management.Automation.PowerShell]::Create().AddScript($sbGUI).AddParameters(@{'BaseDir'=$PSScriptRoot; 'DPI'=$args[0]})
 $cmdGUI.RunSpace = $rsGUI
 $handleGUI = $cmdGUI.BeginInvoke()
 
@@ -3424,7 +3428,7 @@ public static extern IntPtr GetConsoleWindow();
 public static extern bool ShowWindow(IntPtr hWnd, Int32 nCmdShow);
 '
 
-[Console.Window]::ShowWindow([Console.Window]::GetConsoleWindow(), 0)
+#[Console.Window]::ShowWindow([Console.Window]::GetConsoleWindow(), 0)
 
 
 
