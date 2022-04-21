@@ -3428,7 +3428,7 @@ public static extern IntPtr GetConsoleWindow();
 public static extern bool ShowWindow(IntPtr hWnd, Int32 nCmdShow);
 '
 
-#[Console.Window]::ShowWindow([Console.Window]::GetConsoleWindow(), 0)
+[Console.Window]::ShowWindow([Console.Window]::GetConsoleWindow(), 0)
 
 
 
