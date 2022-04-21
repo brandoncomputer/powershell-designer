@@ -29,7 +29,7 @@ SOFTWARE.
         Modified:     Brandon Cunningham
         Created On:   1/15/2020
         Last Updated: 4/19/2022
-        Version:      v2.0.10
+        Version:      v2.1.0
     ===========================================================================
 
     .DESCRIPTION
@@ -126,9 +126,11 @@ SOFTWARE.
 		Modern Visual Control Styles Added. Add the tag 'VisualStyle'
 		Fixed bugs with File>New
 		Adjustments to Size Buttons for window maximized. Added DesignerDPI.ps1 for clear text editing, adjusted math in that script for size buttons, but the controls will be squished at runtime (intentional, wontfix).
-	2.0.10
+	2.0.10 4/19/2022
 		Resolved issue with cancel on file open.
 		Dot sourced events.ps1 to calc.ps1 and added VisualStyle tag.
+	2.1.0 4/21/2022
+		Changed tscale variable to ctscale for dialogshell compatibility. Call to variable in resize events must be updated to ctscale
 BASIC MODIFICATIONS License
 #This software has been modified from the original as tagged with #brandoncomputer
 Original available at https://www.pswinformscreator.com/ for deeper comparison.
@@ -192,9 +194,9 @@ $vscreen = [System.Windows.Forms.SystemInformation]::VirtualScreen.height
 #[psd]::SetProcessDPIAware()
 [psd]::SetProcessDpiAwarenessContext(-1)
 $screen = [System.Windows.Forms.SystemInformation]::VirtualScreen.height
-$global:tscale = ($screen/$vscreen)
+$global:ctscale = ($screen/$vscreen)
 
-#$global:tscale = 1
+#$global:ctscale = 1
 
     param($BaseDir)
 
@@ -248,24 +250,24 @@ $global:tscale = ($screen/$vscreen)
 				if ($attribName -eq 'Size'){
 					
 					$n = $attrib.Value.split(',')
-					$n[0] = ($n[0]/1) * $tscale
-					$n[1] = ($n[1]/1) * $tscale
+					$n[0] = ($n[0]/1) * $ctscale
+					$n[1] = ($n[1]/1) * $ctscale
 					if ("$($n[0]),$($n[1])" -ne ",") {
 						$attrib.Value = "$($n[0]),$($n[1])"
 					}
 				}
 				if ($attribName -eq 'Location'){
 					$n = $attrib.Value.split(',')
-					$n[0] = ($n[0]/1) * $tscale
-					$n[1] = ($n[1]/1) * $tscale
+					$n[0] = ($n[0]/1) * $ctscale
+					$n[1] = ($n[1]/1) * $ctscale
 					if ("$($n[0]),$($n[1])" -ne ",") {
 						$attrib.Value = "$($n[0]),$($n[1])"
 					}
 				}
 				if ($attribName -eq 'MaximumSize'){
 					$n = $attrib.Value.split(',')
-					$n[0] = ($n[0]/1) * $tscale
-					$n[1] = ($n[1]/1) * $tscale
+					$n[0] = ($n[0]/1) * $ctscale
+					$n[1] = ($n[1]/1) * $ctscale
 					if ("$($n[0]),$($n[1])" -ne ",") {
 						$attrib.Value = "$($n[0]),$($n[1])"
 					}
@@ -273,8 +275,8 @@ $global:tscale = ($screen/$vscreen)
 				
 				if ($attribName -eq 'MinimumSize'){
 					$n = $attrib.Value.split(',')
-					$n[0] = ($n[0]/1) * $tscale
-					$n[1] = ($n[1]/1) * $tscale
+					$n[0] = ($n[0]/1) * $ctscale
+					$n[1] = ($n[1]/1) * $ctscale
 					if ("$($n[0]),$($n[1])" -ne ",") {
 						$attrib.Value = "$($n[0]),$($n[1])"
 					}
@@ -1444,7 +1446,7 @@ $global:tscale = ($screen/$vscreen)
 									$scriptText.Add("	`$vscreen = [System.Windows.Forms.SystemInformation]::VirtualScreen.height")
 									$scriptText.Add("[psd]::SetProcessDPIAware()")
 									$scriptText.Add("	`$screen = [System.Windows.Forms.SystemInformation]::VirtualScreen.height")
-									$scriptText.Add("	`$script:tscale = (`$screen/`$vscreen)")
+									$scriptText.Add("	`$script:ctscale = (`$screen/`$vscreen)")
 								}
 							if ($tag -like "*VisualStyle*")
 								{
@@ -2766,7 +2768,7 @@ vs7bAAAAAElFTkSuQmCC
 				"public static extern bool SetProcessDPIAware();",
 				"}",
 				"`"`@  -ReferencedAssemblies System.Windows.Forms,System.Drawing,System.Drawing.Primitives,System.Net.Primitives,System.ComponentModel.Primitives,Microsoft.Win32.Primitives",
-				"`$script:tscale = 1",
+				"`$script:ctscale = 1",
 				""
             )
             StartRegion_Functions = ([string[]]`
@@ -2832,32 +2834,32 @@ vs7bAAAAAElFTkSuQmCC
 				"				if (`$attribName -eq 'Size'){",
 				"					",
 				"					`$n = `$attrib.Value.split(',')",
-				"					`$n[0] = (`$n[0]/1) * `$tscale",
-				"					`$n[1] = (`$n[1]/1) * `$tscale",
+				"					`$n[0] = (`$n[0]/1) * `$ctscale",
+				"					`$n[1] = (`$n[1]/1) * `$ctscale",
 				"				if (`"`$(`$n[0]),`$(`$n[1])`" -ne `",`") {",
 				"					`$attrib.Value = `"`$(`$n[0]),`$(`$n[1])`"",
 				"				}",
 				"				}",
 				"				if (`$attribName -eq 'Location'){",
 				"					`$n = `$attrib.Value.split(',')",
-				"					`$n[0] = (`$n[0]/1) * `$tscale",
-				"					`$n[1] = (`$n[1]/1) * `$tscale",
+				"					`$n[0] = (`$n[0]/1) * `$ctscale",
+				"					`$n[1] = (`$n[1]/1) * `$ctscale",
 				"				if (`"`$(`$n[0]),`$(`$n[1])`" -ne `",`") {",
 				"					`$attrib.Value = `"`$(`$n[0]),`$(`$n[1])`"",
 				"				}",
 				"				}",
 				"				if (`$attribName -eq 'MaximumSize'){",
 				"					`$n = `$attrib.Value.split(',')",
-				"					`$n[0] = (`$n[0]/1) * `$tscale",
-				"					`$n[1] = (`$n[1]/1) * `$tscale",
+				"					`$n[0] = (`$n[0]/1) * `$ctscale",
+				"					`$n[1] = (`$n[1]/1) * `$ctscale",
 				"				if (`"`$(`$n[0]),`$(`$n[1])`" -ne `",`") {",
 				"					`$attrib.Value = `"`$(`$n[0]),`$(`$n[1])`"",
 				"				}",
 				"				}",
 				"				if (`$attribName -eq 'MinimumSize'){",
 				"					`$n = `$attrib.Value.split(',')",
-				"					`$n[0] = (`$n[0]/1) * `$tscale",
-				"					`$n[1] = (`$n[1]/1) * `$tscale",
+				"					`$n[0] = (`$n[0]/1) * `$ctscale",
+				"					`$n[1] = (`$n[1]/1) * `$ctscale",
 				"				if (`"`$(`$n[0]),`$(`$n[1])`" -ne `",`") {",
 				"					`$attrib.Value = `"`$(`$n[0]),`$(`$n[1])`"",
 				"				}",

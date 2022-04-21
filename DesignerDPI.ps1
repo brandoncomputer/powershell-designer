@@ -192,9 +192,9 @@ $vscreen = [System.Windows.Forms.SystemInformation]::VirtualScreen.height
 #[psd]::SetProcessDPIAware()
 [psd]::SetProcessDpiAwarenessContext(-2)
 $screen = [System.Windows.Forms.SystemInformation]::VirtualScreen.height
-$global:tscale = ($screen/$vscreen)
+$global:ctscale = ($screen/$vscreen)
 
-#$global:tscale = 1
+#$global:ctscale = 1
 
     param($BaseDir)
 
@@ -248,24 +248,24 @@ $global:tscale = ($screen/$vscreen)
 				if ($attribName -eq 'Size'){
 					
 					$n = $attrib.Value.split(',')
-					$n[0] = ($n[0]/1) * $tscale
-					$n[1] = ($n[1]/1) * $tscale
+					$n[0] = ($n[0]/1) * $ctscale
+					$n[1] = ($n[1]/1) * $ctscale
 					if ("$($n[0]),$($n[1])" -ne ",") {
 						$attrib.Value = "$($n[0]),$($n[1])"
 					}
 				}
 				if ($attribName -eq 'Location'){
 					$n = $attrib.Value.split(',')
-					$n[0] = ($n[0]/1) * $tscale
-					$n[1] = ($n[1]/1) * $tscale
+					$n[0] = ($n[0]/1) * $ctscale
+					$n[1] = ($n[1]/1) * $ctscale
 					if ("$($n[0]),$($n[1])" -ne ",") {
 						$attrib.Value = "$($n[0]),$($n[1])"
 					}
 				}
 				if ($attribName -eq 'MaximumSize'){
 					$n = $attrib.Value.split(',')
-					$n[0] = ($n[0]/1) * $tscale
-					$n[1] = ($n[1]/1) * $tscale
+					$n[0] = ($n[0]/1) * $ctscale
+					$n[1] = ($n[1]/1) * $ctscale
 					if ("$($n[0]),$($n[1])" -ne ",") {
 						$attrib.Value = "$($n[0]),$($n[1])"
 					}
@@ -273,8 +273,8 @@ $global:tscale = ($screen/$vscreen)
 				
 				if ($attribName -eq 'MinimumSize'){
 					$n = $attrib.Value.split(',')
-					$n[0] = ($n[0]/1) * $tscale
-					$n[1] = ($n[1]/1) * $tscale
+					$n[0] = ($n[0]/1) * $ctscale
+					$n[1] = ($n[1]/1) * $ctscale
 					if ("$($n[0]),$($n[1])" -ne ",") {
 						$attrib.Value = "$($n[0]),$($n[1])"
 					}
@@ -765,8 +765,8 @@ $global:tscale = ($screen/$vscreen)
                     $clientOffset = New-Object System.Drawing.Point((($clientParent.X - $clientForm.X) * -1),(($clientParent.Y - $clientForm.Y) * -1))
                 } else {$clientOffset = New-Object System.Drawing.Point(0,0)}
                 
-                $newLoc.X = ($newLoc.X * -1) - $refFID.Location.X - $refs['MainForm'].Location.X - $clientOffset.X - $Script:refs['ms_Left'].Size.Width - (15 * $tscale)
-                $newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - $clientOffset.Y - (100 * $tscale)
+                $newLoc.X = ($newLoc.X * -1) - $refFID.Location.X - $refs['MainForm'].Location.X - $clientOffset.X - $Script:refs['ms_Left'].Size.Width - (15 * $ctscale)
+                $newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - $clientOffset.Y - (100 * $ctscale)
 
                 if ( $Script:refs['pnl_Left'].Visible -eq $true ) {$newLoc.X = $newLoc.X - $Script:refs['pnl_Left'].Size.Width - $Script:refs['lbl_Left'].Size.Width}
             } else {$newLoc = New-Object System.Drawing.Point(($Script:sButtons['btn_TLeft'].Location.X + $Object.LocOffset.X),($Script:sButtons['btn_TLeft'].Location.Y + $Object.LocOffset.Y))}
@@ -1440,7 +1440,7 @@ $global:tscale = ($screen/$vscreen)
 									$scriptText.Add("	`$vscreen = [System.Windows.Forms.SystemInformation]::VirtualScreen.height")
 									$scriptText.Add("[psd]::SetProcessDPIAware()")
 									$scriptText.Add("	`$screen = [System.Windows.Forms.SystemInformation]::VirtualScreen.height")
-									$scriptText.Add("	`$script:tscale = (`$screen/`$vscreen)")
+									$scriptText.Add("	`$script:ctscale = (`$screen/`$vscreen)")
 								}
 							if ($tag -like "*VisualStyle*")
 								{
@@ -2762,7 +2762,7 @@ vs7bAAAAAElFTkSuQmCC
 				"public static extern bool SetProcessDPIAware();",
 				"}",
 				"`"`@  -ReferencedAssemblies System.Windows.Forms,System.Drawing,System.Drawing.Primitives,System.Net.Primitives,System.ComponentModel.Primitives,Microsoft.Win32.Primitives",
-				"`$script:tscale = 1",
+				"`$script:ctscale = 1",
 				""
             )
             StartRegion_Functions = ([string[]]`
@@ -2828,32 +2828,32 @@ vs7bAAAAAElFTkSuQmCC
 				"				if (`$attribName -eq 'Size'){",
 				"					",
 				"					`$n = `$attrib.Value.split(',')",
-				"					`$n[0] = (`$n[0]/1) * `$tscale",
-				"					`$n[1] = (`$n[1]/1) * `$tscale",
+				"					`$n[0] = (`$n[0]/1) * `$ctscale",
+				"					`$n[1] = (`$n[1]/1) * `$ctscale",
 				"				if (`"`$(`$n[0]),`$(`$n[1])`" -ne `",`") {",
 				"					`$attrib.Value = `"`$(`$n[0]),`$(`$n[1])`"",
 				"				}",
 				"				}",
 				"				if (`$attribName -eq 'Location'){",
 				"					`$n = `$attrib.Value.split(',')",
-				"					`$n[0] = (`$n[0]/1) * `$tscale",
-				"					`$n[1] = (`$n[1]/1) * `$tscale",
+				"					`$n[0] = (`$n[0]/1) * `$ctscale",
+				"					`$n[1] = (`$n[1]/1) * `$ctscale",
 				"				if (`"`$(`$n[0]),`$(`$n[1])`" -ne `",`") {",
 				"					`$attrib.Value = `"`$(`$n[0]),`$(`$n[1])`"",
 				"				}",
 				"				}",
 				"				if (`$attribName -eq 'MaximumSize'){",
 				"					`$n = `$attrib.Value.split(',')",
-				"					`$n[0] = (`$n[0]/1) * `$tscale",
-				"					`$n[1] = (`$n[1]/1) * `$tscale",
+				"					`$n[0] = (`$n[0]/1) * `$ctscale",
+				"					`$n[1] = (`$n[1]/1) * `$ctscale",
 				"				if (`"`$(`$n[0]),`$(`$n[1])`" -ne `",`") {",
 				"					`$attrib.Value = `"`$(`$n[0]),`$(`$n[1])`"",
 				"				}",
 				"				}",
 				"				if (`$attribName -eq 'MinimumSize'){",
 				"					`$n = `$attrib.Value.split(',')",
-				"					`$n[0] = (`$n[0]/1) * `$tscale",
-				"					`$n[1] = (`$n[1]/1) * `$tscale",
+				"					`$n[0] = (`$n[0]/1) * `$ctscale",
+				"					`$n[1] = (`$n[1]/1) * `$ctscale",
 				"				if (`"`$(`$n[0]),`$(`$n[1])`" -ne `",`") {",
 				"					`$attrib.Value = `"`$(`$n[0]),`$(`$n[1])`"",
 				"				}",
