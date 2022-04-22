@@ -131,6 +131,10 @@ SOFTWARE.
 		Dot sourced events.ps1 to calc.ps1 and added VisualStyle tag.
 	2.1.0 4/21/2022
 		Changed tscale variable to ctscale for dialogshell compatibility. Call to variable in resize events must be updated to ctscale
+		Here there be math involving scaling.
+		DPIScale is now default mode for editing.
+		DPIScale and VisualStyle are now defaults for new projects.
+		Added status bar advising of $ctscale stuff.
 BASIC MODIFICATIONS License
 #This software has been modified from the original as tagged with #brandoncomputer
 Original available at https://www.pswinformscreator.com/ for deeper comparison.
