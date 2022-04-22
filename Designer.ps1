@@ -832,10 +832,15 @@ $global:ctscale = ($screen/$vscreen)
 		#	$newLoc.Y = ($newLoc.Y * -1) - $Object.Top - ($refs['MainForm'].Location.Y) - $clientOffset.Y #- (108 / $ctscale)
 		if ($ctscale -gt 1){
                 $newLoc.X = ($newLoc.X * -1) - $refFID.Location.X - $refs['MainForm'].Location.X - $clientOffset.X - $Script:refs['ms_Left'].Size.Width - [math]::Round((15 * $ctscale))
-		$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - $clientOffset.Y - (100 * $ctscale)}
+		#$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - $clientOffset.Y - (100 * $ctscale)
+		$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - $clientOffset.Y - [math]::Round((((108 - ($ctscale * 4 )) * $ctscale)/1))
+		}
 		else
 		{ $newLoc.X = ($newLoc.X * -1) - $refFID.Location.X - $refs['MainForm'].Location.X - $clientOffset.X - $Script:refs['ms_Left'].Size.Width - [math]::Round((18 * $ctscale))
 		$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - $clientOffset.Y - [math]::Round((108 * $ctscale))}
+		
+
+		
 
                 if ( $Script:refs['pnl_Left'].Visible -eq $true ) {$newLoc.X = $newLoc.X - $Script:refs['pnl_Left'].Size.Width - $Script:refs['lbl_Left'].Size.Width}
             } else {$newLoc = New-Object System.Drawing.Point(($Script:sButtons['btn_TLeft'].Location.X + $Object.LocOffset.X),($Script:sButtons['btn_TLeft'].Location.Y + $Object.LocOffset.Y))}
@@ -1048,6 +1053,7 @@ $global:ctscale = ($screen/$vscreen)
                                                 switch ($newElementType) {
                                                     'MenuStrip' {}
                                                     'ContextMenuStrip' {}
+													'StatusStrip'{}
                                                     #'ListView' {}
                                                     default {if ( $ReturnXML -eq $false ) {[void][System.Windows.Forms.MessageBox]::Show("$($newElementType) items will not save",'Notification')}}
                                                 }
@@ -2653,6 +2659,9 @@ $global:ctscale = ($screen/$vscreen)
 		<ToolStripMenuItem Name="RunLast" ShortcutKeys="F9" DisplayStyle="Text" Text="Save Events.ps1 and Run Last Generated" />
       </ToolStripMenuItem>
     </MenuStrip>
+	<StatusStrip Name="sta_Status">
+      <ToolStripStatusLabel Name="tsl_StatusLabel" />
+    </StatusStrip>
   </Form>
 "@
     } catch {Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered during Form Initialization."}
@@ -3498,7 +3507,7 @@ $Script:refs['ms_Left'].Width = 0
 
 $eventForm.Show()
 
-$Script:refs['MainForm'].text = "PowerShell Designer 	 DPIScale $ctscale (`$ctscale = $ctscale)"
+$Script:refs['tsl_StatusLabel'].text = "Current DPIScale: $ctscale - for resize events multiply all location and size modifiers by `$ctscale."
 
 		[void]$Script:refs['MainForm'].ShowDialog()
 	}
