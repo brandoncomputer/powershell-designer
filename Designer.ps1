@@ -139,6 +139,8 @@ SOFTWARE.
 		Reverted ctscale back to tscale due to cross compatibility issues.
 		Refactored versioning. This (tscale) is no longer considered a breaking change, since it impacts no known published scripts.
 		Added AutoNaming and AutoTexting controls by control type.
+	2.1.2 4/23/2022
+		Added FormName to FormText on New Project.
 		
 BASIC MODIFICATIONS License
 #This software has been modified from the original as tagged with #brandoncomputer
@@ -548,7 +550,7 @@ $global:control_track = @{}
                         # Create the Form
                     $form = New-Object System.Windows.Forms.Form
                     $form.Name = $ControlName
-					$form.text = $ControlText
+					$form.text = $ControlName
 					$form.Height = 600
 					$form.Width = 800
                     $form.Location = New-Object System.Drawing.Point(0,0)
