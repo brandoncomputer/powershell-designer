@@ -135,6 +135,11 @@ SOFTWARE.
 		DPIScale is now default mode for editing.
 		DPIScale and VisualStyle are now defaults for new projects.
 		Added status bar advising of $ctscale stuff.
+	2.1.1 4/22/2022
+		Reverted ctscale back to tscale due to cross compatibility issues.
+		Refactored versioning. This (tscale) is no longer considered a breaking change, since it impacts no known published scripts.
+		Added AutoNaming and AutoTexting controls by control type.
+		
 BASIC MODIFICATIONS License
 #This software has been modified from the original as tagged with #brandoncomputer
 Original available at https://www.pswinformscreator.com/ for deeper comparison.
@@ -205,10 +210,12 @@ if ($dpi -eq $null){
 [psd]::SetProcessDpiAwarenessContext(-5)}
 
 $screen = [System.Windows.Forms.SystemInformation]::VirtualScreen.height
-$global:ctscale = ($screen/$vscreen)
+$global:tscale = ($screen/$vscreen)
+
+$global:control_track = @{}
 
 
-#$global:ctscale = 1
+#$global:tscale = 1
 
 
     #region Functions
@@ -261,24 +268,24 @@ $global:ctscale = ($screen/$vscreen)
 				if ($attribName -eq 'Size'){
 					
 					$n = $attrib.Value.split(',')
-					$n[0] = [math]::Round(($n[0]/1) * $ctscale)
-					$n[1] = [math]::Round(($n[1]/1) * $ctscale)
+					$n[0] = [math]::Round(($n[0]/1) * $tscale)
+					$n[1] = [math]::Round(($n[1]/1) * $tscale)
 					if ("$($n[0]),$($n[1])" -ne ",") {
 						$attrib.Value = "$($n[0]),$($n[1])"
 					}
 				}
 				if ($attribName -eq 'Location'){
 					$n = $attrib.Value.split(',')
-					$n[0] = [math]::Round(($n[0]/1) * $ctscale)
-					$n[1] = [math]::Round(($n[1]/1) * $ctscale)
+					$n[0] = [math]::Round(($n[0]/1) * $tscale)
+					$n[1] = [math]::Round(($n[1]/1) * $tscale)
 					if ("$($n[0]),$($n[1])" -ne ",") {
 						$attrib.Value = "$($n[0]),$($n[1])"
 					}
 				}
 				if ($attribName -eq 'MaximumSize'){
 					$n = $attrib.Value.split(',')
-					$n[0] = [math]::Round(($n[0]/1) * $ctscale)
-					$n[1] = [math]::Round(($n[1]/1) * $ctscale)
+					$n[0] = [math]::Round(($n[0]/1) * $tscale)
+					$n[1] = [math]::Round(($n[1]/1) * $tscale)
 					if ("$($n[0]),$($n[1])" -ne ",") {
 						$attrib.Value = "$($n[0]),$($n[1])"
 					}
@@ -286,14 +293,13 @@ $global:ctscale = ($screen/$vscreen)
 				
 				if ($attribName -eq 'MinimumSize'){
 					$n = $attrib.Value.split(',')
-					$n[0] = [math]::Round(($n[0]/1) * $ctscale)
-					$n[1] = [math]::Round(($n[1]/1) * $ctscale)
+					$n[0] = [math]::Round(($n[0]/1) * $tscale)
+					$n[1] = [math]::Round(($n[1]/1) * $tscale)
 					if ("$($n[0]),$($n[1])" -ne ",") {
 						$attrib.Value = "$($n[0]),$($n[1])"
 					}
 				}
-
-
+				
                 if ( $Script:specialProps.Array -contains $attribName ) {
                     if ( $attribName -eq 'Items' ) {
                         $($_.Value -replace "\|\*BreakPT\*\|","`n").Split("`n") | ForEach-Object{[void]$newControl.Items.Add($_)}
@@ -393,24 +399,24 @@ $global:ctscale = ($screen/$vscreen)
 				if ($_.ToString() -eq 'Size'){
 					
 					$n = $_.Value.split(',')
-					$n[0] = [math]::Round(($n[0]/1) * $ctscale)
-					$n[1] = [math]::Round(($n[1]/1) * $ctscale)
+					$n[0] = [math]::Round(($n[0]/1) * $tscale)
+					$n[1] = [math]::Round(($n[1]/1) * $tscale)
 					if ("$($n[0]),$($n[1])" -ne ",") {
 						$_.Value = "$($n[0]),$($n[1])"
 					}
 				}
 				if ($_.ToString() -eq 'Location'){
 					$n = $_.Value.split(',')
-					$n[0] = [math]::Round(($n[0]/1) * $ctscale)
-					$n[1] = [math]::Round(($n[1]/1) * $ctscale)
+					$n[0] = [math]::Round(($n[0]/1) * $tscale)
+					$n[1] = [math]::Round(($n[1]/1) * $tscale)
 					if ("$($n[0]),$($n[1])" -ne ",") {
 						$_.Value = "$($n[0]),$($n[1])"
 					}
 				}
 				if ($_.ToString() -eq 'MaximumSize'){
 					$n = $_.Value.split(',')
-					$n[0] = [math]::Round(($n[0]/1) * $ctscale)
-					$n[1] = [math]::Round(($n[1]/1) * $ctscale)
+					$n[0] = [math]::Round(($n[0]/1) * $tscale)
+					$n[1] = [math]::Round(($n[1]/1) * $tscale)
 					if ("$($n[0]),$($n[1])" -ne ",") {
 						$_.Value = "$($n[0]),$($n[1])"
 					}
@@ -418,8 +424,8 @@ $global:ctscale = ($screen/$vscreen)
 				
 				if ($_.ToString() -eq 'MinimumSize'){
 					$n = $attrib.Value.split(',')
-					$n[0] = [math]::Round(($n[0]/1) * $ctscale)
-					$n[1] = [math]::Round(($n[1]/1) * $ctscale)
+					$n[0] = [math]::Round(($n[0]/1) * $tscale)
+					$n[1] = [math]::Round(($n[1]/1) * $tscale)
 					if ("$($n[0]),$($n[1])" -ne ",") {
 						$_.Value = "$($n[0]),$($n[1])"
 					}
@@ -504,8 +510,22 @@ $global:ctscale = ($screen/$vscreen)
         param(
             $TreeObject,
             [string]$ControlType,
-            [string]$ControlName
+            [string]$ControlName,
+			[string]$ControlText
         )
+		
+		if ($ControlText)
+		{}
+		else {
+		if ($control_track.$controlType -eq $null){
+		$control_track[$controlType] = 1
+		}
+		else {
+		$control_track.$controlType = $control_track.$controlType + 1
+		}
+		}
+		
+		
 
         if ( $ControlName -eq '' ) {
             $userInput = Get-UserInputFromForm -SetText "$($Script:supportedControls.Where({$_.Name -eq $ControlType}).Prefix)_"
@@ -528,6 +548,7 @@ $global:ctscale = ($screen/$vscreen)
                         # Create the Form
                     $form = New-Object System.Windows.Forms.Form
                     $form.Name = $ControlName
+					$form.text = $ControlText
 					$form.Height = 600
 					$form.Width = 800
                     $form.Location = New-Object System.Drawing.Point(0,0)
@@ -689,10 +710,16 @@ $global:ctscale = ($screen/$vscreen)
 
                     if ( $objRef.Success -ne $false ) {
                         $newControl = New-Object System.Windows.Forms.$ControlType
+						if ($controlType -like "*DateTimePicker*") {
+						#do nothing
+						}
+						else{$newControl.Text = $controlText
+#brandoncomputer_textDisabledDuetoLoadBug
+						}
 						if ($newControl.height){
-						$newControl.height = $newControl.height * $ctscale}
+						$newControl.height = $newControl.height * $tscale}
 						if ($newControl.width){
-						$newControl.width = $newControl.width * $ctscale}
+						$newControl.width = $newControl.width * $tscale}
                         $newControl.Name = $ControlName
 #brandoncomputer_ToolStripException
 					if ( $ControlType -eq "ToolStrip" ) {
@@ -715,7 +742,7 @@ $global:ctscale = ($screen/$vscreen)
                         } else {$objRef.Objects[$TreeObject.Name].Controls.Add($newControl)}
 					}
 						
-
+					
 							
                         try {
                             $newControl.Add_MouseUp({
@@ -724,7 +751,7 @@ $global:ctscale = ($screen/$vscreen)
                                 }
                             })
                         } catch {
-                            if ( $_.Exception.Message -notmatch 'not valid on this ActiveX control' ) {throw $_}
+                            if ( $_.Exception.Message -notmatch 'not valid on this control' ) {throw $_}
                         }
 
                         $newTreeNode = $TreeObject.Nodes.Add($ControlName,"$($ControlType) - $($ControlName)")
@@ -754,6 +781,7 @@ $global:ctscale = ($screen/$vscreen)
                 $Script:refs['TreeView'].SelectedNode = $newTreeNode
 
                 if (( $ControlType -eq 'TabControl' ) -and ( $Script:openingProject -eq $false )) {Add-TreeNode -TreeObject $newTreeNode -ControlType TabPage -ControlName 'Tab 1'}
+				
             }
         } catch {Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered adding TreeNode ($($ControlType) - $($ControlName))."}
     }
@@ -832,16 +860,16 @@ $global:ctscale = ($screen/$vscreen)
                 
 			#	info "bean"
 		#	info ($Object.Left).ToString()
-		#	$newLoc.X = ($newLoc.X * -1) - $Object.Left - ($refs['MainForm'].Location.X) - $clientOffset.X  - $Script:refs['ms_Left'].Size.Width #- (18 / $ctscale)
-		#	$newLoc.Y = ($newLoc.Y * -1) - $Object.Top - ($refs['MainForm'].Location.Y) - $clientOffset.Y #- (108 / $ctscale)
-		if ($ctscale -gt 1){
-                $newLoc.X = ($newLoc.X * -1) - $refFID.Location.X - $refs['MainForm'].Location.X - $clientOffset.X - $Script:refs['ms_Left'].Size.Width - [math]::Round((15 * $ctscale))
-		#$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - $clientOffset.Y - (100 * $ctscale)
-		$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - $clientOffset.Y - [math]::Round((((108 - ($ctscale * 4 )) * $ctscale)/1))
+		#	$newLoc.X = ($newLoc.X * -1) - $Object.Left - ($refs['MainForm'].Location.X) - $clientOffset.X  - $Script:refs['ms_Left'].Size.Width #- (18 / $tscale)
+		#	$newLoc.Y = ($newLoc.Y * -1) - $Object.Top - ($refs['MainForm'].Location.Y) - $clientOffset.Y #- (108 / $tscale)
+		if ($tscale -gt 1){
+                $newLoc.X = ($newLoc.X * -1) - $refFID.Location.X - $refs['MainForm'].Location.X - $clientOffset.X - $Script:refs['ms_Left'].Size.Width - [math]::Round((15 * $tscale))
+		#$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - $clientOffset.Y - (100 * $tscale)
+		$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - $clientOffset.Y - [math]::Round((((108 - ($tscale * 4 )) * $tscale)/1))
 		}
 		else
-		{ $newLoc.X = ($newLoc.X * -1) - $refFID.Location.X - $refs['MainForm'].Location.X - $clientOffset.X - $Script:refs['ms_Left'].Size.Width - [math]::Round((18 * $ctscale))
-		$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - $clientOffset.Y - [math]::Round((108 * $ctscale))}
+		{ $newLoc.X = ($newLoc.X * -1) - $refFID.Location.X - $refs['MainForm'].Location.X - $clientOffset.X - $Script:refs['ms_Left'].Size.Width - [math]::Round((18 * $tscale))
+		$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - $clientOffset.Y - [math]::Round((108 * $tscale))}
 		
 
 		
@@ -1109,24 +1137,24 @@ $global:ctscale = ($screen/$vscreen)
 				if ($node.Size){
 					
 					$n = ($node.Size).split(',')
-					$n[0] = [math]::round(($n[0]/1) / $ctscale)
-					$n[1] = [math]::round(($n[1]/1) / $ctscale)
+					$n[0] = [math]::round(($n[0]/1) / $tscale)
+					$n[1] = [math]::round(($n[1]/1) / $tscale)
 					if ("$($n[0]),$($n[1])" -ne ",") {
 						$node.Size = "$($n[0]),$($n[1])"
 					}
 				}
 				if ($node.Location){
 					$n = ($node.Location).split(',')
-					$n[0] = [math]::round(($n[0]/1) / $ctscale)
-					$n[1] = [math]::round(($n[1]/1) / $ctscale)
+					$n[0] = [math]::round(($n[0]/1) / $tscale)
+					$n[1] = [math]::round(($n[1]/1) / $tscale)
 					if ("$($n[0]),$($n[1])" -ne ",") {
 						$node.Location = "$($n[0]),$($n[1])"
 					}
 				}
 				if ($node.MaximumSize){
 					$n = ($node.MaximumSize).split(',')
-					$n[0] = [math]::round(($n[0]/1) / $ctscale)
-					$n[1] = [math]::round(($n[1]/1) / $ctscale)
+					$n[0] = [math]::round(($n[0]/1) / $tscale)
+					$n[1] = [math]::round(($n[1]/1) / $tscale)
 					if ("$($n[0]),$($n[1])" -ne ",") {
 						$node.MaximumSize = "$($n[0]),$($n[1])"
 					}
@@ -1134,12 +1162,13 @@ $global:ctscale = ($screen/$vscreen)
 				
 				if ($node.MinimumSize){
 					$n = ($node.MinimumSize).split(',')
-					$n[0] = [math]::round(($n[0]/1) / $ctscale)
-					$n[1] = [math]::round(($n[1]/1) / $ctscale)
+					$n[0] = [math]::round(($n[0]/1) / $tscale)
+					$n[1] = [math]::round(($n[1]/1) / $tscale)
 					if ("$($n[0]),$($n[1])" -ne ",") {
 						$node.MinimumSize = "$($n[0]),$($n[1])"
 					}
 				}
+				
 				}
 					$nodes.RemoveAttribute('ContextMenuStrip')
 				}
@@ -1201,6 +1230,7 @@ $global:ctscale = ($screen/$vscreen)
                 try {
 					
 					if ( [System.Windows.Forms.MessageBox]::Show("Unsaved changes to the current project will be lost.  Are you sure you want to start a new project?", 'Confirm', 4) -eq 'Yes' ) {
+						$global:control_track = @{}
                         $projectName = "NewProject.fbs"
 						$FastText.Clear()
 						$refs['tpg_Form1'].Text = $projectName
@@ -1216,8 +1246,8 @@ $global:ctscale = ($screen/$vscreen)
 
                         Add-TreeNode -TreeObject $Script:refs['TreeView'] -ControlType Form -ControlName MainForm
 						#brandoncomputer_newResize
-						$Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].height = $Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].height * $ctscale
-						$Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].width = $Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].width * $ctscale
+						$Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].height = $Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].height * $tscale
+						$Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].width = $Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].width * $tscale
 						$Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].tag = "VisualStyle,DPIAware"
 					}
                 } catch {Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered during start of New Project."}
@@ -1235,6 +1265,7 @@ $global:ctscale = ($screen/$vscreen)
                         if ( $openDialog.ShowDialog() -eq 'OK' ) {
                             $fileName = $openDialog.FileName
 							 if ($openDialog.FileName) {
+								 $global:control_track = @{}
                             
                             New-Object -TypeName XML | ForEach-Object {
                                 $_.Load("$($fileName)")
@@ -1391,6 +1422,7 @@ $global:ctscale = ($screen/$vscreen)
                         if (( $objRef.Success -eq $true ) -and ( $Script:refs['TreeView'].SelectedNode.Level -ne 0 ) -or ( $objRef.RootType -ne 'Form' )) {
                             if ( [System.Windows.Forms.MessageBox]::Show("Are you sure you wish to remove the selected node and all child nodes? This cannot be undone." ,"Confirm Removal" , 4) -eq 'Yes' ) {
                                     # Generate array of TreeNodes to delete
+									
                                 $nodesToDelete = @($($Script:refs['TreeView'].SelectedNode).Name)
                                 $nodesToDelete += Get-ChildNodeList -TreeNode $Script:refs['TreeView'].SelectedNode
                                 
@@ -1565,7 +1597,7 @@ $global:ctscale = ($screen/$vscreen)
 									$scriptText.Add("	`$vscreen = [System.Windows.Forms.SystemInformation]::VirtualScreen.height")
 									$scriptText.Add("[psd]::SetProcessDPIAware()")
 									$scriptText.Add("	`$screen = [System.Windows.Forms.SystemInformation]::VirtualScreen.height")
-									$scriptText.Add("	`$script:ctscale = (`$screen/`$vscreen)")
+									$scriptText.Add("	`$script:tscale = (`$screen/`$vscreen)")
 								}
 							if ($tag -like "*VisualStyle*")
 								{
@@ -1992,24 +2024,58 @@ $global:ctscale = ($screen/$vscreen)
                     try {
                         if (( $controlObjectType -eq 'Parentless' ) -or ( $context -eq 0 )) {
                             $controlType = $controlName
-
+#brandoncomputer_autoname&autotext
                             $Script:newNameCheck = $false
-                            $userInput = Get-UserInputFromForm -SetText "$($Script:supportedControls.Where({$_.Name -eq $controlType}).Prefix)_"
+                        #    $userInput = Get-UserInputFromForm -SetText "$($Script:supportedControls.Where({$_.Name -eq $controlType}).Prefix)_"
                             $Script:newNameCheck = $true
-
-                            if ( $userInput.Result -eq 'OK' ) {
+							
+                         #   if ( $userInput.Result -eq 'OK' ) {
                                 if ( $Script:refs['TreeView'].Nodes.Text -match "$($controlType) - $($userInput.NewName)" ) {
                                     [void][System.Windows.Forms.MessageBox]::Show("A $($controlType) with the Name '$($userInput.NewName)' already exists.",'Error')
                                 } else {
-                                    Add-TreeNode -TreeObject $Script:refs['TreeView'] -ControlType $controlType -ControlName $userInput.NewName
-                                }
+                                  #  Add-TreeNode -TreeObject $Script:refs['TreeView'] -ControlType $controlType -ControlName $userInput.NewName
+								if ($control_track.$controlName -eq $null){
+									$control_track[$controlName] = 1
+								}
+								else {
+									$control_track.$controlName = $control_track.$controlName + 1
+								}
+							#	info "$($controlType) - $controlName$($control_track.$controlName)"
+								if ( $Script:refs['TreeView'].Nodes.Text -match "$($controlType) - $controlName$($control_track.$controlName)" )
+								{[void][System.Windows.Forms.MessageBox]::Show("A $($controlType) with the Name '$controlName$($control_track.$controlName)' already exists.",'Error')}
+								else{
+								Add-TreeNode -TreeObject $Script:refs['TreeView'] -ControlType $controlName "$controlName$($control_track.$controlName)" "$controlName$($control_track.$controlName)"}
                             }
-                        } else {
+                             #   }
+                            }
+                         else {
                             if ( $Script:supportedControls.Where({$_.Name -eq $($refs['TreeView'].SelectedNode.Text -replace " - .*$")}).ChildTypes -contains $controlObjectType ) {
-                                Add-TreeNode -TreeObject $Script:refs['TreeView'].SelectedNode -ControlType $controlName
+								if ($control_track.$controlName -eq $null){
+									$control_track[$controlName] = 1
+								}
+								else {
+									$control_track.$controlName = $control_track.$controlName + 1
+								}
+
+								if ($Script:refs['TreeView'].Nodes.Nodes | Where-Object { $_.Text -eq "$($controlName) - $controlName$($control_track.$controlName)" })
+								{[void][System.Windows.Forms.MessageBox]::Show("A $($controlName) with the Name '$controlName$($control_track.$controlName)' already exists. Try again to create '$controlName$($control_track.$controlName + 1)'",'Error')}
+								else{
+								Add-TreeNode -TreeObject $Script:refs['TreeView'].SelectedNode -ControlType $controlName "$controlName$($control_track.$controlName)" "$controlName$($control_track.$controlName)"}
                             } else {
+
+
+								if ($control_track.$controlName -eq $null){
+									$control_track[$controlName] = 1
+								}
+								else {
+									$control_track.$controlName = $control_track.$controlName + 1
+								}
 #brandoncomputer_SlickToTopNode
-								Add-TreeNode -TreeObject $Script:refs['TreeView'].TopNode -ControlType $controlName
+								
+								if ($Script:refs['TreeView'].Nodes.Nodes | Where-Object { $_.Text -eq "$($controlName) - $controlName$($control_track.$controlName)" })
+								{[void][System.Windows.Forms.MessageBox]::Show("A $($controlName) with the Name '$controlName$($control_track.$controlName)' already exists. Try again to create '$controlName$($control_track.$controlName + 1)'",'Error')}
+								else{
+								Add-TreeNode -TreeObject $Script:refs['TreeView'].TopNode -ControlType $controlName "$controlName$($control_track.$controlName)" "$controlName$($control_track.$controlName)"}
 								#[void][System.Windows.Forms.MessageBox]::Show("Unable to add $($controlName) to $($refs['TreeView'].SelectedNode.Text -replace " - .*$").")
 								}
                         }
@@ -2799,8 +2865,8 @@ $global:ctscale = ($screen/$vscreen)
                 # Add the Initial Form TreeNode
             Add-TreeNode -TreeObject $Script:refs['TreeView'] -ControlType Form -ControlName MainForm
 			
-						$Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].height = $Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].height * $ctscale
-						$Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].width = $Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].width * $ctscale
+						$Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].height = $Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].height * $tscale
+						$Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].width = $Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].width * $tscale
 						$Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].tag = "VisualStyle,DPIAware"
             Remove-Variable -Name eventSB, reuseContextInfo
         } catch {
@@ -2894,7 +2960,7 @@ vs7bAAAAAElFTkSuQmCC
 				"public static extern bool SetProcessDPIAware();",
 				"}",
 				"`"`@  -ReferencedAssemblies System.Windows.Forms,System.Drawing,System.Drawing.Primitives,System.Net.Primitives,System.ComponentModel.Primitives,Microsoft.Win32.Primitives",
-				"`$script:ctscale = 1",
+				"`$script:tscale = 1",
 				""
             )
             StartRegion_Functions = ([string[]]`
@@ -2960,32 +3026,32 @@ vs7bAAAAAElFTkSuQmCC
 				"				if (`$attribName -eq 'Size'){",
 				"					",
 				"					`$n = `$attrib.Value.split(',')",
-				"					`$n[0] = [math]::round((`$n[0]/1) * `$ctscale)",
-				"					`$n[1] = [math]::round((`$n[1]/1) * `$ctscale)",
+				"					`$n[0] = [math]::round((`$n[0]/1) * `$tscale)",
+				"					`$n[1] = [math]::round((`$n[1]/1) * `$tscale)",
 				"				if (`"`$(`$n[0]),`$(`$n[1])`" -ne `",`") {",
 				"					`$attrib.Value = `"`$(`$n[0]),`$(`$n[1])`"",
 				"				}",
 				"				}",
 				"				if (`$attribName -eq 'Location'){",
 				"					`$n = `$attrib.Value.split(',')",
-				"					`$n[0] = [math]::round((`$n[0]/1) * `$ctscale)",
-				"					`$n[1] = [math]::round((`$n[1]/1) * `$ctscale)",
+				"					`$n[0] = [math]::round((`$n[0]/1) * `$tscale)",
+				"					`$n[1] = [math]::round((`$n[1]/1) * `$tscale)",
 				"				if (`"`$(`$n[0]),`$(`$n[1])`" -ne `",`") {",
 				"					`$attrib.Value = `"`$(`$n[0]),`$(`$n[1])`"",
 				"				}",
 				"				}",
 				"				if (`$attribName -eq 'MaximumSize'){",
 				"					`$n = `$attrib.Value.split(',')",
-				"					`$n[0] = [math]::round((`$n[0]/1) * `$ctscale)",
-				"					`$n[1] = [math]::round((`$n[1]/1) * `$ctscale)",
+				"					`$n[0] = [math]::round((`$n[0]/1) * `$tscale)",
+				"					`$n[1] = [math]::round((`$n[1]/1) * `$tscale)",
 				"				if (`"`$(`$n[0]),`$(`$n[1])`" -ne `",`") {",
 				"					`$attrib.Value = `"`$(`$n[0]),`$(`$n[1])`"",
 				"				}",
 				"				}",
 				"				if (`$attribName -eq 'MinimumSize'){",
 				"					`$n = `$attrib.Value.split(',')",
-				"					`$n[0] = [math]::round((`$n[0]/1) * `$ctscale)",
-				"					`$n[1] = [math]::round((`$n[1]/1) * `$ctscale)",
+				"					`$n[0] = [math]::round((`$n[0]/1) * `$tscale)",
+				"					`$n[1] = [math]::round((`$n[1]/1) * `$tscale)",
 				"				if (`"`$(`$n[0]),`$(`$n[1])`" -ne `",`") {",
 				"					`$attrib.Value = `"`$(`$n[0]),`$(`$n[1])`"",
 				"				}",
@@ -3508,10 +3574,17 @@ $Script:refs['ms_Left'].visible = $false
 $Script:refs['ms_Right'].visible = $false
 $Script:refs['ms_Left'].Width = 0
 
+$eventform.height = $eventform.height * $tscale
+
 
 $eventForm.Show()
 
-$Script:refs['tsl_StatusLabel'].text = "Current DPIScale: $ctscale - for resize events multiply all location and size modifiers by `$ctscale."
+$Script:refs['tsl_StatusLabel'].text = "Current DPIScale: $tscale - for resize events multiply all location and size modifiers by `$tscale."
+
+$Script:refs['spt_Right'].splitterdistance = $Script:refs['spt_Right'].splitterdistance * $tscale
+
+
+
 
 		[void]$Script:refs['MainForm'].ShowDialog()
 	}
@@ -3553,7 +3626,7 @@ public static extern IntPtr GetConsoleWindow();
 public static extern bool ShowWindow(IntPtr hWnd, Int32 nCmdShow);
 '
 
-[Console.Window]::ShowWindow([Console.Window]::GetConsoleWindow(), 0)
+#[Console.Window]::ShowWindow([Console.Window]::GetConsoleWindow(), 0)
 
 
 
