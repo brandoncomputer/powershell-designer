@@ -139,8 +139,9 @@ SOFTWARE.
 		Reverted ctscale back to tscale due to cross compatibility issues.
 		Refactored versioning. This (tscale) is no longer considered a breaking change, since it impacts no known published scripts.
 		Added AutoNaming and AutoTexting controls by control type.
-	2.1.2 4/23/2022
+	2.1.2 432/2022
 		Added FormName to FormText on New Project.
+		Added a try-catch for loading FastColoredTextBox that should cause the script to be portable.
 		
 BASIC MODIFICATIONS License
 #This software has been modified from the original as tagged with #brandoncomputer
@@ -3487,11 +3488,16 @@ vs7bAAAAAElFTkSuQmCC
 $eventForm = New-Object System.Windows.Forms.Form
 $eventForm.Text = "Events"
 
-if ((Get-Module -ListAvailable powershell-designer).count -gt 1){
-	[Reflection.Assembly]::LoadFile("$(split-path -path (Get-Module -ListAvailable powershell-designer)[0].path)\FastColoredTextBox.dll") | out-null
+try {
+	if ((Get-Module -ListAvailable powershell-designer).count -gt 1){
+		[Reflection.Assembly]::LoadFile("$(split-path -path (Get-Module -ListAvailable powershell-designer)[0].path)\FastColoredTextBox.dll") | out-null
+	}
+	else{
+		[Reflection.Assembly]::LoadFile("$(split-path -path (Get-Module -ListAvailable powershell-designer).path)\FastColoredTextBox.dll") | out-null
+	}
 }
-else{
-	[Reflection.Assembly]::LoadFile("$(split-path -path (Get-Module -ListAvailable powershell-designer).path)\FastColoredTextBox.dll") | out-null
+catch {
+	[Reflection.Assembly]::LoadFile("$BaseDir\FastColoredTextBox.dll") | out-null
 }
 
 $FastText = New-Object FastColoredTextBoxNS.FastColoredTextBox
