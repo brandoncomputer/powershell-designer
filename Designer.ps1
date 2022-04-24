@@ -139,7 +139,7 @@ SOFTWARE.
 		Reverted ctscale back to tscale due to cross compatibility issues.
 		Refactored versioning. This (tscale) is no longer considered a breaking change, since it impacts no known published scripts.
 		Added AutoNaming and AutoTexting controls by control type.
-	2.1.2 432/2022
+	2.1.2 4/24/2022
 		Added FormName to FormText on New Project.
 		Added a try-catch for loading FastColoredTextBox that should cause the script to be portable.
 		
