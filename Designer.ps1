@@ -146,6 +146,7 @@ SOFTWARE.
 		Added warning concerning item collections in the property grid.
 		Seperated edit and control menu.
 		Fixed bug with timers causing them to not be initialized.
+		Changed behavior of Paste Control to 'slick' to top node upon paste failure.
 		
 BASIC MODIFICATIONS License
 #This software has been modified from the original as tagged with #brandoncomputer
@@ -1495,7 +1496,26 @@ $global:control_track = @{}
                             Move-SButtons -Object $refs['PropertyGrid'].SelectedObject
 
                             $newNodeNames.ForEach({if ( $Script:nodeClipboard.ObjRef.Events["$($_.OldName)"] ) {$objRef.Events["$($_.NewName)"] = $Script:nodeClipboard.ObjRef.Events["$($_.OldName)"]}})
-                        } else {[void][System.Windows.Forms.MessageBox]::Show("You cannot paste a $($pastedObjType) control to the selected control type $($currentObjType).")}
+                        } else {
+							                           $pastedObjName = $Script:nodeClipboard.Node.Name
+                            $objRef = Get-RootNodeObjRef -TreeNode $Script:refs['TreeView'].TopNode
+
+                            $xml = Save-Project -ReturnXML
+
+                            $pastedXML = Select-Xml -Xml $xml -XPath "//$($Script:nodeClipboard.ObjRef.RootType)[@Name=`"$($Script:nodeClipboard.ObjRef.RootName)`"]//$($pastedObjType)[@Name=`"$($pastedObjName)`"]"
+
+                            $Script:refs['TreeView'].BeginUpdate()
+
+                            if (( $objRef.RootType -eq $Script:nodeClipboard.ObjRef.RootType ) -and ( $objRef.RootName -eq $Script:nodeClipboard.ObjRef.RootName )) {
+                                [array]$newNodeNames = Convert-XmlToTreeView -TreeObject $Script:refs['TreeView'].TopNode -Xml $pastedXml.Node -IncrementName
+                            } else {[array]$newNodeNames = Convert-XmlToTreeView -TreeObject $Script:refs['TreeView'].TopNode -Xml $pastedXml.Node}
+
+                            $Script:refs['TreeView'].EndUpdate()
+
+                            Move-SButtons -Object $refs['PropertyGrid'].SelectedObject
+
+                            $newNodeNames.ForEach({if ( $Script:nodeClipboard.ObjRef.Events["$($_.OldName)"] ) {$objRef.Events["$($_.NewName)"] = $Script:nodeClipboard.ObjRef.Events["$($_.OldName)"]}})				
+						}
                     }
                 } catch {Update-ErrorLog -ErrorRecord $_ -Message 'Exception encountered while pasting node from clipboard.'}
             }
