@@ -142,6 +142,10 @@ SOFTWARE.
 	2.1.2 4/24/2022
 		Added FormName to FormText on New Project.
 		Added a try-catch for loading FastColoredTextBox that should cause the script to be portable.
+	2.1.3 4/25/2022
+		Added warning concerning item collections in the property grid.
+		Seperated edit and control menu.
+		Fixed bug with timers causing them to not be initialized.
 		
 BASIC MODIFICATIONS License
 #This software has been modified from the original as tagged with #brandoncomputer
@@ -1230,6 +1234,7 @@ $global:control_track = @{}
         }
         'New' = @{
             Click = {
+				
                 try {
 					
 					if ( [System.Windows.Forms.MessageBox]::Show("Unsaved changes to the current project will be lost.  Are you sure you want to start a new project?", 'Confirm', 4) -eq 'Yes' ) {
@@ -1736,8 +1741,15 @@ $global:control_track = @{}
                                                 $controlText += $xmlText[$_]
                                             }
                                         })
+										
+										if ($childTypeName -eq "Timer"){
+										$controlScriptInit+="`$$controlName = ConvertFrom-WinFormsXML -Xml `$Script:timerInfo[`'$controlName`'].XMLText
+"		
+										}
+										else {
 										$controlScriptInit+="`$$controlName = ConvertFrom-WinFormsXML -Xml `$Script:dialoginfo[`'$controlName`'].XMLText
-"										
+"			
+										}
                                         $scriptText.Add("        '$controlName' = @{")
                                         $scriptText.Add("            XMLText = @`"")
                                         $controlText | ForEach-Object {$scriptText.Add($_)}
@@ -1776,7 +1788,7 @@ $global:control_track = @{}
                                     } else {$Script:templateText."EndRegion_$($childTypeName)s".ForEach({$scriptText.Add($_)})}
                                 }
                             })
-
+							
                                 # Environment Setup
                             $Script:templateText.Region_EnvSetup.ForEach({$scriptText.Add($_)})
 							
@@ -1823,6 +1835,8 @@ $global:control_track = @{}
                                 ""
                             ).ForEach({$scriptText.Add($_)})
 							
+							$scriptText.Add($controlScriptInit)
+							
 #brandoncomputer_NotSure
 							if ( $Script:refsGenerate['cbx_Events'].Checked ) {$scriptText.Add("    . `"`$(`$dotSourceDir)\$($Script:refsGenerate['tbx_Events'].Text)`"")}
 							
@@ -1861,8 +1875,7 @@ $global:control_track = @{}
                                 # Other Actions Before ShowDialog
                             $Script:templateText.Region_OtherActions.ForEach({$scriptText.Add($_)})
 #brandoncomputer_NotSure
-							$scriptText.Add($controlScriptInit)
-                            $scriptText.Add("    try {[void]`$Script:refs['$($xml.Data.Form.Name)'].ShowDialog()} catch {Update-ErrorLog -ErrorRecord `$_ -Message `"Exception encountered unexpectedly at ShowDialog.`"}")
+							$scriptText.Add("    try {[void]`$Script:refs['$($xml.Data.Form.Name)'].ShowDialog()} catch {Update-ErrorLog -ErrorRecord `$_ -Message `"Exception encountered unexpectedly at ShowDialog.`"}")
                             $scriptText.Add("")
 
                                 # Actions After Form Closed
@@ -1968,7 +1981,7 @@ $global:control_track = @{}
         'PropertyGrid' = @{
             PropertyValueChanged = {
                 param($Sender,$e)
-
+				
                 try {
                     $changedProperty = $e.ChangedItem
                     if ( @('Location','Size','Dock','AutoSize','Multiline') -contains $changedProperty.PropertyName ) {Move-SButtons -Object $Script:refs['PropertyGrid'].SelectedObject}
@@ -2015,6 +2028,43 @@ $global:control_track = @{}
         'trv_Controls' = @{
             DoubleClick = {
                 $controlName = $this.SelectedNode.Name
+				
+				
+					if ($global:warn -eq $null)
+					{
+						switch ($controlName)
+						{
+						'MenuStrip' {
+							$global:warn = $true
+							[void][System.Windows.Forms.MessageBox]::Show("Please do not use item collections in the property grid. Build onto controls by stacking controls from the selection on the left.",'Information')
+						}
+						'ContextMenuStrip' {
+							$global:warn = $true
+							[void][System.Windows.Forms.MessageBox]::Show("Please do not use item collections in the property grid. Build onto controls by stacking controls from the selection on the left.",'Information')
+						}
+						'StatusStrip' {
+							$global:warn = $true
+							[void][System.Windows.Forms.MessageBox]::Show("Please do not use item collections in the property grid. Build onto controls by stacking controls from the selection on the left.",'Information')
+						}
+						'ToolStrip' {
+							$global:warn = $true
+							[void][System.Windows.Forms.MessageBox]::Show("Please do not use item collections in the property grid. Build onto controls by stacking controls from the selection on the left.",'Information')
+						}
+						'ToolStripDropDownButton' {
+							$global:warn = $true
+							[void][System.Windows.Forms.MessageBox]::Show("Please do not use item collections in the property grid. Build onto controls by stacking controls from the selection on the left.",'Information')
+						}
+						'ToolStripSplitButton' {
+							$global:warn = $true
+							[void][System.Windows.Forms.MessageBox]::Show("Please do not use item collections in the property grid. Build onto controls by stacking controls from the selection on the left.",'Information')
+						}
+						'ToolStripMenuItem' {
+							$global:warn = $true
+							[void][System.Windows.Forms.MessageBox]::Show("Please do not use item collections in the property grid. Build onto controls by stacking controls from the selection on the left.",'Information')
+						}
+						default{}
+						}
+					}
 
                 if ( $controlName -eq 'ContextMenuStrip' ) {
 #brandoncomputer_RemoveGlobalContextMenuStrip
@@ -2023,6 +2073,8 @@ $global:control_track = @{}
 
                 if ( @('All Controls','Common','Containers', 'Menus and ToolStrips','Miscellaneous') -notcontains $controlName ) {
                     $controlObjectType = $Script:supportedControls.Where({$_.Name -eq $controlName}).Type
+					
+
                     
                     try {
                         if (( $controlObjectType -eq 'Parentless' ) -or ( $context -eq 0 )) {
@@ -2697,15 +2749,6 @@ $global:control_track = @{}
         <ToolStripMenuItem Name="Exit" ShortcutKeys="Ctrl+Alt+X" DisplayStyle="Text" ShortcutKeyDisplayString="Ctrl+Alt+X" Text="Exit" />
       </ToolStripMenuItem>
       <ToolStripMenuItem Name="ts_Edit" Text="Edit">
-        <ToolStripMenuItem Name="Rename" ShortcutKeys="Ctrl+R" Text="Rename" ShortcutKeyDisplayString="Ctrl+R" />
-        <ToolStripMenuItem Name="Delete" ShortcutKeys="Ctrl+D" Text="Delete" ShortcutKeyDisplayString="Ctrl+D" />
-        <ToolStripSeparator Name="EditSep1" />
-        <ToolStripMenuItem Name="CopyNode" Text="Copy Control" />
-        <ToolStripMenuItem Name="PasteNode" Text="Paste Control" />
-        <ToolStripSeparator Name="EditSep2" />
-        <ToolStripMenuItem Name="Move Up" ShortcutKeys="F5" Text="Move Up" ShortcutKeyDisplayString="F5" />
-        <ToolStripMenuItem Name="Move Down" ShortcutKeys="F6" Text="Move Down" ShortcutKeyDisplayString="F6" />
-		<ToolStripSeparator Name="EditSep3" />
 		<ToolStripMenuItem Name="Undo" ShortcutKeys="Ctrl+Z" Text="Undo" ShortcutKeyDisplayString="Ctrl+Z" />
 		<ToolStripMenuItem Name="Redo" ShortcutKeys="Ctrl+Y" Text="Redo" ShortcutKeyDisplayString="Ctrl+Y" />
 		<ToolStripSeparator Name="EditSep4" />
@@ -2720,6 +2763,16 @@ $global:control_track = @{}
 		<ToolStripSeparator Name="EditSep6" />
 		<ToolStripMenuItem Name="Collapse All" ShortcutKeys="F7" Text="Collapse All" ShortcutKeyDisplayString="F7" />
 		<ToolStripMenuItem Name="Expand All" ShortcutKeys="F8" Text="Expand All" ShortcutKeyDisplayString="F8" />
+	  </ToolStripMenuItem>
+	  <ToolStripMenuItem Name="ts_Controls" Text="Controls">
+        <ToolStripMenuItem Name="Rename" ShortcutKeys="Ctrl+R" Text="Rename" ShortcutKeyDisplayString="Ctrl+R" />
+        <ToolStripMenuItem Name="Delete" ShortcutKeys="Ctrl+D" Text="Delete" ShortcutKeyDisplayString="Ctrl+D" />
+        <ToolStripSeparator Name="EditSep1" />
+        <ToolStripMenuItem Name="CopyNode" Text="Copy Control" />
+        <ToolStripMenuItem Name="PasteNode" Text="Paste Control" />
+        <ToolStripSeparator Name="EditSep2" />
+        <ToolStripMenuItem Name="Move Up" ShortcutKeys="F5" Text="Move Up" ShortcutKeyDisplayString="F5" />
+        <ToolStripMenuItem Name="Move Down" ShortcutKeys="F6" Text="Move Down" ShortcutKeyDisplayString="F6" />
 	  </ToolStripMenuItem>
       <ToolStripMenuItem Name="ts_View" Text="View">
         <ToolStripMenuItem Name="Toolbox" Checked="True" ShortcutKeys="F1" Text="Toolbox" ShortcutKeyDisplayString="F1" />
@@ -2768,7 +2821,10 @@ $global:control_track = @{}
         $Script:refs['Generate Script File'].Add_Click($eventSB['Generate Script File'].Click)
         $Script:refs['TreeView'].Add_AfterSelect($eventSB['TreeView'].AfterSelect)
         $Script:refs['PropertyGrid'].Add_PropertyValueChanged($eventSB['PropertyGrid'].PropertyValueChanged)
-        $Script:refs['trv_Controls'].Add_DoubleClick($eventSB['trv_Controls'].DoubleClick)
+		
+		
+		
+		$Script:refs['trv_Controls'].Add_DoubleClick($eventSB['trv_Controls'].DoubleClick)
         $Script:refs['lst_AvailableEvents'].Add_DoubleClick($eventSB['lst_AvailableEvents'].DoubleClick)
         $Script:refs['lst_AssignedEvents'].Add_DoubleClick($eventSB['lst_AssignedEvents'].DoubleClick)
 		
@@ -3273,6 +3329,14 @@ vs7bAAAAAElFTkSuQmCC
 				"										{`$newControl.Title = `$xml.Title}",
 				"									if (`$xml.ValidateNames)",
 				"										{`$newControl.ValidateNames = `$xml.ValidateNames}",
+				"								}",
+				"								`"Timer`" {",
+				"									if (`$xml.Enabled)",
+				"										{`$newControl.Enabled = `$xml.Enabled}",
+				"									if (`$xml.Interval)",
+				"										{`$newControl.Interval = `$xml.Interval}",
+				"									if (`$xml.Tag)",
+				"										{`$newControl.Tag = `$xml.Tag}",						
 				"								}",
 				"								default {",
 				"									`$newControl.`$attribName = `$value",
