@@ -147,6 +147,8 @@ SOFTWARE.
 		Seperated edit and control menu.
 		Fixed bug with timers causing them to not be initialized.
 		Changed behavior of Paste Control to 'slick' to top node upon paste failure.
+		Added image and icon embedding.
+		Removed toolstrip due to buggy behavior. Toolstrip is now an alias for MenuStrip.
 		
 BASIC MODIFICATIONS License
 #This software has been modified from the original as tagged with #brandoncomputer
@@ -259,6 +261,11 @@ $global:control_track = @{}
             if ( $Xml.GetType().Name -eq 'String' ) {$Xml = ([xml]$Xml).ChildNodes}
 
             if ( $Xml.ToString() -ne 'SplitterPanel' ) {$newControl = New-Object System.Windows.Forms.$($Xml.ToString())}
+			
+			if ( $Xml.ToString() -eq 'ToolStrip' ) {
+					$newControl = New-Object System.Windows.Forms.MenuStrip
+					$ParentControl.Controls.Add($newControl)
+				}
 
             if ( $ParentControl ) {
                 if ( $Xml.ToString() -match "^ToolStrip" ) {
@@ -307,7 +314,15 @@ $global:control_track = @{}
 						$attrib.Value = "$($n[0]),$($n[1])"
 					}
 				}
-				
+				if ($attribName -eq 'ImageScalingSize'){
+					$n = $attrib.Value.split(',')
+					$n[0] = [math]::Round(($n[0]/1) * $tscale)
+					$n[1] = [math]::Round(($n[1]/1) * $tscale)
+					if ("$($n[0]),$($n[1])" -ne ",") {
+						$attrib.Value = "$($n[0]),$($n[1])"
+					}
+				}
+							
                 if ( $Script:specialProps.Array -contains $attribName ) {
                     if ( $attribName -eq 'Items' ) {
                         $($_.Value -replace "\|\*BreakPT\*\|","`n").Split("`n") | ForEach-Object{[void]$newControl.Items.Add($_)}
@@ -439,6 +454,15 @@ $global:control_track = @{}
 					}
 				}
 				
+				if ($_.ToString() -eq 'ImageScalingSize'){
+					$n = $attrib.Value.split(',')
+					$n[0] = [math]::Round(($n[0]/1) * $tscale)
+					$n[1] = [math]::Round(($n[1]/1) * $tscale)
+					if ("$($n[0]),$($n[1])" -ne ",") {
+						$_.Value = "$($n[0]),$($n[1])"
+					}
+				}
+				
 				
 						
 						#end dpi
@@ -533,6 +557,9 @@ $global:control_track = @{}
 		}
 		}
 		
+		if ($ControlType -eq 'ToolStrip')
+		{$ControlType = 'MenuStrip'}
+		
 		
 
         if ( $ControlName -eq '' ) {
@@ -565,6 +592,7 @@ $global:control_track = @{}
 
                         $e.Cancel = $true
                     })
+					
                     $form.Add_Click({
                         if (( $Script:refs['PropertyGrid'].SelectedObject -ne $this ) -and ( $args[1].Button -eq 'Left' )) {
                             $Script:refs['TreeView'].SelectedNode = $Script:refsFID.Form.TreeNodes[$this.Name]
@@ -728,7 +756,8 @@ $global:control_track = @{}
 						$newControl.height = $newControl.height * $tscale}
 						if ($newControl.width){
 						$newControl.width = $newControl.width * $tscale}
-                        $newControl.Name = $ControlName
+						if ($newControl.ImageScalingSize)
+						{$newControl.imagescalingsize = new-object System.Drawing.Size([int]($tscale * $newControl.imagescalingsize.width),[int]($tscale * $newControl.imagescalingsize.Height))}
 #brandoncomputer_ToolStripException
 					if ( $ControlType -eq "ToolStrip" ) {
 						$objRef.Objects[$TreeObject.Name].Controls.Add($newControl)}
@@ -1094,6 +1123,7 @@ $global:control_track = @{}
                                                     'MenuStrip' {}
                                                     'ContextMenuStrip' {}
 													'StatusStrip'{}
+													'ToolStrip'{}
                                                     #'ListView' {}
                                                     default {if ( $ReturnXML -eq $false ) {[void][System.Windows.Forms.MessageBox]::Show("$($newElementType) items will not save",'Notification')}}
                                                 }
@@ -1177,8 +1207,19 @@ $global:control_track = @{}
 					}
 				}
 				
+				if ($node.ImageScalingSize){
+					$n = ($node.ImageScalingSize).split(',')
+					$n[0] = [math]::round(($n[0]/1) / $tscale)
+					$n[1] = [math]::round(($n[1]/1) / $tscale)
+					if ("$($n[0]),$($n[1])" -ne ",") {
+						$node.ImageScalingSize = "$($n[0]),$($n[1])"
+					}
+				}
+				
 				}
 					$nodes.RemoveAttribute('ContextMenuStrip')
+					$nodes.RemoveAttribute('Image')
+					$nodes.RemoveAttribute('Icon')
 				}
 				
                 if ( $ReturnXML ) {return $xml}
@@ -1258,6 +1299,9 @@ $global:control_track = @{}
 						$Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].height = $Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].height * $tscale
 						$Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].width = $Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].width * $tscale
 						$Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].tag = "VisualStyle,DPIAware"
+						
+						$baseicon = $Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].Icon
+					
 					}
                 } catch {Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered during start of New Project."}
             }
@@ -1880,6 +1924,7 @@ $global:control_track = @{}
 	
 									}		
                                 }
+							}
 #brandoncomputer_FastTextScriptTextAdd
 								$fastArr = ($FastText.Text).split([byte][char]13+[byte][char]10)
 								foreach ($arrItem in $fastArr){
@@ -1890,7 +1935,7 @@ $global:control_track = @{}
 								#$scriptText.Add($controlScriptInit)
 
                                 $Script:templateText.EndRegion_Events.ForEach({$scriptText.Add($_)})
-                            }
+                            
 
                                 # Other Actions Before ShowDialog
                             $Script:templateText.Region_OtherActions.ForEach({$scriptText.Add($_)})
@@ -2030,7 +2075,40 @@ $global:control_track = @{}
 
                     if ( $changedProperty.PropertyDescriptor.ShouldSerializeValue($changedProperty.Component) ) {
                         switch ($changedProperty.PropertyType) {
-							'System.Drawing.Image' {[void][System.Windows.Forms.MessageBox]::Show('While the image will display on the preview of this form, you will need to add the image manually in the generated code.','Notification')}
+							'System.Drawing.Image' {
+								#[void][System.Windows.Forms.MessageBox]::Show('While the image will display on the preview of this form, you will need to add the image manually in the generated code.','Notification')
+							[void][System.Windows.Forms.MessageBox]::Show('While the image will display on the preview of this form during this session, it will not save to the form file. Please select the image again to generate code to load the image in your solution at runtime.','Notification')
+		$filedlg = New-Object System.Windows.Forms.OpenFileDialog
+    #    $filedlg.initialDirectory = $b
+        $filedlg.filter = "All image files|*.bmp;*.gif;*.jpg;*.jpeg;*.png;*.ico;*.emf;*.wmf|Bitmap Files|*.bmp;*.gif;*.jpg;*.jpeg;*.png;*.ico|Metafiles|*.emf;*.wmf"
+        $filedlg.ShowDialog() | Out-Null
+        $encodedImage = [Convert]::ToBase64String((Get-Content $filedlg.FileName -Encoding Byte))
+
+$string = "`$$controlName.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String(`"$encodedImage`"))
+				
+" 
+				$FastText.GoEnd()
+					$FastText.SelectedText = $string
+							
+							[System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String($encodedimage))
+							}
+							
+							'System.Drawing.Icon'{
+								[void][System.Windows.Forms.MessageBox]::Show('While the image will display on the preview of this form during this session, it will not save to the form file. Please select the image again to generate code to load the image in your solution at runtime.','Notification')
+		$filedlg = New-Object System.Windows.Forms.OpenFileDialog
+    #    $filedlg.initialDirectory = $b
+        $filedlg.filter = "Icon Files|*.ico"
+        $filedlg.ShowDialog() | Out-Null
+        $encodedImage = [Convert]::ToBase64String((Get-Content $filedlg.FileName -Encoding Byte))
+			   
+$string = "`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Drawing.Bitmap][System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String(`"$encodedImage`"))).GetHicon())
+				
+" 
+				
+				$FastText.GoEnd()
+					$FastText.SelectedText = $string
+								
+							}
 							default {
                                 if ( $null -eq $objRef.Changes[$controlName] ) {$objRef.Changes[$controlName] = @{}}
                                 $objRef.Changes[$controlName][$changedProperty.PropertyName] = $value
@@ -2931,7 +3009,7 @@ $global:control_track = @{}
                     'All Controls'         {$Script:supportedControls.Where({ @('Special','SplitContainer') -notcontains $_.Type }).Name.ForEach({$treeNode.Nodes.Add($_,$_)})}
                     'Common'               {$Script:supportedControls.Where({ $_.Type -eq 'Common' }).Name.ForEach({$treeNode.Nodes.Add($_,$_)})}
                     'Containers'           {$Script:supportedControls.Where({ $_.Type -eq 'Container' }).Name.ForEach({$treeNode.Nodes.Add($_,$_)})}
-                    'Menus and ToolStrips' {$Script:supportedControls.Where({ $_.Type -eq 'Context' -or $_.Type -match "^MenuStrip" -or  $_.Type -match "Status*"}).Name.ForEach({$treeNode.Nodes.Add($_,$_)})}
+                    'Menus and ToolStrips' {$Script:supportedControls.Where({ $_.Type -eq 'Context' -or $_.Type -match "^MenuStrip" -or  $_.Type -match "Status*" -or $_.Type -eq "ToolStrip"}).Name.ForEach({$treeNode.Nodes.Add($_,$_)})}
                     'Miscellaneous'        {$Script:supportedControls.Where({ @('TabControl','Parentless') -match "^$($_.Type)$" }).Name.ForEach({$treeNode.Nodes.Add($_,$_)})}
                 }
             })
@@ -2947,6 +3025,8 @@ $global:control_track = @{}
 						$Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].height = $Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].height * $tscale
 						$Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].width = $Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].width * $tscale
 						$Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].tag = "VisualStyle,DPIAware"
+						
+						
             Remove-Variable -Name eventSB, reuseContextInfo
         } catch {
             Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered before ShowDialog."
@@ -3084,8 +3164,8 @@ vs7bAAAAAElFTkSuQmCC
                 "            if ( `$ParentControl ) {",
 				"#brandoncomputer_ToolStripFix_Export",
 				"				if ( `$Xml.ToString() -eq 'ToolStrip' ) {",
-				"					`$newControl = New-Object System.Windows.Forms.`$(`$Xml.ToString()",
-				"					`$ParentControl.Controls.Add(`$newControl))",
+				"					`$newControl = New-Object System.Windows.Forms.MenuStrip",
+				"					`$ParentControl.Controls.Add(`$newControl)",
 				"				}",
 				"				else {",
                 "                if ( `$Xml.ToString() -match `"^ToolStrip`" ) {",
@@ -3128,6 +3208,14 @@ vs7bAAAAAElFTkSuQmCC
 				"				}",
 				"				}",
 				"				if (`$attribName -eq 'MinimumSize'){",
+				"					`$n = `$attrib.Value.split(',')",
+				"					`$n[0] = [math]::round((`$n[0]/1) * `$tscale)",
+				"					`$n[1] = [math]::round((`$n[1]/1) * `$tscale)",
+				"				if (`"`$(`$n[0]),`$(`$n[1])`" -ne `",`") {",
+				"					`$attrib.Value = `"`$(`$n[0]),`$(`$n[1])`"",
+				"				}",
+				"				}",
+				"				if (`$attribName -eq 'ImageScalingSize'){",
 				"					`$n = `$attrib.Value.split(',')",
 				"					`$n[0] = [math]::round((`$n[0]/1) * `$tscale)",
 				"					`$n[1] = [math]::round((`$n[1]/1) * `$tscale)",
