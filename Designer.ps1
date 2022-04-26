@@ -1427,81 +1427,27 @@ $global:control_track = @{}
 								$dotSplit = $arrItem.split(".")
 								if ($dotSplit[1]) {
 									$spaceSplit = $dotSplit[1].Split(" ")
-									if ($spaceSplit[0] -eq 'Icon') {
-										$baseStr = $arrItem.split(" ")[0]
-										$noCash = $baseStr.split("`$")[1]
-										if ($noCash.count -gt 0) {
-											$Control = $noCash.Split(".")[0]
-											$b64 = $arrItem.split("`"")[1]
-											$objRef.Objects[$Control].Icon = [System.Drawing.Icon]::FromHandle(([System.Drawing.Bitmap][System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String($b64))).GetHicon())
-										}
-									}
-								}
-							}
-						
-						
-							foreach ($arrItem in $fastArr){
-								$dotSplit = $arrItem.split(".")
-								if ($dotSplit[1]) {
-									$spaceSplit = $dotSplit[1].Split(" ")
-									if ($spaceSplit[0] -eq 'Image') {
-										$baseStr = $arrItem.split(" ")[0]
-										$noCash = $baseStr.split("`$")[1]
-										if ($noCash.count -gt 0) {
-											$Control = $noCash.Split(".")[0]
-											$b64 = $arrItem.split("`"")[1]
-											$objRef.Objects[$Control].Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String($b64))
-										}
-									}
-								}
-							}
-							
-							
-							foreach ($arrItem in $fastArr){
-								$dotSplit = $arrItem.split(".")
-								if ($dotSplit[1]) {
-									$spaceSplit = $dotSplit[1].Split(" ")
-									if ($spaceSplit[0] -eq 'InitialImage') {
-										$baseStr = $arrItem.split(" ")[0]
-										$noCash = $baseStr.split("`$")[1]
-										if ($noCash.count -gt 0) {
-											$Control = $noCash.Split(".")[0]
-											$b64 = $arrItem.split("`"")[1]
-											$objRef.Objects[$Control].InitialImage = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String($b64))
-										}
-									}
-								}
-							}
-							
-
-							foreach ($arrItem in $fastArr){
-								$dotSplit = $arrItem.split(".")
-								if ($dotSplit[1]) {
-									$spaceSplit = $dotSplit[1].Split(" ")
-									if ($spaceSplit[0] -eq 'ErrorImage') {
-										$baseStr = $arrItem.split(" ")[0]
-										$noCash = $baseStr.split("`$")[1]
-										if ($noCash.count -gt 0) {
-											$Control = $noCash.Split(".")[0]
-											$b64 = $arrItem.split("`"")[1]
-											$objRef.Objects[$Control].ErrorImage = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String($b64))
-										}
-									}
-								}
-							}
-							
-
-							foreach ($arrItem in $fastArr){
-								$dotSplit = $arrItem.split(".")
-								if ($dotSplit[1]) {
-									$spaceSplit = $dotSplit[1].Split(" ")
-									if ($spaceSplit[0] -eq 'BackgroundImage') {
-										$baseStr = $arrItem.split(" ")[0]
-										$noCash = $baseStr.split("`$")[1]
-										if ($noCash.count -gt 0) {
-											$Control = $noCash.Split(".")[0]
-											$b64 = $arrItem.split("`"")[1]
-											$objRef.Objects[$Control].BackgroundImage = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String($b64))
+											$baseStr = $arrItem.split(" ")[0]
+											$noCash = $baseStr.split("`$")[1]
+									if ($noCash.count -gt 0) {
+										$Control = $noCash.Split(".")[0]
+										$b64 = $arrItem.split("`"")[1]
+										switch ($spaceSplit[0]) {
+											'Icon'{
+												$objRef.Objects[$Control].Icon = [System.Drawing.Icon]::FromHandle(([System.Drawing.Bitmap][System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String($b64))).GetHicon())
+											}
+											'Image'{
+												$objRef.Objects[$Control].Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String($b64))
+											}
+											'BackgroundImage'{
+												$objRef.Objects[$Control].BackgroundImage = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String($b64))
+											}
+											'ErrorImage'{
+												$objRef.Objects[$Control].ErrorImage = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String($b64))
+											}
+											'InitialImage'{
+												$objRef.Objects[$Control].BackgroundImage = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String($b64))
+											}
 										}
 									}
 								}
@@ -1512,7 +1458,7 @@ $global:control_track = @{}
 
 					}
 					
-                     catch {Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered while opening $($fileName)."}
+                    } catch {Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered while opening $($fileName)."}
                     finally {
                         $Script:openingProject = $false
 
@@ -2203,7 +2149,8 @@ $MemoryStream.Flush()
 $MemoryStream.Dispose()
 $decodedimage = [convert]::ToBase64String($Bytes)
 
-$string = "`$$controlName.$($changedProperty.PropertyName) = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String(`"$decodedimage`"))
+$string = "#Must start at column 0.
+`$$controlName.$($changedProperty.PropertyName) = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String(`"$decodedimage`"))
 
 "
 $FastText.GoEnd()
@@ -2219,7 +2166,8 @@ $MemoryStream.Flush()
 $MemoryStream.Dispose()
 $decodedimage = [convert]::ToBase64String($Bytes)
 
-$string = "`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Drawing.Bitmap][System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String(`"$decodedimage`"))).GetHicon())
+$string = "#Must start at column 0.
+`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Drawing.Bitmap][System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String(`"$decodedimage`"))).GetHicon())
 
 "
 $FastText.GoEnd()
