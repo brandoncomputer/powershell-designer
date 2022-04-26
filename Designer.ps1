@@ -152,6 +152,7 @@ SOFTWARE.
 	2.1.4 4/26/2022
 		Fixed double file dialog for icons, images
 		Fixed WebBrowser control
+		Fixed bug with direct control selection (accidental code delete in 2.1.3, restored)
 		
 BASIC MODIFICATIONS License
 #This software has been modified from the original as tagged with #brandoncomputer
