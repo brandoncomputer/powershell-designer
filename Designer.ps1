@@ -2102,7 +2102,7 @@ $global:control_track = @{}
                         switch ($changedProperty.PropertyType) {
 							'System.Drawing.Image' {
 $MemoryStream = New-Object System.IO.MemoryStream
-$Script:refsFID.Form.Objects[$controlName].Image.save($MemoryStream, [System.Drawing.Imaging.ImageFormat]::Jpeg)
+$Script:refsFID.Form.Objects[$controlName].$changedProperty.save($MemoryStream, [System.Drawing.Imaging.ImageFormat]::Jpeg)
 $Bytes = $MemoryStream.ToArray()
 $MemoryStream.Flush()
 $MemoryStream.Dispose()
