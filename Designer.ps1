@@ -149,6 +149,9 @@ SOFTWARE.
 		Changed behavior of Paste Control to 'slick' to top node upon paste failure.
 		Added image and icon embedding.
 		Removed toolstrip due to buggy behavior. Toolstrip is now an alias for MenuStrip.
+	2.1.4 4/26/2022
+		Fixed double file dialog for icons, images
+		Fixed WebBrowser control
 		
 BASIC MODIFICATIONS License
 #This software has been modified from the original as tagged with #brandoncomputer
@@ -746,11 +749,11 @@ $global:control_track = @{}
 
                     if ( $objRef.Success -ne $false ) {
                         $newControl = New-Object System.Windows.Forms.$ControlType
-						if ($controlType -like "*DateTimePicker*") {
-						#do nothing
-						}
-						else{$newControl.Text = $controlText
-#brandoncomputer_textDisabledDuetoLoadBug
+						
+						switch ($ControlType){
+							'DateTimePicker'{}
+							'WebBrowser'{}
+							default{$newControl.Text = $controlText}
 						}
 						if ($newControl.height){
 						$newControl.height = $newControl.height * $tscale}
@@ -780,7 +783,8 @@ $global:control_track = @{}
 					}
 						
 					
-							
+						if ($ControlType -ne 'WebBrowser')
+						{						
                         try {
                             $newControl.Add_MouseUp({
                                 if (( $Script:refs['PropertyGrid'].SelectedObject -ne $this ) -and ( $args[1].Button -eq 'Left' )) {
@@ -790,6 +794,8 @@ $global:control_track = @{}
                         } catch {
                             if ( $_.Exception.Message -notmatch 'not valid on this control' ) {throw $_}
                         }
+						
+						}
 
                         $newTreeNode = $TreeObject.Nodes.Add($ControlName,"$($ControlType) - $($ControlName)")
                         $objRef.TreeNodes[$ControlName] = $newTreeNode
@@ -2076,37 +2082,35 @@ $global:control_track = @{}
                     if ( $changedProperty.PropertyDescriptor.ShouldSerializeValue($changedProperty.Component) ) {
                         switch ($changedProperty.PropertyType) {
 							'System.Drawing.Image' {
-								#[void][System.Windows.Forms.MessageBox]::Show('While the image will display on the preview of this form, you will need to add the image manually in the generated code.','Notification')
-							[void][System.Windows.Forms.MessageBox]::Show('While the image will display on the preview of this form during this session, it will not save to the form file. Please select the image again to generate code to load the image in your solution at runtime.','Notification')
-		$filedlg = New-Object System.Windows.Forms.OpenFileDialog
-    #    $filedlg.initialDirectory = $b
-        $filedlg.filter = "All image files|*.bmp;*.gif;*.jpg;*.jpeg;*.png;*.ico;*.emf;*.wmf|Bitmap Files|*.bmp;*.gif;*.jpg;*.jpeg;*.png;*.ico|Metafiles|*.emf;*.wmf"
-        $filedlg.ShowDialog() | Out-Null
-        $encodedImage = [Convert]::ToBase64String((Get-Content $filedlg.FileName -Encoding Byte))
+$MemoryStream = New-Object System.IO.MemoryStream
+$Script:refsFID.Form.Objects[$controlName].Image.save($MemoryStream, [System.Drawing.Imaging.ImageFormat]::Jpeg)
+$Bytes = $MemoryStream.ToArray()
+$MemoryStream.Flush()
+$MemoryStream.Dispose()
+$decodedimage = [convert]::ToBase64String($Bytes)
 
-$string = "`$$controlName.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String(`"$encodedImage`"))
-				
-" 
-				$FastText.GoEnd()
+$string = "`$$controlName.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String(`"$decodedimage`"))
+
+"
+$FastText.GoEnd()
 					$FastText.SelectedText = $string
 							
-							[System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String($encodedimage))
 							}
 							
 							'System.Drawing.Icon'{
-								[void][System.Windows.Forms.MessageBox]::Show('While the image will display on the preview of this form during this session, it will not save to the form file. Please select the image again to generate code to load the image in your solution at runtime.','Notification')
-		$filedlg = New-Object System.Windows.Forms.OpenFileDialog
-    #    $filedlg.initialDirectory = $b
-        $filedlg.filter = "Icon Files|*.ico"
-        $filedlg.ShowDialog() | Out-Null
-        $encodedImage = [Convert]::ToBase64String((Get-Content $filedlg.FileName -Encoding Byte))
-			   
-$string = "`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Drawing.Bitmap][System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String(`"$encodedImage`"))).GetHicon())
-				
-" 
-				
-				$FastText.GoEnd()
+$MemoryStream = New-Object System.IO.MemoryStream
+$Script:refsFID.Form.Objects[$controlName].Icon.save($MemoryStream)
+$Bytes = $MemoryStream.ToArray()
+$MemoryStream.Flush()
+$MemoryStream.Dispose()
+$decodedimage = [convert]::ToBase64String($Bytes)
+
+$string = "`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Drawing.Bitmap][System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String(`"$decodedimage`"))).GetHicon())
+
+"
+$FastText.GoEnd()
 					$FastText.SelectedText = $string
+
 								
 							}
 							default {
