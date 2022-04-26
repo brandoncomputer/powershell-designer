@@ -749,6 +749,7 @@ $global:control_track = @{}
 
                     if ( $objRef.Success -ne $false ) {
                         $newControl = New-Object System.Windows.Forms.$ControlType
+						$newControl.Name = $ControlName
 						
 						switch ($ControlType){
 							'DateTimePicker'{}
