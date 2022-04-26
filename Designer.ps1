@@ -154,6 +154,7 @@ SOFTWARE.
 		Fixed WebBrowser control
 		Fixed bug with direct control selection (accidental code delete in 2.1.3, restored)
 		More control resize math for when client is maximized.
+		Removed some problem attributes from export (image attributes)
 		
 BASIC MODIFICATIONS License
 #This software has been modified from the original as tagged with #brandoncomputer
@@ -1245,6 +1246,10 @@ $global:control_track = @{}
 					$nodes.RemoveAttribute('ContextMenuStrip')
 					$nodes.RemoveAttribute('Image')
 					$nodes.RemoveAttribute('Icon')
+					$nodes.RemoveAttribute('BackgroundImage')
+					$nodes.RemoveAttribute('ErrorImage')
+					$nodes.RemoveAttribute('InitialImage')
+					
 				}
 				
                 if ( $ReturnXML ) {return $xml}
