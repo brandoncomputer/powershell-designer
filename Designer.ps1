@@ -28,8 +28,8 @@ SOFTWARE.
         FileName:     Designer.ps1
         Modified:     Brandon Cunningham
         Created On:   1/15/2020
-        Last Updated: 4/26/2022
-        Version:      v2.1.4
+        Last Updated: 4/27/2022
+        Version:      v2.1.5
     ===========================================================================
 
     .DESCRIPTION
@@ -156,6 +156,8 @@ SOFTWARE.
 		More control resize math for when client is maximized.
 		Removed some problem attributes from export (image attributes) that are handled programmatically
 		Added image import on solution open.
+	2.1.5 4/27/2022
+		Fixed bug with Powershell 7 not loading saved images.
 		
 BASIC MODIFICATIONS License
 #This software has been modified from the original as tagged with #brandoncomputer
@@ -1423,7 +1425,7 @@ $global:control_track = @{}
 						if (Test-Path -path "$generationPath\Events.ps1") {
 							$FastText.OpenFile("$generationPath\Events.ps1")	
 							$fastArr = ($FastText.Text).split("
-							")
+")
 							foreach ($arrItem in $fastArr){
 								$dotSplit = $arrItem.split(".")
 								if ($dotSplit[1]) {
