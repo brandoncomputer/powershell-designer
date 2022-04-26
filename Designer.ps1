@@ -2072,9 +2072,12 @@ $global:control_track = @{}
             PropertyValueChanged = {
                 param($Sender,$e)
 				
+				
+				
                 try {
                     $changedProperty = $e.ChangedItem
-                    if ( @('Location','Size','Dock','AutoSize','Multiline') -contains $changedProperty.PropertyName ) {Move-SButtons -Object $Script:refs['PropertyGrid'].SelectedObject}
+					
+				if ( @('Location','Size','Dock','AutoSize','Multiline') -contains $changedProperty.PropertyName ) {Move-SButtons -Object $Script:refs['PropertyGrid'].SelectedObject}
                     
                     if ( $e.ChangedItem.PropertyDepth -gt 0 ) {
                         $stopProcess = $false
@@ -2102,13 +2105,13 @@ $global:control_track = @{}
                         switch ($changedProperty.PropertyType) {
 							'System.Drawing.Image' {
 $MemoryStream = New-Object System.IO.MemoryStream
-$Script:refsFID.Form.Objects[$controlName].Image.save($MemoryStream, [System.Drawing.Imaging.ImageFormat]::Jpeg)
+$Script:refsFID.Form.Objects[$controlName].($changedProperty.PropertyName).save($MemoryStream, [System.Drawing.Imaging.ImageFormat]::Jpeg)
 $Bytes = $MemoryStream.ToArray()
 $MemoryStream.Flush()
 $MemoryStream.Dispose()
 $decodedimage = [convert]::ToBase64String($Bytes)
 
-$string = "`$$controlName.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String(`"$decodedimage`"))
+$string = "`$$controlName.$($changedProperty.PropertyName) = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String(`"$decodedimage`"))
 
 "
 $FastText.GoEnd()
