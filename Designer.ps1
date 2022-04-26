@@ -153,6 +153,7 @@ SOFTWARE.
 		Fixed double file dialog for icons, images
 		Fixed WebBrowser control
 		Fixed bug with direct control selection (accidental code delete in 2.1.3, restored)
+		More control resize math for when client is maximized.
 		
 BASIC MODIFICATIONS License
 #This software has been modified from the original as tagged with #brandoncomputer
@@ -889,6 +890,9 @@ $global:control_track = @{}
     function Move-SButtons {
         param($Object)
         
+		
+		
+		
         if ( ($Script:supportedControls.Where({$_.Type -eq 'Parentless'}).Name + @('Form','ToolStripMenuItem','ToolStripComboBox','ToolStripTextBox','ToolStripSeparator','ContextMenuStrip')) -notcontains $Object.GetType().Name ) {
             $newSize = $Object.Size
             
@@ -900,6 +904,7 @@ $global:control_track = @{}
                 if ( $Script:MouseMoving -eq $true ) {
                     $clientParent = $Object.Parent.PointToClient([System.Drawing.Point]::Empty)
                     $clientForm = $refFID.PointToClient([System.Drawing.Point]::Empty)
+					
                     $clientOffset = New-Object System.Drawing.Point((($clientParent.X - $clientForm.X) * -1),(($clientParent.Y - $clientForm.Y) * -1))
                 } else {$clientOffset = New-Object System.Drawing.Point(0,0)}
                 
@@ -908,13 +913,25 @@ $global:control_track = @{}
 		#	$newLoc.X = ($newLoc.X * -1) - $Object.Left - ($refs['MainForm'].Location.X) - $clientOffset.X  - $Script:refs['ms_Left'].Size.Width #- (18 / $tscale)
 		#	$newLoc.Y = ($newLoc.Y * -1) - $Object.Top - ($refs['MainForm'].Location.Y) - $clientOffset.Y #- (108 / $tscale)
 		if ($tscale -gt 1){
+			if ($Object.Parent.WindowState -eq "Maximized"){
+		$newLoc.X = ($newLoc.X * -1) - $refFID.Location.X - $refs['MainForm'].Location.X - $clientOffset.X - $Script:refs['ms_Left'].Size.Width - [math]::Round((15 * $tscale))
+		$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - (20 * $tscale) - $clientOffset.Y - [math]::Round((((108 - ($tscale * 4 )) * $tscale)/1))
+			}
+			else{
                 $newLoc.X = ($newLoc.X * -1) - $refFID.Location.X - $refs['MainForm'].Location.X - $clientOffset.X - $Script:refs['ms_Left'].Size.Width - [math]::Round((15 * $tscale))
 		#$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - $clientOffset.Y - (100 * $tscale)
 		$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - $clientOffset.Y - [math]::Round((((108 - ($tscale * 4 )) * $tscale)/1))
+			}
 		}
 		else
-		{ $newLoc.X = ($newLoc.X * -1) - $refFID.Location.X - $refs['MainForm'].Location.X - $clientOffset.X - $Script:refs['ms_Left'].Size.Width - [math]::Round((18 * $tscale))
-		$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - $clientOffset.Y - [math]::Round((108 * $tscale))}
+	{
+			if ($Object.Parent.WindowState -eq "Maximized"){
+			$newLoc.X = ($newLoc.X * -1) - $refFID.Location.X - $refs['MainForm'].Location.X - $clientOffset.X - $Script:refs['ms_Left'].Size.Width - [math]::Round((18 * $tscale))
+			$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - (20 * $tscale) - $clientOffset.Y - [math]::Round((108 * $tscale))}
+			else {$newLoc.X = ($newLoc.X * -1) - $refFID.Location.X - $refs['MainForm'].Location.X - $clientOffset.X - $Script:refs['ms_Left'].Size.Width - [math]::Round((18 * $tscale))
+			$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - $clientOffset.Y - [math]::Round((108 * $tscale))}
+			
+			}
 		
 
 		
