@@ -158,6 +158,7 @@ SOFTWARE.
 		Added image import on solution open.
 	2.1.5 4/27/2022
 		Fixed bug with Powershell 7 not loading saved images.
+		Added 'region Images' for collecting applied images and icons.
 		
 BASIC MODIFICATIONS License
 #This software has been modified from the original as tagged with #brandoncomputer
@@ -2159,6 +2160,7 @@ $FastText.SelectedText = "#region Images
                     $objRef = Get-RootNodeObjRef -TreeNode $Script:refs['TreeView'].SelectedNode
 
                     if ( $changedProperty.PropertyDescriptor.ShouldSerializeValue($changedProperty.Component) ) {
+						
                         switch ($changedProperty.PropertyType) {
 							'System.Drawing.Image' {
 								$MemoryStream = New-Object System.IO.MemoryStream
