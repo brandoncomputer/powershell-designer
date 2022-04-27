@@ -1316,6 +1316,16 @@ $global:control_track = @{}
 						$global:control_track = @{}
                         $projectName = "NewProject.fbs"
 						$FastText.Clear()
+$FastText.SelectedText = "#region Images
+						
+#endregion
+
+"
+
+						try{
+						$FastText.CollapseFoldingBlock(0)}
+						catch{}
+						
 						$refs['tpg_Form1'].Text = $projectName
 						$Script:refs['TreeView'].Nodes.ForEach({
                             $controlName = $_.Name
@@ -1456,6 +1466,10 @@ $global:control_track = @{}
 								}
 							}
 						}
+						
+						try{
+						$FastText.CollapseFoldingBlock(0)}
+						catch{}
 					
 
 
@@ -2042,6 +2056,8 @@ $global:control_track = @{}
                             
 							}
 							
+							$ascii = new-object System.Text.ASCIIEncoding
+							$FastText.SaveToFile("$generationPath\Events.ps1",$ascii)
 							$scriptText | Out-File "$($generationPath)\$($projectName -replace "fbs$","ps1")" -Encoding ASCII -Force
 
                             [void][System.Windows.Forms.MessageBox]::Show('Script file(s) successfully generated!','Success')
@@ -2145,19 +2161,24 @@ $global:control_track = @{}
                     if ( $changedProperty.PropertyDescriptor.ShouldSerializeValue($changedProperty.Component) ) {
                         switch ($changedProperty.PropertyType) {
 							'System.Drawing.Image' {
-$MemoryStream = New-Object System.IO.MemoryStream
-$Script:refsFID.Form.Objects[$controlName].($changedProperty.PropertyName).save($MemoryStream, [System.Drawing.Imaging.ImageFormat]::Jpeg)
-$Bytes = $MemoryStream.ToArray()
-$MemoryStream.Flush()
-$MemoryStream.Dispose()
-$decodedimage = [convert]::ToBase64String($Bytes)
+								$MemoryStream = New-Object System.IO.MemoryStream
+								$Script:refsFID.Form.Objects[$controlName].($changedProperty.PropertyName).save($MemoryStream, [System.Drawing.Imaging.ImageFormat]::Jpeg)
+								$Bytes = $MemoryStream.ToArray()
+								$MemoryStream.Flush()
+								$MemoryStream.Dispose()
+								$decodedimage = [convert]::ToBase64String($Bytes)
 
-$string = "#Must start at column 0.
-`$$controlName.$($changedProperty.PropertyName) = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String(`"$decodedimage`"))
+								if ($FastText.GetLineText(0) -eq "#region Images")
+								{
+								$FastText.ExpandFoldedBlock(0)
+								$FastText.SelectionStart = 16}
 
+								$string = "`$$controlName.$($changedProperty.PropertyName) = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String(`"$decodedimage`"))
 "
-$FastText.GoEnd()
-					$FastText.SelectedText = $string
+								$FastText.SelectedText = $string
+
+								if ($FastText.GetLineText(0) -eq "#region Images"){
+								$FastText.CollapseFoldingBlock(0)}
 							
 							}
 							
@@ -2169,20 +2190,28 @@ $MemoryStream.Flush()
 $MemoryStream.Dispose()
 $decodedimage = [convert]::ToBase64String($Bytes)
 
-$string = "#Must start at column 0.
-`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Drawing.Bitmap][System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String(`"$decodedimage`"))).GetHicon())
-
+									if ($FastText.GetLineText(0) -eq "#region Images")
+									{
+									$FastText.ExpandFoldedBlock(0)
+									$FastText.SelectionStart = 16}
+								
+$string = "`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Drawing.Bitmap][System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String(`"$decodedimage`"))).GetHicon())
 "
-$FastText.GoEnd()
 					$FastText.SelectedText = $string
+					
+						if ($FastText.GetLineText(0) -eq "#region Images"){
+						$FastText.CollapseFoldingBlock(0)}
+						
 
 								
 							}
+							
 							default {
                                 if ( $null -eq $objRef.Changes[$controlName] ) {$objRef.Changes[$controlName] = @{}}
                                 $objRef.Changes[$controlName][$changedProperty.PropertyName] = $value
                             }
                         }
+
                     } elseif ( $objRef.Changes[$controlName] ) {
                         if ( $objRef.Changes[$controlName][$changedProperty.PropertyName] ) {
                             $objRef.Changes[$controlName].Remove($changedProperty.PropertyName)
@@ -3767,7 +3796,8 @@ $xpopup.Items.Add($xpSep1)
 
 $Cut = new-object System.Windows.Forms.ToolStripMenuItem
 $Cut.text = "Cut"
-$Cut.Add_Click({$FastText.Cut()})
+$Cut.Add_Click({$FastText.Cut()
+})
 $xpopup.Items.Add($Cut)
 
 $Copy = new-object System.Windows.Forms.ToolStripMenuItem
@@ -3825,14 +3855,22 @@ $Script:refs['ms_Left'].Width = 0
 
 $eventform.height = $eventform.height * $tscale
 
+$FastText.SelectedText = "#region Images
+
+#endregion
+
+"
+
+
+						try{
+						$FastText.CollapseFoldingBlock(0)}
+						catch{}
 
 $eventForm.Show()
 
 $Script:refs['tsl_StatusLabel'].text = "Current DPIScale: $tscale - for resize events multiply all location and size modifiers by `$tscale."
 
 $Script:refs['spt_Right'].splitterdistance = $Script:refs['spt_Right'].splitterdistance * $tscale
-
-
 
 
 		[void]$Script:refs['MainForm'].ShowDialog()
