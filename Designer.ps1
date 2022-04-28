@@ -164,6 +164,8 @@ SOFTWARE.
 		Fixed minor bug involving ToolStripProgressBar sizing (Set AutoSize to False to save the size of this element)
 		Fixed minor bug involving ToolStripSeparator
 		Fixed bug loading projects with ImageScalingSize and MinimumSize attributes.
+	2.1.7 4/29/2022
+		Changed several message box dialogs to status bar label updates with timer instances.
 		
 BASIC MODIFICATIONS License
 #This software has been modified from the original as tagged with #brandoncomputer
@@ -252,7 +254,7 @@ $global:control_track = @{}
             [switch]$Promote
         )
 
-        if ( $Message -ne '' ) {[void][System.Windows.Forms.MessageBox]::Show("$($Message)`r`n`r`nCheck '$($BaseDir)\exceptions.txt' for details.",'Exception Occurred')}
+        if ( $Message -ne '' ) {$Script:refs['tsl_StatusLabel'].text = "$($Message)"}#`r`n`r`nCheck '$($BaseDir)\exceptions.txt' for details."}
 
         $date = Get-Date -Format 'yyyyMMdd HH:mm:ss'
         $ErrorRecord | Out-File "$($BaseDir)\tmpError.txt"
@@ -845,7 +847,7 @@ $global:control_track = @{}
                 if (( $ControlType -eq 'TabControl' ) -and ( $Script:openingProject -eq $false )) {Add-TreeNode -TreeObject $newTreeNode -ControlType TabPage -ControlName 'Tab 1'}
 				
             }
-        } catch {Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered adding TreeNode ($($ControlType) - $($ControlName))."}
+        } catch {Update-ErrorLog -ErrorRecord $_ -Message "Unable to add $($ControlName) to $($objRef.Objects[$TreeObject.Name])."}
     }
 
     function Get-ChildNodeList {
@@ -1288,7 +1290,7 @@ $global:control_track = @{}
 					$FastText.SaveToFile("$generationPath\Events.ps1",$ascii)
 
 
-                    if ( $Suppress -eq $false ) {[void][System.Windows.Forms.MessageBox]::Show('Successfully Saved!','Success')}
+                    if ( $Suppress -eq $false ) {$Script:refs['tsl_StatusLabel'].text = 'Successfully Saved!'}
                 }
             } catch {
                 if ( $ReturnXML ) {
@@ -1592,7 +1594,7 @@ $FastText.SelectedText = "#region Images
                                     if ( $objRef.Events[$nodesToDelete[$_]] ) {$objRef.Events.Remove($nodesToDelete[$_])}
                                 })
                             }
-                        } else {[void][System.Windows.Forms.MessageBox]::Show('Cannot delete the root Form.  Start a New Project instead.')}
+                        } else {$Script:refs['tsl_StatusLabel'].text = 'Cannot delete the root Form.  Start a New Project instead.'}
                     } catch {Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered deleting '$($Script:refs['TreeView'].SelectedNode.Text)'."}
                 } else {[void][System.Windows.Forms.MessageBox]::Show("Cannot perform any action from the 'Edit' Menu against a SplitterPanel control.",'Restricted Action')}
             }
@@ -2073,11 +2075,11 @@ $FastText.SelectedText = "#region Images
 							$FastText.SaveToFile("$generationPath\Events.ps1",$ascii)
 							$scriptText | Out-File "$($generationPath)\$($projectName -replace "fbs$","ps1")" -Encoding ASCII -Force
 
-                            [void][System.Windows.Forms.MessageBox]::Show('Script file(s) successfully generated!','Success')
+                            $Script:refs['tsl_StatusLabel'].text = 'Script file(s) successfully generated!'
                         }
                     } catch {
                         if ( $_.Exception.Message -ne 'SaveCancelled' ) {
-                            [void][System.Windows.Forms.MessageBox]::Show('There was an issue generating the script file.','Error')
+                            $Script:refs['tsl_StatusLabel'].text = 'There was an issue generating the script file.'
                             Update-ErrorLog -ErrorRecord $_
                         }
                     }
@@ -2240,41 +2242,31 @@ $string = "`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Draw
                 $controlName = $this.SelectedNode.Name
 				
 				
-					if ($global:warn -eq $null)
-					{
 						switch ($controlName)
 						{
 						'MenuStrip' {
-							$global:warn = $true
-							[void][System.Windows.Forms.MessageBox]::Show("Please do not use item collections in the property grid. Build onto controls by stacking controls from the selection on the left.",'Information')
+							$Script:refs['tsl_StatusLabel'].text = "Please do not use item collections in the property grid. Build onto controls by stacking controls from the selection on the left."
 						}
 						'ContextMenuStrip' {
-							$global:warn = $true
-							[void][System.Windows.Forms.MessageBox]::Show("Please do not use item collections in the property grid. Build onto controls by stacking controls from the selection on the left.",'Information')
+							$Script:refs['tsl_StatusLabel'].text = "Please do not use item collections in the property grid. Build onto controls by stacking controls from the selection on the left."
 						}
 						'StatusStrip' {
-							$global:warn = $true
-							[void][System.Windows.Forms.MessageBox]::Show("Please do not use item collections in the property grid. Build onto controls by stacking controls from the selection on the left.",'Information')
+							$Script:refs['tsl_StatusLabel'].text = "Please do not use item collections in the property grid. Build onto controls by stacking controls from the selection on the left."
 						}
 						'ToolStrip' {
-							$global:warn = $true
-							[void][System.Windows.Forms.MessageBox]::Show("Please do not use item collections in the property grid. Build onto controls by stacking controls from the selection on the left.",'Information')
+							$Script:refs['tsl_StatusLabel'].text = "Please do not use item collections in the property grid. Build onto controls by stacking controls from the selection on the left."
 						}
 						'ToolStripDropDownButton' {
-							$global:warn = $true
-							[void][System.Windows.Forms.MessageBox]::Show("Please do not use item collections in the property grid. Build onto controls by stacking controls from the selection on the left.",'Information')
+							$Script:refs['tsl_StatusLabel'].text = "Please do not use item collections in the property grid. Build onto controls by stacking controls from the selection on the left."
 						}
 						'ToolStripSplitButton' {
-							$global:warn = $true
-							[void][System.Windows.Forms.MessageBox]::Show("Please do not use item collections in the property grid. Build onto controls by stacking controls from the selection on the left.",'Information')
+							$Script:refs['tsl_StatusLabel'].text = "Please do not use item collections in the property grid. Build onto controls by stacking controls from the selection on the left."
 						}
 						'ToolStripMenuItem' {
-							$global:warn = $true
-							[void][System.Windows.Forms.MessageBox]::Show("Please do not use item collections in the property grid. Build onto controls by stacking controls from the selection on the left.",'Information')
+							$Script:refs['tsl_StatusLabel'].text = "Please do not use item collections in the property grid. Build onto controls by stacking controls from the selection on the left."
 						}
 						default{}
 						}
-					}
 
                 if ( $controlName -eq 'ContextMenuStrip' ) {
 #brandoncomputer_RemoveGlobalContextMenuStrip
@@ -3880,9 +3872,25 @@ $FastText.SelectedText = "#region Images
 
 $eventForm.Show()
 
+$Script:refs['tsl_StatusLabel'].add_TextChanged({
+		
+		if ($Script:refs['tsl_StatusLabel'].text -ne "Current DPIScale: $tscale")
+		{
+		$errT = new-object System.Windows.Forms.Timer
+		$errT.Interval = 10000
+		$errT.Enabled = $True
+			$errT.add_Tick({$Script:refs['tsl_StatusLabel'].text ="Current DPIScale: $tscale" 
+			$this.Enabled = $false
+			$this.Dispose()
+		})
+		}
+		
+})
+
 $Script:refs['tsl_StatusLabel'].text = "Current DPIScale: $tscale - for resize events multiply all location and size modifiers by `$tscale."
 
 $Script:refs['spt_Right'].splitterdistance = $Script:refs['spt_Right'].splitterdistance * $tscale
+
 
 
 		[void]$Script:refs['MainForm'].ShowDialog()
