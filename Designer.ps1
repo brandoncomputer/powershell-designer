@@ -28,8 +28,8 @@ SOFTWARE.
         FileName:     Designer.ps1
         Modified:     Brandon Cunningham
         Created On:   1/15/2020
-        Last Updated: 4/27/2022
-        Version:      v2.1.5
+        Last Updated: 4/28/2022
+        Version:      v2.1.6
     ===========================================================================
 
     .DESCRIPTION
@@ -159,6 +159,12 @@ SOFTWARE.
 	2.1.5 4/27/2022
 		Fixed bug with Powershell 7 not loading saved images.
 		Added 'region Images' for collecting applied images and icons.
+	2.1.6 4/28/2022
+		Removed HScrollBar and VScrollBar due to support issues with DPI Scaling (these can still be added programmatically within 'events', if so multiply Width by $tscale for HScrollBar but exclude width, and the opposite is true for VScrollBar).
+		Fixed minor bug involving ToolStripProgressBar sizing (Set AutoSize to False to save the size of this element)
+		Fixed minor bug involving ToolStripSeparator
+		Fixed bug loading projects with ImageScalingSize and MinimumSize attributes.
+		Fixed bug with ImageScalingSize being multiplied twice by DPIScale regarding MenuStips and ToolStrips.
 		
 BASIC MODIFICATIONS License
 #This software has been modified from the original as tagged with #brandoncomputer
@@ -207,7 +213,7 @@ public class psd {
 	            Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(true);
 		}
-			
+		
 	    [System.Runtime.InteropServices.DllImport("user32.dll")]
         public static extern bool SetProcessDPIAware();
 		
@@ -272,6 +278,7 @@ $global:control_track = @{}
 
             if ( $Xml.ToString() -ne 'SplitterPanel' ) {$newControl = New-Object System.Windows.Forms.$($Xml.ToString())}
 			
+#brandoncomputer_ToolStripAlias
 			if ( $Xml.ToString() -eq 'ToolStrip' ) {
 					$newControl = New-Object System.Windows.Forms.MenuStrip
 					$ParentControl.Controls.Add($newControl)
@@ -284,8 +291,8 @@ $global:control_track = @{}
                 elseif ( $Xml.ToString() -eq 'SplitterPanel' ) {$newControl = $ParentControl.$($Xml.Name.Split('_')[-1])}
                 else {$ParentControl.Controls.Add($newControl)}
             }
-		
-            
+			
+       
             $Xml.Attributes | ForEach-Object {
                 $attrib = $_
                 $attribName = $_.ToString()
@@ -456,7 +463,7 @@ $global:control_track = @{}
 				}
 				
 				if ($_.ToString() -eq 'MinimumSize'){
-					$n = $attrib.Value.split(',')
+					$n = $_.Value.split(',')
 					$n[0] = [math]::Round(($n[0]/1) * $tscale)
 					$n[1] = [math]::Round(($n[1]/1) * $tscale)
 					if ("$($n[0]),$($n[1])" -ne ",") {
@@ -465,7 +472,7 @@ $global:control_track = @{}
 				}
 				
 				if ($_.ToString() -eq 'ImageScalingSize'){
-					$n = $attrib.Value.split(',')
+					$n = $_.Value.split(',')
 					$n[0] = [math]::Round(($n[0]/1) * $tscale)
 					$n[1] = [math]::Round(($n[1]/1) * $tscale)
 					if ("$($n[0]),$($n[1])" -ne ",") {
@@ -556,6 +563,8 @@ $global:control_track = @{}
 			[string]$ControlText
         )
 		
+#		info $TreeObject.ToString()
+		
 		if ($ControlText)
 		{}
 		else {
@@ -567,6 +576,7 @@ $global:control_track = @{}
 		}
 		}
 		
+#brandoncomputer_ToolStripAlias2		
 		if ($ControlType -eq 'ToolStrip')
 		{$ControlType = 'MenuStrip'}
 		
@@ -767,8 +777,10 @@ $global:control_track = @{}
 						$newControl.height = $newControl.height * $tscale}
 						if ($newControl.width){
 						$newControl.width = $newControl.width * $tscale}
-						if ($newControl.ImageScalingSize)
-						{$newControl.imagescalingsize = new-object System.Drawing.Size([int]($tscale * $newControl.imagescalingsize.width),[int]($tscale * $newControl.imagescalingsize.Height))}
+#brandoncomputer_ImageScalingSize(Temporarily? Disabled to fix bug with Menustrips and Toolstrips)
+<# 						if ($newControl.ImageScalingSize)
+						{
+							$newControl.imagescalingsize = new-object System.Drawing.Size([int]($tscale * $newControl.imagescalingsize.width),[int]($tscale * $newControl.imagescalingsize.Height))} #>
 #brandoncomputer_ToolStripException
 					if ( $ControlType -eq "ToolStrip" ) {
 						$objRef.Objects[$TreeObject.Name].Controls.Add($newControl)}
@@ -894,14 +906,15 @@ $global:control_track = @{}
 
     function Move-SButtons {
         param($Object)
-        
-		
-		
+			
+			if ($Object.GetType().Name -eq 'ToolStripProgressBar')
+			{return}
 		
         if ( ($Script:supportedControls.Where({$_.Type -eq 'Parentless'}).Name + @('Form','ToolStripMenuItem','ToolStripComboBox','ToolStripTextBox','ToolStripSeparator','ContextMenuStrip')) -notcontains $Object.GetType().Name ) {
-            $newSize = $Object.Size
-            
+				      
+		  $newSize = $Object.Size
             if ( $Object.GetType().Name -ne 'HashTable' ) {
+
                 $refFID = $Script:refsFID.Form.Objects.Values.Where({$_.GetType().Name -eq 'Form'})
                 $Script:sButtons.GetEnumerator().ForEach({$_.Value.Visible = $true})
                 $newLoc = $Object.PointToClient([System.Drawing.Point]::Empty)
@@ -942,7 +955,7 @@ $global:control_track = @{}
 		
 
                 if ( $Script:refs['pnl_Left'].Visible -eq $true ) {$newLoc.X = $newLoc.X - $Script:refs['pnl_Left'].Size.Width - $Script:refs['lbl_Left'].Size.Width}
-            } else {$newLoc = New-Object System.Drawing.Point(($Script:sButtons['btn_TLeft'].Location.X + $Object.LocOffset.X),($Script:sButtons['btn_TLeft'].Location.Y + $Object.LocOffset.Y))}
+		} else {$newLoc = New-Object System.Drawing.Point(($Script:sButtons['btn_TLeft'].Location.X + $Object.LocOffset.X),($Script:sButtons['btn_TLeft'].Location.Y + $Object.LocOffset.Y))}
 
             $Script:sRect = New-Object System.Drawing.Rectangle($newLoc,$newSize)
 
@@ -988,7 +1001,7 @@ $global:control_track = @{}
             $Script:refs['PropertyGrid'].SelectedObject.Refresh()
             $Script:refs['PropertyGrid'].SelectedObject.Parent.Refresh()
         } else {$Script:sButtons.GetEnumerator().ForEach({$_.Value.Visible = $false})}
-    }
+	}
 
     function Save-Project {
         param(
@@ -2368,7 +2381,7 @@ $string = "`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Draw
                 $objRef = Get-RootNodeObjRef -TreeNode $Script:refs['TreeView'].SelectedNode
 
                 $Script:refs['lst_AssignedEvents'].Items.Remove($this.SelectedItem)
-
+				
                 if ( $Script:refs['lst_AssignedEvents'].Items.Count -eq 0 ) {
                     $Script:refs['lst_AssignedEvents'].Items.Add('No Events')
                     $Script:refs['lst_AssignedEvents'].Enabled = $false
@@ -2822,7 +2835,6 @@ $string = "`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Draw
             [pscustomobject]@{Name='FolderBrowserDialog';Prefix='fbd';Type='Parentless';ChildTypes=@()},
             [pscustomobject]@{Name='FontDialog';Prefix='fnd';Type='Parentless';ChildTypes=@()},
             [pscustomobject]@{Name='GroupBox';Prefix='gbx';Type='Container';ChildTypes=@('Common','Container','MenuStrip','Context')},
-            [pscustomobject]@{Name='HScrollBar';Prefix='hsc';Type='Common';ChildTypes=@('Context')},
 			[pscustomobject]@{Name='Label';Prefix='lbl';Type='Common';ChildTypes=@('Context')},
             [pscustomobject]@{Name='LinkLabel';Prefix='llb';Type='Common';ChildTypes=@('Context')},
             [pscustomobject]@{Name='ListBox';Prefix='lbx';Type='Common';ChildTypes=@('Context')},
@@ -2859,11 +2871,10 @@ $string = "`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Draw
 			[pscustomobject]@{Name='TrackBar';Prefix='tbr';Type='Common';ChildTypes=@('Context')},
             [pscustomobject]@{Name='TreeView';Prefix='tvw';Type='Common';ChildTypes=@('Context')},
             [pscustomobject]@{Name='WebBrowser';Prefix='wbr';Type='Common';ChildTypes=@('Context')},
-			[pscustomobject]@{Name='VScrollBar';Prefix='vsc';Type='Common';ChildTypes=@('Context')},
             [pscustomobject]@{Name='ToolStripMenuItem';Prefix='tmi';Type='MenuStrip-Root';ChildTypes=@('MenuStrip-Root','MenuStrip-Child')},
             [pscustomobject]@{Name='ToolStripComboBox';Prefix='tcb';Type='MenuStrip-Root';ChildTypes=@()},
             [pscustomobject]@{Name='ToolStripTextBox';Prefix='ttb';Type='MenuStrip-Root';ChildTypes=@()},
-            [pscustomobject]@{Name='ToolStripSeparator';Prefix='tss';Type='MenuStrip-Child';ChildTypes=@()},
+            [pscustomobject]@{Name='ToolStripSeparator';Prefix='tss';Type='MenuStrip-Root';ChildTypes=@()},
             [pscustomobject]@{Name='Form';Prefix='frm';Type='Special';ChildTypes=@('Common','Container','Context','MenuStrip')}
         )
 
@@ -3913,6 +3924,9 @@ public static extern IntPtr GetConsoleWindow();
 
 [DllImport("user32.dll")]
 public static extern bool ShowWindow(IntPtr hWnd, Int32 nCmdShow);
+
+		[DllImport("user32.dll")]
+		public static extern int SendMessage(int hWnd, int hMsg, int wParam, int lParam);
 '
 
 [Console.Window]::ShowWindow([Console.Window]::GetConsoleWindow(), 0)
