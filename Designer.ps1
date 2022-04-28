@@ -164,7 +164,6 @@ SOFTWARE.
 		Fixed minor bug involving ToolStripProgressBar sizing (Set AutoSize to False to save the size of this element)
 		Fixed minor bug involving ToolStripSeparator
 		Fixed bug loading projects with ImageScalingSize and MinimumSize attributes.
-		Fixed bug with ImageScalingSize being multiplied twice by DPIScale regarding MenuStips and ToolStrips.
 		
 BASIC MODIFICATIONS License
 #This software has been modified from the original as tagged with #brandoncomputer
@@ -777,10 +776,10 @@ $global:control_track = @{}
 						$newControl.height = $newControl.height * $tscale}
 						if ($newControl.width){
 						$newControl.width = $newControl.width * $tscale}
-#brandoncomputer_ImageScalingSize(Temporarily? Disabled to fix bug with Menustrips and Toolstrips)
-<# 						if ($newControl.ImageScalingSize)
+#brandoncomputer_ImageScalingSize
+						if ($newControl.ImageScalingSize)
 						{
-							$newControl.imagescalingsize = new-object System.Drawing.Size([int]($tscale * $newControl.imagescalingsize.width),[int]($tscale * $newControl.imagescalingsize.Height))} #>
+							$newControl.imagescalingsize = new-object System.Drawing.Size([int]($tscale * $newControl.imagescalingsize.width),[int]($tscale * $newControl.imagescalingsize.Height))} 
 #brandoncomputer_ToolStripException
 					if ( $ControlType -eq "ToolStrip" ) {
 						$objRef.Objects[$TreeObject.Name].Controls.Add($newControl)}
