@@ -390,7 +390,8 @@ $global:control_track = @{}
             [switch]$IncrementName
         )
 
-        try {
+        # Force 'en-US' culture while converting from Xml
+        [Threading.Thread]::CurrentThread.CurrentCulture = 'en-US'; try {
             $controlType = $Xml.ToString()
             $controlName = "$($Xml.Name)"
 			
