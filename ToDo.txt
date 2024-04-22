@@ -1,2 +1,0 @@
-1. Abstact custom functions to module, copy from base path to documents folder path
-2. Create listbox to display parameters instead of injecting them into the FastText control
