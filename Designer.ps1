@@ -187,6 +187,15 @@ SOFTWARE.
 		Moved custom function (execution) into user customizable file. Moved dependency function (execution) into user customizable file. Theses files are in Documents\PowerShell Designer\functions.
 		Changed AST code a bit to parse the external function file instead of the modules own script base.
 		Added parameter label for displaying options for each custom function instead of injecting them into FastText
+	
+	2.2.2 4/22/2024
+		Changed functions.ps1 to functions.psm1 so it can be imported as a module and commands such as get-help may be used to learn more about functions.
+		Changed $lst_Functions.add_Click to $lst_Functions.add_SelectedIndexChanged
+		Chanced parameter label to TextBox. Did some string tricks to format it properly for display. Enabled on purpose for copy/paste/scroll.
+		Changed Function hotkeys around a little. Added a menu item to load functions.psm1 into PowerShell for testing (F7). Added F8 for generating script file.
+		Function CheckListBox DoubleClick now injects function into FastText window and checks the item
+		Events.ps1 is no longer dot sourced. Changed text to just "Run Script File" and canceled the save to Events.ps1
+		Fixed custom function Get-Arctangent
 		
 BASIC MODIFICATIONS License
 #This software has been modified from the original as tagged with #brandoncomputer
@@ -221,9 +230,9 @@ if ($folderExists -eq $false){
 	New-Item -ItemType directory -Path ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions")
 }
 
-$functionsExists = Test-Path -path ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\functions.ps1")
+$functionsExists = Test-Path -path ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\functions.psm1")
 if ($functionsExists -eq $false){
-	Copy-Item -Path "$PSScriptRoot\functions.ps1" -destination ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\functions.ps1")
+	Copy-Item -Path "$PSScriptRoot\functions.psm1" -destination ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\functions.psm1")
 }
 
 $dependenciesExists = Test-Path -path ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\Dependencies.ps1")
@@ -234,7 +243,8 @@ if ($dependenciesExists -eq $false){
 # ScriptBlock to Execute in STA Runspace
 $sbGUI = {
 	    param($BaseDir,$DPI)
-		
+
+#region These functions are needed for all projects
 function Set-Types {
 Add-Type -AssemblyName System.Windows.Forms,presentationframework, presentationcore, Microsoft.VisualBasic
 
@@ -562,28 +572,64 @@ public class Window
 "@
 $global:ctscale = 1
 }
-Set-Types
-
-$global:control_track = @{}
-
-
-    #region Functions
 
 function Set-EnableVisualStyle {
+<#
+    .SYNOPSIS
+		Enables modern visual styles in the dialog window.
+	.DESCRIPTION
+		This function will call upon the windows application programming
+		interface to apply modern visual style to the window.
+	.EXAMPLE
+		Set-EnableVisualStyle
+#>
 	[vds]::SetCompat() | out-null
 }
 
 function Set-DPIAware {
+<#
+    .SYNOPSIS
+		Causes the dialog window to be DPI Aware.
+	.DESCRIPTION
+		This function will call upon the windows application programming
+		interface to cause the window to be DPI Aware.
+	.EXAMPLE
+		Set-DPIAware
+#>
 	$vscreen = [System.Windows.Forms.SystemInformation]::VirtualScreen.height
 	[vds]::SetProcessDPIAware() | out-null
 	$screen = [System.Windows.Forms.SystemInformation]::VirtualScreen.height
 	$global:ctscale = ($screen/$vscreen)
 }
 
-Set-EnableVisualStyle
-Set-DPIAware
-
 function Show-Form {
+<#
+	.SYNOPSIS
+		Ensures forms are ran in the correct application space, particularly 
+		when multiple forms are involved.
+		
+    .DESCRIPTION
+		This function runs the first form in an application space, and shows
+		successive forms.
+	
+	.PARAMETER Form
+		The form to show.
+		
+	.PARAMETER Modal
+		Switch that specifies the window is to be shown as a modal dialog.
+	
+	.EXAMPLE
+		Show-Form $Form1
+	
+	.EXAMPLE
+		Show-Form -Form $Form1 -modal
+
+	.EXAMPLE
+		$Form1 | Show-Form
+
+	.INPUTS
+		Form as Object
+#>
 	[CmdletBinding()]
     param (
 		[Parameter(Mandatory,
@@ -606,6 +652,37 @@ function Show-Form {
 }
 
 function Update-ErrorLog {
+<#
+    .SYNOPSIS
+		Logs errors to the text file 'exceptions.txt' for use in the catch 
+		statement of a try catch.
+			 
+	.DESCRIPTION
+		This function logs errors to the text file 'exceptions.txt' residing in
+		the current directory in use by powershell, for use in the catch 
+		statement of a try catch.
+	 
+	.PARAMETER ErrorRecord
+		The object from the pipeline represented by $_ or $PSItem
+	
+	.PARAMETER Message
+		The message to display to the end user.
+		
+	.PARAMETER Promote
+		Switch that defines to also call a throw of the ValueFromPipeline
+		
+	.EXAMPLE
+		Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered adding $($Xml.ToString()) to $($ParentControl.Name)"
+		
+	.EXAMPLE
+		Update-ErrorLog -Promote -ErrorRecord $_ -Message "Exception encountered adding $($Xml.ToString()) to $($ParentControl.Name)"
+
+	.INPUTS
+		ErrorRecord as ValueFromPipeline, Message as String, Promote as Switch
+	
+	.Outputs
+		String || String, Throw method of ValueFromPipeline
+#>
 	param(
 		[System.Management.Automation.ErrorRecord]$ErrorRecord,
 		[string]$Message,
@@ -625,10 +702,78 @@ function Update-ErrorLog {
 }
 
 function Get-CurrentDirectory {
+<#
+	.SYNOPSIS
+		Returns the current directory as string
+		     
+    .DESCRIPTION
+		This function returns the current directory of the application as string.
+		
+	.EXAMPLE
+		Write-Host Get-CurrentDirectory
+	
+	.OUTPUTS
+		String
+#>
     return (Get-Location | Select-Object -expandproperty Path | Out-String).Trim()
 }
 
 function ConvertFrom-WinFormsXML {
+<#
+    .SYNOPSIS
+		Opens a form from XAML in the format specified by 'powershell-designer'
+		or its predecessor, PowerShell WinForms Creator
+			 
+	.DESCRIPTION
+		This function opens a form from XAML in the format specified by 'powershell-designer'
+		or its predecessor, PowerShell WinForms Creator
+	 
+	.PARAMETER XML
+		The XML object or XML string specifying the parameters for the form object
+	
+	.PARAMETER Reference
+		This function recursively calls itself. Internal parameter for child 
+		objects, not typically called programatically. Also this function is
+		maintained for legacy compatibility PowerShell WinForm Creator, which 
+		does require the call in some instances due to not creating automatic
+		variables.
+	
+	.PARAMETER Supress
+		This function recursively calls itself. Internal parameter for child 
+		objects, not typically called programatically.
+	
+	.EXAMPLE
+		ConvertFrom-WinFormsXML -Xml  @"
+		<Form Name="MainForm" Size="800,600" Tag="VisualStyle,DPIAware" Text="MainForm">
+			<Button Name="Button1" Location="176,94" Text="Button1" />
+		</Form>
+"@
+
+	.EXAMPLE
+		ConvertFrom-WinFormsXML @"
+		<Form Name="MainForm" Size="800,600" Tag="VisualStyle,DPIAware" Text="MainForm">
+			<Button Name="Button1" Location="176,94" Text="Button1" />
+		</Form>
+"@
+
+	.EXAMPLE
+	$content = [xml](get-content $Path)
+	ConvertFrom-WinformsXML -xml $content.Data.Form.OuterXml
+	
+	.EXAMPLE
+	$content = [xml](get-content $Path)
+	ConvertFrom-WinformsXML $content.Data.Form.OuterXml
+
+	.INPUTS
+		Xml as String || Xml as xml
+	
+	.OUTPUTS
+		Object
+	
+	.NOTES
+		Each object created has a variable created to access the object 
+		according to its Name attribute e.g. $Button1
+#>
 	param(
 		[Parameter(Mandatory)]
 		$Xml,
@@ -657,7 +802,6 @@ function ConvertFrom-WinFormsXML {
 		if ( $Xml.ToString() -eq 'Form' ) {
 			$newControl = [vdsForm]
 		}
-		
 		if ( $Xml.ToString() -ne 'SplitterPanel' ) {
 			$newControl = New-Object System.Windows.Forms.$($Xml.ToString())
 		}
@@ -1101,6 +1245,13 @@ function ConvertFrom-WinFormsXML {
 		Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered adding $($Xml.ToString()) to $($ParentControl.Name)"
 	}
 }
+#endregion
+
+Set-Types
+Set-EnableVisualStyle
+Set-DPIAware
+
+$global:control_track = @{} 
 
 function New-Timer {
 <#
@@ -1145,7 +1296,6 @@ function New-Timer {
     $timer.Enabled = $true
     return $timer
 }
-
 
     function Convert-XmlToTreeView {
         param(
@@ -2497,7 +2647,7 @@ for($i=0; $i -lt $lst_Functions.Items.Count; $i++)
 				#iex (Get-Content (([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\Dependencies.ps1")) | Out-String)
 
 				$generationPath = "$(Split-Path -Path $global:projectDirName)\$($projectName -replace "\..*$")"
-				$designerpath = ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\Functions.ps1")
+				$designerpath = ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\functions.psm1")
 				New-Variable astTokens -Force
 				New-Variable astErr -Force
 				$AST = [System.Management.Automation.Language.Parser]::ParseFile($designerpath, [ref]$astTokens, [ref]$astErr)
@@ -2993,7 +3143,7 @@ $string = "`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Draw
   <Form Name="Generate" FormBorderStyle="FixedDialog" MaximizeBox="False" MinimizeBox="False" ShowIcon="False" ShowInTaskbar="False" Size="410, 420" StartPosition="CenterParent" Text="Generate Script File(s)">
     <GroupBox Name="gbx_DotSource" Location="25, 115" Size="345, 219" Text="Dot Sourcing">
       <CheckBox Name="cbx_Functions" Location="25, 25" Text="Functions" />
-      <TextBox Name="tbx_Functions" Enabled="False" Location="165, 25" Size="150, 20" Text="Functions.ps1" />
+      <TextBox Name="tbx_Functions" Enabled="False" Location="165, 25" Size="150, 20" Text="functions.psm1" />
       <CheckBox Name="cbx_Events" Location="25, 55" Text="Events" />
       <TextBox Name="tbx_Events" Enabled="False" Location="165, 55" Size="150, 20" Text="Events.ps1" />
       <CheckBox Name="cbx_ChildForms" Location="25, 85" Text="Child Forms" />
@@ -3367,13 +3517,13 @@ $string = "`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Draw
 #brandoncomputer_FixWindowState
         ConvertFrom-WinFormsXML -Reference refs -Suppress -Xml @"
   <Form Name="MainForm" IsMdiContainer="True" Size="826, 654" WindowState="Maximized" Text="PowerShell Designer">
-   <TabControl Name="tcl_Top" Dock="Top" Size="288, 20">
-      <TabPage Name="tpg_Form1" Size="280, 0" Text="NewProject.fbs" />
+    <TabControl Name="tcl_Top" Dock="Top" Size="330, 20">
+      <TabPage Name="tpg_Form1" Size="322, 0" Text="NewProject.fbs" />
     </TabControl>
     <Label Name="lbl_Left" Dock="Left" BackColor="35, 35, 35" Cursor="VSplit" Size="3, 570" />
     <Label Name="lbl_Right" Dock="Right" BackColor="35, 35, 35" Cursor="VSplit" Size="3, 570" />
     <Panel Name="pnl_Left" Dock="Left" BorderStyle="Fixed3D" Size="200, 570">
-      <SplitContainer Name="spt_Left" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="237">
+      <SplitContainer Name="spt_Left" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="219">
         <SplitterPanel Name="spt_Left_Panel1">
           <TreeView Name="trv_Controls" Dock="Fill" BackColor="Azure" />
         </SplitterPanel>
@@ -3383,31 +3533,29 @@ $string = "`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Draw
       </SplitContainer>
     </Panel>
     <Panel Name="pnl_Right" Dock="Right" BorderStyle="Fixed3D" Size="200, 570">
-      <SplitContainer Name="spt_Right" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="179">
+      <SplitContainer Name="spt_Right" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="165">
         <SplitterPanel Name="spt_Right_Panel1">
           <PropertyGrid Name="PropertyGrid" Dock="Fill" ViewBackColor="Azure" />
         </SplitterPanel>
         <SplitterPanel Name="spt_Right_Panel2" BackColor="Control">
           <TabControl Name="TabControl2" Dock="Fill">
-            <TabPage Name="Tab 1" Size="188, 357" Text="Events">
-              <SplitContainer Name="SplitContainer3" Dock="Fill" Orientation="Horizontal" SplitterDistance="121">
+            <TabPage Name="Tab 1" Size="188, 371" Text="Events">
+              <SplitContainer Name="SplitContainer3" Dock="Fill" Orientation="Horizontal" SplitterDistance="213">
                 <SplitterPanel Name="SplitContainer3_Panel1" AutoScroll="True">
-                  <Label Name="lbl_AvailableEvents" Dock="Top" Size="184, 23" Text="Available Events" />
-                  <ListBox Name="lst_AvailableEvents" BackColor="Azure" Location="1, 23" Size="183, 147" />
+                  <ListBox Name="lst_AvailableEvents" Dock="Fill" BackColor="Azure" />
                 </SplitterPanel>
                 <SplitterPanel Name="SplitContainer3_Panel2" AutoScroll="True">
-                  <Label Name="lbl_AssignedEvents" Dock="Top" Size="188, 23" Text="Assigned Events" />
-                  <ListBox Name="lst_AssignedEvents" BackColor="Azure" Location="0, 23" Size="188, 160" />
+                  <ListBox Name="lst_AssignedEvents" Dock="Fill" BackColor="Azure" />
                 </SplitterPanel>
               </SplitContainer>
             </TabPage>
-            <TabPage Name="TabPage3" Size="188, 357" Text="Functions">
+            <TabPage Name="TabPage3" Size="188, 403" Text="Functions">
               <SplitContainer Name="SplitContainer4" Dock="Fill" Orientation="Horizontal" SplitterDistance="169">
                 <SplitterPanel Name="SplitContainer4_Panel1" AutoScroll="True">
                   <CheckedListBox Name="lst_Functions" Dock="Fill" BackColor="Azure" />
                 </SplitterPanel>
                 <SplitterPanel Name="SplitContainer4_Panel2" AutoScroll="True">
-                  <Label Name="lst_Params" Dock="Fill" BackColor="Azure" />
+                  <TextBox Name="lst_Params" Dock="Fill" BackColor="Azure" Multiline="True" ScrollBars="Both" />
                 </SplitterPanel>
               </SplitContainer>
             </TabPage>
@@ -3445,8 +3593,8 @@ $string = "`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Draw
         <ToolStripMenuItem Name="Replace" ShortcutKeyDisplayString="Ctrl+H" ShortcutKeys="Ctrl+H" Text="Replace" />
         <ToolStripMenuItem Name="Goto" ShortcutKeyDisplayString="Ctrl+G" ShortcutKeys="Ctrl+G" Text="Go To Line..." />
         <ToolStripSeparator Name="EditSep6" />
-        <ToolStripMenuItem Name="Collapse All" ShortcutKeyDisplayString="F7" ShortcutKeys="F7" Text="Collapse All" />
-        <ToolStripMenuItem Name="Expand All" ShortcutKeyDisplayString="F8" ShortcutKeys="F8" Text="Expand All" />
+        <ToolStripMenuItem Name="Collapse All" ShortcutKeyDisplayString="F10" ShortcutKeys="F10" Text="Collapse All" />
+        <ToolStripMenuItem Name="Expand All" ShortcutKeyDisplayString="F11" ShortcutKeys="F11" Text="Expand All" />
       </ToolStripMenuItem>
       <ToolStripMenuItem Name="ts_Controls" Text="Controls">
         <ToolStripMenuItem Name="Rename" ShortcutKeyDisplayString="Ctrl+R" ShortcutKeys="Ctrl+R" Text="Rename" />
@@ -3465,8 +3613,9 @@ $string = "`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Draw
         <ToolStripMenuItem Name="Events" Checked="True" CheckState="Checked" ShortcutKeyDisplayString="F4" ShortcutKeys="F4" Text="Events" />
       </ToolStripMenuItem>
       <ToolStripMenuItem Name="ts_Tools" DisplayStyle="Text" Text="Tools">
-        <ToolStripMenuItem Name="Generate Script File" DisplayStyle="Text" Text="Generate Script File" />
-        <ToolStripMenuItem Name="RunLast" DisplayStyle="Text" ShortcutKeys="F9" Text="Save Events.ps1 and Run Last Generated" />
+		<ToolStripMenuItem Name="functionsModule" DisplayStyle="Text" Text="Load Functions Module in PowerShell" ShortcutKeys="F7" />
+        <ToolStripMenuItem Name="Generate Script File" DisplayStyle="Text" Text="Generate Script File" ShortcutKeys="F8" />
+        <ToolStripMenuItem Name="RunLast" DisplayStyle="Text" ShortcutKeys="F9" Text="Run Script File" />
       </ToolStripMenuItem>
     </MenuStrip>
     <StatusStrip Name="sta_Status">
@@ -3523,11 +3672,15 @@ $string = "`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Draw
 				New-Item -ItemType directory -Path $generationPath
 				}
 				$ascii = new-object System.Text.ASCIIEncoding
-				$FastText.SaveToFile("$generationPath\Events.ps1",$ascii)
+				#$FastText.SaveToFile("$generationPath\Events.ps1",$ascii)
 				$file = "`"$($generationPath)\$($projectName -replace "fbs$","ps1")`""
 
 				start-process -filepath powershell.exe -argumentlist '-ep bypass','-sta',"-file $file"
 			}
+		})
+		
+		$functionsModule.Add_Click({
+			start-process -filepath powershell.exe -argumentlist '-noexit', "-command import-module '$([Environment]::GetFolderPath('MyDocuments'))\PowerShell Designer\functions\functions.psm1'" #-workingdirectory "$($global:projectDirName)"
 		})
 		
 		$Script:refs['Undo'].Add_Click({
@@ -3689,7 +3842,7 @@ catch {
 }
 #bookmarkCode
 
-				$designerpath = ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\Functions.ps1")
+				$designerpath = ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\functions.psm1")
 				New-Variable astTokens -Force
 				New-Variable astErr -Force
 				$AST = [System.Management.Automation.Language.Parser]::ParseFile($designerpath, [ref]$astTokens, [ref]$astErr)
@@ -3820,10 +3973,37 @@ $Script:refs['spt_Right'].splitterdistance = $Script:refs['spt_Right'].splitterd
 iex (Get-Content (([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\Dependencies.ps1")) | Out-String)
 
 
+	$lst_Functions.Add_DoubleClick({
+				$designerpath = ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\functions.psm1")
+		New-Variable astTokens -Force
+		New-Variable astErr -Force
+		$AST = [System.Management.Automation.Language.Parser]::ParseFile($designerpath, [ref]$astTokens, [ref]$astErr)
+		$functions = $ast.FindAll({ $args[0] -is [System.Management.Automation.Language.FunctionDefinitionAst] }, $true)
+		
+		foreach ($function in $functions){
+			if ($function.name -eq $lst_Functions.SelectedItem.ToString()){
+				$parameters = $function.FindAll({ $args[0] -is [System.Management.Automation.Language.ParameterAst] }, $true)
+			#	$lst_functions.items.Add($function.name)
+			}
+		}
 
-	$lst_Functions.add_Click({param($sender, $e)
+#$FastText.SelectedText = (($parameters[0].Name.Extent.Text | Get-Member) | Out-String).Split([char][byte]10)
+
+#$FastText.SelectedText = ($parameters[0].Name.Extent.Text | Out-String).Replace("$","-").Trim()
+$lst_Functions.SetItemChecked($lst_Functions.Items.IndexOf($lst_Functions.SelectedItem.ToString()), $true)
+
+$bldStr = "`$$($lst_Functions.SelectedItem.ToString().Replace("-",'')) = $($lst_Functions.SelectedItem.ToString())"
+foreach ($param in $parameters){
+$bldStr = "$bldStr $(($param.Name.Extent.Text | Out-String).Replace("$","-").Trim()) $(($param.Name.Extent.Text | Out-String).Trim())"
+}
+
+$FastText.SelectedText = $bldStr
+		
+	})
+
+	$lst_Functions.add_SelectedIndexChanged({param($sender, $e)
 	
-		$designerpath = ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\Functions.ps1")
+		$designerpath = ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\functions.psm1")
 		New-Variable astTokens -Force
 		New-Variable astErr -Force
 		$AST = [System.Management.Automation.Language.Parser]::ParseFile($designerpath, [ref]$astTokens, [ref]$astErr)
@@ -3840,7 +4020,7 @@ iex (Get-Content (([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Desi
 		foreach ($param in $parameters){
 			$bldStr = "$bldStr 
 			
-$param"
+$($param -replace '\s', '')"
 		}
 		
 		$bldStr = "$bldStr
@@ -3850,14 +4030,6 @@ $param"
 		$lst_Params.text = ($bldStr)
 		
 	})
-	
-<# $lst_Functions.add_MouseLeave({param($sender, $e)
-	$lst_Functions.ClearSelected()
-}) #>
-
-$lst_Functions.add_ItemCheck({param($sender, $e)
-#    $FastText.Undo()
-})
 
 		[void]$Script:refs['MainForm'].ShowDialog()
 	}

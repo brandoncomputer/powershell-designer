@@ -68,7 +68,7 @@ $functionTimer.Add_Tick({
 	}
 	
 	if ($lst_Functions.GetItemChecked($lst_Functions.Items.IndexOf("Get-DataTables")) -eq $True) {
-		$lst_Functions.SetItemChecked($lst_Functions.Items.IndexOf("Intialize-ODBC"), $true)
+		$lst_Functions.SetItemChecked($lst_Functions.Items.IndexOf("Initialize-ODBC"), $true)
 	}
 	
 	if ($lst_Functions.GetItemChecked($lst_Functions.Items.IndexOf("Add-ContextMenuStripItem")) -eq $True) {
