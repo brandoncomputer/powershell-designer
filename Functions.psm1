@@ -38,6 +38,11 @@ SOFTWARE.
 
 #region These functions are needed for all projects
 function Set-Types {
+	
+	<#
+    .SYNOPSIS
+		Various C# calls and references
+#>
 Add-Type -AssemblyName System.Windows.Forms,presentationframework, presentationcore, Microsoft.VisualBasic
 
 Add-Type @"
@@ -1038,8 +1043,6 @@ function ConvertFrom-WinFormsXML {
 	}
 }
 #endregion
-
-function CustomFunctions{}
 
 function Open-FormFromFBS {
 <#
@@ -4926,7 +4929,7 @@ function Set-ExitCode {
 	exit $ExitCode
 }
 
-function Get-Event {
+function Get-LastEvent {
 <#
 	.SYNOPSIS
 		Returns the last event in the call stack.
@@ -4935,7 +4938,7 @@ function Get-Event {
 		This function returns the last event in the call stack.
 		
 	.EXAMPLE
-		$event = Get-Event
+		$event = Get-LastEvent
 	
 	.OUTPUTS
 		string
@@ -9279,7 +9282,5 @@ function Get-WindowText {
     $that = [vds]::GetWindowText($Handle, $stringbuilt, $strbld+1)
     return $($stringbuilt.ToString())
 }
-
-function EndCustomFunctions{}
 
 #endregion

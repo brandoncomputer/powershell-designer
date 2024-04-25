@@ -203,6 +203,15 @@ SOFTWARE.
 		In my FastText github repository brandoncomputer, lots of updates to FastColoredTextBox.dll
 		Not sure what else I might have done... don't be surprised if these comments don't line up with the diffs.
 		
+	2.2.4 4/25/2024
+		Abstacted initial funcitons calls to module import, which allows us to call get-command instead of invoking AST parsing for function information after functions are loaded into lst_functions
+		Added all commands from Microsoft.PowerShell.Utility into the funciton checked list box
+		Fixed typos in Dependencies.ps1 - typos cause the program to crash. Add custom functions and dependencies carefully.
+		Note: Remember, if a Function isn't checked, it will not export to your script.
+		Began adding a toolstrip.
+		
+
+		
 BASIC MODIFICATIONS License
 #This software has been modified from the original as tagged with #brandoncomputer
 Original available at https://www.pswinformscreator.com/ for deeper comparison.
@@ -249,1008 +258,9 @@ if ($dependenciesExists -eq $false){
 # ScriptBlock to Execute in STA Runspace
 $sbGUI = {
 	    param($BaseDir,$DPI)
-
-#region These functions are needed for all projects
-function Set-Types {
-Add-Type -AssemblyName System.Windows.Forms,presentationframework, presentationcore, Microsoft.VisualBasic
-
-Add-Type @"
-using System;
-using System.Drawing;
-using System.Runtime.InteropServices;
-using System.Windows.Forms;
-using System.ComponentModel;
-using System.Collections.Generic;
-
-public class vds {
-	
-		public static void SetCompat() 
-		{
-			//	SetProcessDPIAware();
-	            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-		}
-			
-	    [System.Runtime.InteropServices.DllImport("user32.dll")]
-        public static extern bool SetProcessDPIAware();
-	
-[DllImport("user32.dll")]
-public static extern bool InvertRect(IntPtr hDC, [In] ref RECT lprc);
-
-[DllImport("user32.dll")]
-public static extern IntPtr GetDC(IntPtr hWnd);
-
-[DllImport("user32.dll")]
-public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
-
-[DllImport("user32.dll")]
-public static extern IntPtr WindowFromPoint(System.Drawing.Point p);
-// Now working in pwsh 7 thanks to advice from seeminglyscience#2404 on Discord
-[DllImport("user32.dll")]
-public static extern IntPtr GetParent(IntPtr hWnd);
-[DllImport("user32.dll")]
-public static extern int SendMessage(int hWnd, int hMsg, int wParam, int lParam);
-[DllImport("user32.dll")]
-public static extern bool ShowWindow(int hWnd, WindowState nCmdShow);
-public enum WindowState
-    {
-        SW_HIDE               = 0,
-        SW_SHOW_NORMAL        = 1,
-        SW_SHOW_MINIMIZED     = 2,
-        SW_MAXIMIZE           = 3,
-        SW_SHOW_MAXIMIZED     = 3,
-        SW_SHOW_NO_ACTIVE     = 4,
-        SW_SHOW               = 5,
-        SW_MINIMIZE           = 6,
-        SW_SHOW_MIN_NO_ACTIVE = 7,
-        SW_SHOW_NA            = 8,
-        SW_RESTORE            = 9,
-        SW_SHOW_DEFAULT       = 10,
-        SW_FORCE_MINIMIZE     = 11
-    }
-    
-[DllImport("User32.dll")]
-public static extern bool MoveWindow(int hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
-[DllImport("User32.dll")]
-public static extern bool GetWindowRect(int hWnd, out RECT lpRect);
-
-      
-[DllImport("user32.dll", EntryPoint="FindWindow")]
-internal static extern int FWBC(string lpClassName, int ZeroOnly);
-public static int FindWindowByClass(string lpClassName) {
-return FWBC(lpClassName, 0);}
-
-[DllImport("user32.dll", EntryPoint="FindWindow")]
-internal static extern int FWBT(int ZeroOnly, string lpTitle);
-public static int FindWindowByTitle(string lpTitle) {
-return FWBT(0, lpTitle);}
-
-[DllImport("user32.dll")]
-public static extern IntPtr GetForegroundWindow();
-
-[DllImport("user32.dll")]
-public static extern IntPtr GetWindow(int hWnd, uint uCmd);
-
-[DllImport("user32.dll")]    
-     public static extern int GetWindowTextLength(int hWnd);
-     
-[DllImport("user32.dll")]
-public static extern IntPtr GetWindowText(IntPtr hWnd, System.Text.StringBuilder text, int count);
-
-[DllImport("user32.dll")]
-public static extern IntPtr GetClassName(IntPtr hWnd, System.Text.StringBuilder text, int count);
-     
-[DllImport("user32.dll")]
-    public static extern bool SetWindowPos(int hWnd, int hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
-    
-[DllImport ("user32.dll")]
-public static extern bool SetParent(int ChWnd, int hWnd);
-
-[DllImport("user32.dll")]
-public static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
-    
-[DllImport("User32.dll")]
-public static extern bool SetWindowText(IntPtr hWnd, string lpString);
-
-
-//CC-BY-SA
-//Adapted from script by StephenP
-//https://stackoverflow.com/users/3594883/stephenp
-[DllImport("User32.dll")]
-extern static uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
-
-public struct INPUT
-    { 
-        public int        type; // 0 = INPUT_MOUSE,
-                                // 1 = INPUT_KEYBOARD
-                                // 2 = INPUT_HARDWARE
-        public MOUSEINPUT mi;
-    }
-
-public struct MOUSEINPUT
-    {
-        public int    dx ;
-        public int    dy ;
-        public int    mouseData ;
-        public int    dwFlags;
-        public int    time;
-        public IntPtr dwExtraInfo;
-    }
-    
-const int MOUSEEVENTF_MOVED      = 0x0001 ;
-const int MOUSEEVENTF_LEFTDOWN   = 0x0002 ;
-const int MOUSEEVENTF_LEFTUP     = 0x0004 ;
-const int MOUSEEVENTF_RIGHTDOWN  = 0x0008 ;
-const int MOUSEEVENTF_RIGHTUP    = 0x0010 ;
-const int MOUSEEVENTF_MIDDLEDOWN = 0x0020 ;
-const int MOUSEEVENTF_MIDDLEUP   = 0x0040 ;
-const int MOUSEEVENTF_WHEEL      = 0x0080 ;
-const int MOUSEEVENTF_XDOWN      = 0x0100 ;
-const int MOUSEEVENTF_XUP        = 0x0200 ;
-const int MOUSEEVENTF_ABSOLUTE   = 0x8000 ;
-
-const int screen_length = 0x10000 ;
-
-public static void LeftClickAtPoint(int x, int y, int width, int height)
-{
-    //Move the mouse
-    INPUT[] input = new INPUT[3];
-    input[0].mi.dx = x*(65535/width);
-    input[0].mi.dy = y*(65535/height);
-    input[0].mi.dwFlags = MOUSEEVENTF_MOVED | MOUSEEVENTF_ABSOLUTE;
-    //Left mouse button down
-    input[1].mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
-    //Left mouse button up
-    input[2].mi.dwFlags = MOUSEEVENTF_LEFTUP;
-    SendInput(3, input, Marshal.SizeOf(input[0]));
-}
-
-public static void RightClickAtPoint(int x, int y, int width, int height)
-{
-    //Move the mouse
-    INPUT[] input = new INPUT[3];
-    input[0].mi.dx = x*(65535/width);
-    input[0].mi.dy = y*(65535/height);
-    input[0].mi.dwFlags = MOUSEEVENTF_MOVED | MOUSEEVENTF_ABSOLUTE;
-    //Left mouse button down
-    input[1].mi.dwFlags = MOUSEEVENTF_RIGHTDOWN;
-    //Left mouse button up
-    input[2].mi.dwFlags = MOUSEEVENTF_RIGHTUP;
-    SendInput(3, input, Marshal.SizeOf(input[0]));
-}
-//End CC-SA
-[DllImport("user32.dll")] public static extern int SetForegroundWindow(IntPtr hwnd);
-
-
-}
-
- public struct RECT
-
-    {
-    public int Left;
-    public int Top; 
-    public int Right;
-    public int Bottom;
-    }
-"@ -ReferencedAssemblies System.Windows.Forms, System.Drawing, System.Drawing.Primitives
-
-if ((get-host).version.major -eq 7) {
-	if ((get-host).version.minor -eq 0) {
-Add-Type @"
-using System;
-using System.Drawing;
-using System.Runtime.InteropServices;
-using System.Windows.Forms;
-using System.ComponentModel;
-public class vdsForm:Form {
-[DllImport("user32.dll")]
-public static extern bool RegisterHotKey(IntPtr hWnd, int id, int fsModifiers, int vk);
-[DllImport("user32.dll")]
-public static extern bool UnregisterHotKey(IntPtr hWnd, int id);
-    protected override void WndProc(ref Message m) {
-        base.WndProc(ref m);
-        if (m.Msg == 0x0312) {
-            int id = m.WParam.ToInt32();    
-            foreach (Control item in this.Controls) {
-                if (item.Name == "hotkey") {
-                    item.Text = id.ToString();
-                }
-            }
-        }
-    }   
-}
-"@ -ReferencedAssemblies System.Windows.Forms,System.Drawing,System.Drawing.Primitives,System.Net.Primitives,System.ComponentModel.Primitives,Microsoft.Win32.Primitives
-	}
-	else{
-Add-Type @"
-using System;
-using System.Drawing;
-using System.Runtime.InteropServices;
-using System.Windows.Forms;
-using System.ComponentModel;
-public class vdsForm:Form {
-[DllImport("user32.dll")]
-public static extern bool RegisterHotKey(IntPtr hWnd, int id, int fsModifiers, int vk);
-[DllImport("user32.dll")]
-public static extern bool UnregisterHotKey(IntPtr hWnd, int id);
-    protected override void WndProc(ref Message m) {
-        base.WndProc(ref m);
-        if (m.Msg == 0x0312) {
-            int id = m.WParam.ToInt32();    
-            foreach (Control item in this.Controls) {
-                if (item.Name == "hotkey") {
-                    item.Text = id.ToString();
-                }
-            }
-        }
-    }   
-}
-"@ -ReferencedAssemblies System.Windows.Forms,System.Drawing,System.Drawing.Primitives,System.Net.Primitives,System.ComponentModel.Primitives,Microsoft.Win32.Primitives,System.Windows.Forms.Primitives	
-	}
-}
-else {
-Add-Type @"
-using System;
-using System.Drawing;
-using System.Runtime.InteropServices;
-using System.Windows.Forms;
-using System.ComponentModel;
-public class vdsForm:Form {
-[DllImport("user32.dll")]
-public static extern bool RegisterHotKey(IntPtr hWnd, int id, int fsModifiers, int vk);
-[DllImport("user32.dll")]
-public static extern bool UnregisterHotKey(IntPtr hWnd, int id);
-    protected override void WndProc(ref Message m) {
-        base.WndProc(ref m);
-        if (m.Msg == 0x0312) {
-            int id = m.WParam.ToInt32();    
-            foreach (Control item in this.Controls) {
-                if (item.Name == "hotkey") {
-                    item.Text = id.ToString();
-                }
-            }
-        }
-    }   
-}
-"@ -ReferencedAssemblies System.Windows.Forms,System.Drawing
-}
-
-<#      
-        Function: FlashWindow
-        Author: Boe Prox
-        https://social.technet.microsoft.com/profile/boe%20prox/
-        Adapted to VDS: 20190212
-        License: Microsoft Limited Public License
-#>
-
-Add-Type -TypeDefinition @"
-//"
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Runtime.InteropServices;
-
-public class Window
-{
-    [StructLayout(LayoutKind.Sequential)]
-    public struct FLASHWINFO
-    {
-        public UInt32 cbSize;
-        public IntPtr hwnd;
-        public UInt32 dwFlags;
-        public UInt32 uCount;
-        public UInt32 dwTimeout;
-    }
-
-    //Stop flashing. The system restores the window to its original state. 
-    const UInt32 FLASHW_STOP = 0;
-    //Flash the window caption. 
-    const UInt32 FLASHW_CAPTION = 1;
-    //Flash the taskbar button. 
-    const UInt32 FLASHW_TRAY = 2;
-    //Flash both the window caption and taskbar button.
-    //This is equivalent to setting the FLASHW_CAPTION | FLASHW_TRAY flags. 
-    const UInt32 FLASHW_ALL = 3;
-    //Flash continuously, until the FLASHW_STOP flag is set. 
-    const UInt32 FLASHW_TIMER = 4;
-    //Flash continuously until the window comes to the foreground. 
-    const UInt32 FLASHW_TIMERNOFG = 12; 
-
-
-    [DllImport("user32.dll")]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    static extern bool FlashWindowEx(ref FLASHWINFO pwfi);
-
-    public static bool FlashWindow(IntPtr handle, UInt32 timeout, UInt32 count)
-    {
-        IntPtr hWnd = handle;
-        FLASHWINFO fInfo = new FLASHWINFO();
-
-        fInfo.cbSize = Convert.ToUInt32(Marshal.SizeOf(fInfo));
-        fInfo.hwnd = hWnd;
-        fInfo.dwFlags = FLASHW_ALL | FLASHW_TIMERNOFG;
-        fInfo.uCount = count;
-        fInfo.dwTimeout = timeout;
-
-        return FlashWindowEx(ref fInfo);
-    }
-}
-"@
-$global:ctscale = 1
-}
-
-function Set-EnableVisualStyle {
-<#
-    .SYNOPSIS
-		Enables modern visual styles in the dialog window.
-	.DESCRIPTION
-		This function will call upon the windows application programming
-		interface to apply modern visual style to the window.
-	.EXAMPLE
-		Set-EnableVisualStyle
-#>
-	[vds]::SetCompat() | out-null
-}
-
-function Set-DPIAware {
-<#
-    .SYNOPSIS
-		Causes the dialog window to be DPI Aware.
-	.DESCRIPTION
-		This function will call upon the windows application programming
-		interface to cause the window to be DPI Aware.
-	.EXAMPLE
-		Set-DPIAware
-#>
-	$vscreen = [System.Windows.Forms.SystemInformation]::VirtualScreen.height
-	[vds]::SetProcessDPIAware() | out-null
-	$screen = [System.Windows.Forms.SystemInformation]::VirtualScreen.height
-	$global:ctscale = ($screen/$vscreen)
-}
-
-function Show-Form {
-<#
-	.SYNOPSIS
-		Ensures forms are ran in the correct application space, particularly 
-		when multiple forms are involved.
 		
-    .DESCRIPTION
-		This function runs the first form in an application space, and shows
-		successive forms.
-	
-	.PARAMETER Form
-		The form to show.
-		
-	.PARAMETER Modal
-		Switch that specifies the window is to be shown as a modal dialog.
-	
-	.EXAMPLE
-		Show-Form $Form1
-	
-	.EXAMPLE
-		Show-Form -Form $Form1 -modal
+import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\functions.psm1")
 
-	.EXAMPLE
-		$Form1 | Show-Form
-
-	.INPUTS
-		Form as Object
-#>
-	[CmdletBinding()]
-    param (
-		[Parameter(Mandatory,
-			ValueFromPipeline)]
-		[object]$Form,
-		[switch]$Modal
-	)
-	if ($Modal) {
-		$Form.ShowDialog() | Out-Null
-	}
-	else {
-		if ($global:apprunning -eq $true) {
-			$Form.Show() | Out-Null
-		}
-		else {
-			$global:apprunning = $true
-			[System.Windows.Forms.Application]::Run($Form) | Out-Null
-		}
-	}
-}
-
-function Update-ErrorLog {
-<#
-    .SYNOPSIS
-		Logs errors to the text file 'exceptions.txt' for use in the catch 
-		statement of a try catch.
-			 
-	.DESCRIPTION
-		This function logs errors to the text file 'exceptions.txt' residing in
-		the current directory in use by powershell, for use in the catch 
-		statement of a try catch.
-	 
-	.PARAMETER ErrorRecord
-		The object from the pipeline represented by $_ or $PSItem
-	
-	.PARAMETER Message
-		The message to display to the end user.
-		
-	.PARAMETER Promote
-		Switch that defines to also call a throw of the ValueFromPipeline
-		
-	.EXAMPLE
-		Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered adding $($Xml.ToString()) to $($ParentControl.Name)"
-		
-	.EXAMPLE
-		Update-ErrorLog -Promote -ErrorRecord $_ -Message "Exception encountered adding $($Xml.ToString()) to $($ParentControl.Name)"
-
-	.INPUTS
-		ErrorRecord as ValueFromPipeline, Message as String, Promote as Switch
-	
-	.Outputs
-		String || String, Throw method of ValueFromPipeline
-#>
-	param(
-		[System.Management.Automation.ErrorRecord]$ErrorRecord,
-		[string]$Message,
-		[switch]$Promote
-	)
-
-	if ( $Message -ne '' ) {
-		[void][System.Windows.Forms.MessageBox]::Show("$($Message)`r`n`r`nCheck '$(get-currentdirectory)\exceptions.txt' for details.",'Exception Occurred')
-	}
-	$date = Get-Date -Format 'yyyyMMdd HH:mm:ss'
-	$ErrorRecord | Out-File "$(get-currentdirectory)\tmpError.txt"
-	Add-Content -Path "$(get-currentdirectory)\exceptions.txt" -Value "$($date): $($(Get-Content "$(get-currentdirectory)\tmpError.txt") -replace "\s+"," ")"
-	Remove-Item -Path "$(get-currentdirectory)\tmpError.txt"
-	if ( $Promote ) {
-		throw $ErrorRecord
-	}
-}
-
-function Get-CurrentDirectory {
-<#
-	.SYNOPSIS
-		Returns the current directory as string
-		     
-    .DESCRIPTION
-		This function returns the current directory of the application as string.
-		
-	.EXAMPLE
-		Write-Host Get-CurrentDirectory
-	
-	.OUTPUTS
-		String
-#>
-    return (Get-Location | Select-Object -expandproperty Path | Out-String).Trim()
-}
-
-function ConvertFrom-WinFormsXML {
-<#
-    .SYNOPSIS
-		Opens a form from XAML in the format specified by 'powershell-designer'
-		or its predecessor, PowerShell WinForms Creator
-			 
-	.DESCRIPTION
-		This function opens a form from XAML in the format specified by 'powershell-designer'
-		or its predecessor, PowerShell WinForms Creator
-	 
-	.PARAMETER XML
-		The XML object or XML string specifying the parameters for the form object
-	
-	.PARAMETER Reference
-		This function recursively calls itself. Internal parameter for child 
-		objects, not typically called programatically. Also this function is
-		maintained for legacy compatibility PowerShell WinForm Creator, which 
-		does require the call in some instances due to not creating automatic
-		variables.
-	
-	.PARAMETER Supress
-		This function recursively calls itself. Internal parameter for child 
-		objects, not typically called programatically.
-	
-	.EXAMPLE
-		ConvertFrom-WinFormsXML -Xml  @"
-		<Form Name="MainForm" Size="800,600" Tag="VisualStyle,DPIAware" Text="MainForm">
-			<Button Name="Button1" Location="176,94" Text="Button1" />
-		</Form>
-"@
-
-	.EXAMPLE
-		ConvertFrom-WinFormsXML @"
-		<Form Name="MainForm" Size="800,600" Tag="VisualStyle,DPIAware" Text="MainForm">
-			<Button Name="Button1" Location="176,94" Text="Button1" />
-		</Form>
-"@
-
-	.EXAMPLE
-	$content = [xml](get-content $Path)
-	ConvertFrom-WinformsXML -xml $content.Data.Form.OuterXml
-	
-	.EXAMPLE
-	$content = [xml](get-content $Path)
-	ConvertFrom-WinformsXML $content.Data.Form.OuterXml
-
-	.INPUTS
-		Xml as String || Xml as xml
-	
-	.OUTPUTS
-		Object
-	
-	.NOTES
-		Each object created has a variable created to access the object 
-		according to its Name attribute e.g. $Button1
-#>
-	param(
-		[Parameter(Mandatory)]
-		$Xml,
-		[string]$Reference,
-		$ParentControl,
-		[switch]$Suppress
-	)
-	try {
-		if ( $Xml.GetType().Name -eq 'String' ) {
-			$Xml = ([xml]$Xml).ChildNodes
-		}
-		$Xml.Attributes | ForEach-Object {
-			$attrib = $_
-			$attribName = $_.ToString()
-			$attrib = $_
-			$attribName = $_.ToString()
-			if ($attribName -eq 'Tag'){
-				if (($attrib.Value | Out-String).Contains("VisualStyle")) {
-					Set-EnableVisualStyle
-				}
-				if (($attrib.Value | Out-String).Contains("DPIAware")) {
-					Set-DPIAware
-				}
-			}
-		}
-		if ( $Xml.ToString() -eq 'Form' ) {
-			$newControl = [vdsForm]
-		}
-		if ( $Xml.ToString() -ne 'SplitterPanel' ) {
-			$newControl = New-Object System.Windows.Forms.$($Xml.ToString())
-		}
-		if ( $ParentControl ) {
-			if ( $Xml.ToString() -eq 'ToolStrip' ) {
-				$newControl = New-Object System.Windows.Forms.MenuStrip
-				$ParentControl.Controls.Add($newControl)
-			}
-			else {
-				if ( $Xml.ToString() -match "^ToolStrip" ) {
-					if ( $ParentControl.GetType().Name -match "^ToolStrip" ) {
-						[void]$ParentControl.DropDownItems.Add($newControl)
-					} 
-					else {
-						[void]$ParentControl.Items.Add($newControl)
-					}
-				} 
-				elseif ( $Xml.ToString() -eq 'ContextMenuStrip' ) {
-					$ParentControl.ContextMenuStrip = $newControl
-				}
-				elseif ( $Xml.ToString() -eq 'SplitterPanel' ) {
-					$newControl = $ParentControl.$($Xml.Name.Split('_')[-1])
-					}
-				else {
-					$ParentControl.Controls.Add($newControl)
-				}
-			}
-		}
-
-		$Xml.Attributes | ForEach-Object {
-			$attrib = $_
-			$attribName = $_.ToString()
-			$attrib = $_
-			$attribName = $_.ToString()
-			if ($attribName -eq 'Opacity'){
-				$n = $attrib.Value.split('%')
-				$attrib.value = $n[0]/100
-			}
-			if ($attribName -eq 'Size'){				
-				$n = $attrib.Value.split(',')
-				$n[0] = [math]::round(($n[0]/1) * $ctscale)
-				$n[1] = [math]::round(($n[1]/1) * $ctscale)
-				if ("$($n[0]),$($n[1])" -ne ",") {
-					$attrib.Value = "$($n[0]),$($n[1])"
-				}
-			}
-			if ($attribName -eq 'Location'){
-				$n = $attrib.Value.split(',')
-				$n[0] = [math]::round(($n[0]/1) * $ctscale)
-				$n[1] = [math]::round(($n[1]/1) * $ctscale)
-				if ("$($n[0]),$($n[1])" -ne ",") {
-					$attrib.Value = "$($n[0]),$($n[1])"
-				}
-			}
-			if ($attribName -eq 'MaximumSize'){
-				$n = $attrib.Value.split(',')
-				$n[0] = [math]::round(($n[0]/1) * $ctscale)
-				$n[1] = [math]::round(($n[1]/1) * $ctscale)
-				if ("$($n[0]),$($n[1])" -ne ",") {
-					$attrib.Value = "$($n[0]),$($n[1])"
-				}
-			}
-			if ($attribName -eq 'MinimumSize'){
-				$n = $attrib.Value.split(',')
-				$n[0] = [math]::round(($n[0]/1) * $ctscale)
-				$n[1] = [math]::round(($n[1]/1) * $ctscale)
-				if ("$($n[0]),$($n[1])" -ne ",") {
-					$attrib.Value = "$($n[0]),$($n[1])"
-				}
-			}
-			if ($attribName -eq 'ImageScalingSize'){
-				$n = $attrib.Value.split(',')
-				$n[0] = [math]::round(($n[0]/1) * $ctscale)
-				$n[1] = [math]::round(($n[1]/1) * $ctscale)
-				if ("$($n[0]),$($n[1])" -ne ",") {
-					$attrib.Value = "$($n[0]),$($n[1])"
-				}
-			}
-
-			if ( $Script:specialProps.Array -contains $attribName ) {
-				if ( $attribName -eq 'Items' ) {
-					$($_.Value -replace "\|\*BreakPT\*\|","`n").Split("`n") | ForEach-Object {
-						[void]$newControl.Items.Add($_)
-					}
-				}
-				else {
-						# Other than Items only BoldedDate properties on MonthCalendar control
-					$methodName = "Add$($attribName)" -replace "s$"
-					$($_.Value -replace "\|\*BreakPT\*\|","`n").Split("`n") | ForEach-Object { 
-						$newControl.$attribName.$methodName($_)
-					}
-				}
-			} 
-			else {
-				switch ($attribName) {
-					FlatAppearance {
-						$attrib.Value.Split('|') | ForEach-Object {
-							$newControl.FlatAppearance.$($_.Split('=')[0]) = $_.Split('=')[1]
-						}
-					}
-					default {
-						if ( $null -ne $newControl.$attribName ) {
-							if ( $newControl.$attribName.GetType().Name -eq 'Boolean' ) {
-								if ( $attrib.Value -eq 'True' ) {
-									$value = $true
-								} 
-								else {
-									$value = $false
-								}
-							} 
-							else {
-								$value = $attrib.Value
-							}
-						} 
-						else {
-							$value = $attrib.Value
-						}
-						switch ($xml.ToString()) {
-							"FolderBrowserDialog" {
-								if ($xml.Description) {
-									$newControl.Description = $xml.Description
-								}
-								if ($xml.Tag) {
-									$newControl.Tag = $xml.Tag
-								}
-								if ($xml.RootFolder) {
-									$newControl.RootFolder = $xml.RootFolder
-								}
-								if ($xml.SelectedPath) {
-									$newControl.SelectedPath = $xml.SelectedPath
-								}
-								if ($xml.ShowNewFolderButton) {
-									$newControl.ShowNewFolderButton = $xml.ShowNewFolderButton
-								}
-							}
-							"OpenFileDialog" {
-								if ($xml.AddExtension) {
-										$newControl.AddExtension = $xml.AddExtension
-								}
-								if ($xml.AutoUpgradeEnabled) {
-									$newControl.AutoUpgradeEnabled = $xml.AutoUpgradeEnabled
-								}
-								if ($xml.CheckFileExists) {
-									$newControl.CheckFileExists = $xml.CheckFileExists
-								}
-								if ($xml.CheckPathExists) {
-									$newControl.CheckPathExists = $xml.CheckPathExists
-								}
-								if ($xml.DefaultExt) {
-									$newControl.DefaultExt = $xml.DefaultExt
-								}
-								if ($xml.DereferenceLinks) {
-									$newControl.DereferenceLinks = $xml.DereferenceLinks
-								}
-								if ($xml.FileName) {
-									$newControl.FileName = $xml.FileName
-								}
-								if ($xml.Filter) {
-									$newControl.Filter = $xml.Filter
-								}
-								if ($xml.FilterIndex) {
-									$newControl.FilterIndex = $xml.FilterIndex
-								}
-								if ($xml.InitialDirectory) {
-									$newControl.InitialDirectory = $xml.InitialDirectory
-								}
-								if ($xml.Multiselect) {
-									$newControl.Multiselect = $xml.Multiselect
-								}
-								if ($xml.ReadOnlyChecked) {
-									$newControl.ReadOnlyChecked = $xml.ReadOnlyChecked
-								}
-								if ($xml.RestoreDirectory) {
-									$newControl.RestoreDirectory = $xml.RestoreDirectory
-								}
-								if ($xml.ShowHelp) {
-									$newControl.ShowHelp = $xml.ShowHelp
-								}
-								if ($xml.ShowReadOnly) {
-									$newControl.ShowReadOnly = $xml.ShowReadOnly
-								}
-								if ($xml.SupportMultiDottedExtensions) {
-									$newControl.SupportMultiDottedExtensions = $xml.SupportMultiDottedExtensions
-								}
-								if ($xml.Tag) {
-									$newControl.Tag = $xml.Tag
-								}
-								if ($xml.Title) {
-									$newControl.Title = $xml.Title
-								}
-								if ($xml.ValidateNames) {
-									$newControl.ValidateNames = $xml.ValidateNames
-								}
-							}
-							"ColorDialog" {
-								if ($xml.AllowFullOpen) {
-									$newControl.AllowFullOpen = $xml.AllowFullOpen
-								}
-								if ($xml.AnyColor) {
-									$newControl.AnyColor = $xml.AnyColor
-								}
-								if ($xml.Color) {
-									$newControl.Color = $xml.Color
-								}
-								if ($xml.FullOpen) {
-									$newControl.FullOpen = $xml.FullOpen
-								}
-								if ($xml.ShowHelp) {
-									$newControl.ShowHelp = $xml.ShowHelp
-								}
-								if ($xml.SolidColorOnly) {
-									$newControl.SolidColorOnly = $xml.SolidColorOnly
-								}
-								if ($xml.Tag) {
-									$newControl.Tag = $xml.Tag
-								}								
-							}
-							"FontDialog" {
-								if ($xml.AllowScriptChange) {
-									$newControl.AllowScriptChange = $xml.AllowScriptChange
-								}
-								if ($xml.AllowSimulations) {
-									$newControl.AllowSimulations = $xml.AllowSimulations
-								}
-								if ($xml.AllowVectorFonts) {
-									$newControl.AllowVectorFonts = $xml.AllowVectorFonts
-								}
-								if ($xml.Color) {
-									$newControl.Color = $xml.Color
-								}
-								if ($xml.FixedPitchOnly) {
-									$newControl.FixedPitchOnly = $xml.FixedPitchOnly
-								}
-								if ($xml.Font) {
-									$newControl.Font = $xml.Font
-								}
-								if ($xml.FontMustExists) {
-									$newControl.FontMustExists = $xml.FontMustExists
-								}		
-								if ($xml.MaxSize) {
-									$newControl.MaxSize = $xml.MaxSize
-								}
-								if ($xml.MinSize) {
-									$newControl.MinSize = $xml.MinSize
-								}
-								if ($xml.ScriptsOnly) {
-									$newControl.ScriptsOnly = $xml.ScriptsOnly
-								}
-								if ($xml.ShowApply) {
-									$newControl.ShowApply = $xml.ShowApply
-								}
-								if ($xml.ShowColor) {
-									$newControl.ShowColor = $xml.ShowColor
-								}
-								if ($xml.ShowEffects) {
-									$newControl.ShowEffects = $xml.ShowEffects
-								}
-								if ($xml.ShowHelp) {
-									$newControl.ShowHelp = $xml.ShowHelp
-								}
-								if ($xml.Tag) {
-									$newControl.Tag = $xml.Tag
-								}											
-							}
-							"PageSetupDialog" {
-								if ($xml.AllowMargins) {
-									$newControl.AllowMargins = $xml.AllowMargins
-								}
-								if ($xml.AllowOrientation) {
-									$newControl.AllowOrientation = $xml.AllowOrientation
-								}
-								if ($xml.AllowPaper) {
-									$newControl.AllowPaper = $xml.AllowPaper
-								}
-								if ($xml.Document) {
-									$newControl.Document = $xml.Document
-								}
-								if ($xml.EnableMetric) {
-									$newControl.EnableMetric = $xml.EnableMetric
-								}
-								if ($xml.MinMargins) {
-									$newControl.MinMargins = $xml.MinMargins
-								}
-								if ($xml.ShowHelp) {
-									$newControl.ShowHelp = $xml.ShowHelp
-								}		
-								if ($xml.ShowNetwork) {
-									$newControl.ShowNetwork = $xml.ShowNetwork
-								}
-								if ($xml.Tag) {
-									$newControl.Tag = $xml.Tag
-								}								
-							}
-							"PrintDialog" {
-								if ($xml.AllowCurrentPage) {
-									$newControl.AllowCurrentPage = $xml.AllowCurrentPage
-								}
-								if ($xml.AllowPrintToFile) {
-									$newControl.AllowPrintToFile = $xml.AllowPrintToFile
-								}
-								if ($xml.AllowSelection) {
-									$newControl.AllowSelection = $xml.AllowSelection
-								}
-								if ($xml.AllowSomePages) {
-									$newControl.AllowSomePages = $xml.AllowSomePages
-								}
-								if ($xml.Document) {
-									$newControl.Document = $xml.Document
-								}
-								if ($xml.PrintToFile) {
-									$newControl.PrintToFile = $xml.PrintToFile
-								}
-								if ($xml.ShowHelp) {
-									$newControl.ShowHelp = $xml.ShowHelp
-								}		
-								if ($xml.ShowNetwork) {
-									$newControl.ShowNetwork = $xml.ShowNetwork
-								}
-								if ($xml.Tag) {
-									$newControl.Tag = $xml.Tag
-								}
-								if ($xml.UseEXDialog) {
-									$newControl.UseEXDialog = $xml.UseEXDialog
-								}
-							}
-							"PrintPreviewDialog" {
-								if ($xml.AutoSizeMode) {
-									$newControl.AutoSizeMode = $xml.AutoSizeMode
-								}
-								if ($xml.Document) {
-									$newControl.Document = $xml.Document
-								}
-								if ($xml.MainMenuStrip) {
-									$newControl.MainMenuStrip = $xml.MainMenuStrip
-								}
-								if ($xml.ShowIcon) {
-									$newControl.ShowIcon = $xml.ShowIcon
-								}
-								if ($xml.UseAntiAlias) {
-									$newControl.UseAntiAlias = $xml.UseAntiAlias
-								}
-							}
-							"SaveFileDialog" {
-								if ($xml.AddExtension) {
-									$newControl.AddExtension = $xml.AddExtension
-								}
-								if ($xml.AutoUpgradeEnabled) {
-									$newControl.AutoUpgradeEnabled = $xml.AutoUpgradeEnabled
-								}
-								if ($xml.CheckFileExists) {
-									$newControl.CheckFileExists = $xml.CheckFileExists
-								}
-								if ($xml.CheckPathExists) {
-									$newControl.CheckPathExists = $xml.CheckPathExists
-								}
-								if ($xml.CreatePrompt) {
-									$newControl.CreatePrompt = $xml.CreatePrompt
-								}
-								if ($xml.DefaultExt) {
-									$newControl.DefaultExt = $xml.DefaultExt
-								}
-								if ($xml.DereferenceLinks) {
-									$newControl.DereferenceLinks = $xml.DereferenceLinks
-								}
-								if ($xml.FileName) {
-									$newControl.FileName = $xml.FileName
-								}
-								if ($xml.Filter) {
-									$newControl.Filter = $xml.Filter
-								}
-								if ($xml.FilterIndex) {
-									$newControl.FilterIndex = $xml.FilterIndex
-								}
-								if ($xml.InitialDirectory) {
-									$newControl.InitialDirectory = $xml.InitialDirectory
-								}
-								if ($xml.Multiselect) {
-									$newControl.OverwritePrompt = $xml.OverwritePrompt
-								}
-								if ($xml.RestoreDirectory) {
-									$newControl.RestoreDirectory = $xml.RestoreDirectory
-								}
-								if ($xml.ShowHelp) {
-									$newControl.ShowHelp = $xml.ShowHelp
-								}
-								if ($xml.SupportMultiDottedExtensions) {
-									$newControl.SupportMultiDottedExtensions = $xml.SupportMultiDottedExtensions
-								}
-								if ($xml.Tag) {
-									$newControl.Tag = $xml.Tag
-								}
-								if ($xml.Title) {
-									$newControl.Title = $xml.Title
-								}
-								if ($xml.ValidateNames) {
-									$newControl.ValidateNames = $xml.ValidateNames
-								}
-							}
-							"Timer" {
-								if ($xml.Enabled) {
-									$newControl.Enabled = $xml.Enabled
-								}
-								if ($xml.Interval) {
-									$newControl.Interval = $xml.Interval
-								}
-								if ($xml.Tag) {
-									$newControl.Tag = $xml.Tag
-								}
-							}
-							default {
-								$newControl.$attribName = $value
-							}
-						}
-					}
-				}
-			}
-			if ($newControl.Name){ 			
-				if ((Test-Path variable:global:"$($newControl.Name)") -eq $False) {
-					New-Variable -Name $newControl.Name -Scope global -Value $newControl | Out-Null
-				}
-			}
-			if (( $attrib.ToString() -eq 'Name' ) -and ( $Reference -ne '' )) {
-				try {
-					$refHashTable = Get-Variable -Name $Reference -Scope global -ErrorAction Stop
-				}
-				catch {
-					New-Variable -Name $Reference -Scope global -Value @{} | Out-Null
-					$refHashTable = Get-Variable -Name $Reference -Scope global -ErrorAction SilentlyContinue
-				}
-				$refHashTable.Value.Add($attrib.Value,$newControl)
-			}
-		}
-		if ( $Xml.ChildNodes ) {
-			$Xml.ChildNodes | ForEach-Object {ConvertFrom-WinformsXML -Xml $_ -ParentControl $newControl -Reference $Reference -Suppress}
-		}
-		if ( $Suppress -eq $false ) {
-			return $newControl
-		}
-	} 
-	catch {
-		Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered adding $($Xml.ToString()) to $($ParentControl.Name)"
-	}
-}
 #endregion
 
 Set-Types
@@ -1258,169 +268,6 @@ Set-EnableVisualStyle
 Set-DPIAware
 
 $global:control_track = @{} 
-
-function Set-WindowParent {
-<#
-    .SYNOPSIS
-		This function fuses a window into another window
-			 
-	.DESCRIPTION
-		This function fuses a child window into a parent window
-
-	.PARAMETER Child
-		The child window
-		
-	.PARAMETER Parent
-		The parent window
-
-	.EXAMPLE
-		Set-WindowParent (Get-WindowExists "Untitled - Notepad") (Get-WindowExists "Libraries") 
-
-	.EXAMPLE
-		Set-WindowParent -child (Get-WindowExists "Untitled - Notepad") -parent (Get-WindowExists "Libraries")
-		
-	.EXAMPLE
-		(Get-WindowExists "Untitled - Notepad") | Set-WindowParent -parent (Get-WindowExists "Libraries")
-		
-	.INPUTS
-		Child as Handle,Parent as Handle
-#>
-	[CmdletBinding()]
-    param (
-        [Parameter(Mandatory,
-			ValueFromPipeline)]
-        [int]$Child,
-        [Parameter(Mandatory)]
-		[int]$Parent
-	)
-	[vds]::SetParent($Child,$Parent)
-}
-
-function Get-WindowExists {
-<#
-    .SYNOPSIS
-		Returns the handle of a window, or null if it doesn't exists
-			 
-	.DESCRIPTION
-		This function returns the handle of a window, or null if it doesn't exists
-
-	.PARAMETER Window
-		The title of a window, the class of a window, or the window as a powershell object
-
-	.EXAMPLE
-		Set-WindowText (Get-WindowExists "Untitled - Notepad") "Hello World"
-
-	.EXAMPLE
-		Set-WindowText -handle (Get-WindowExists -window "Untitled - Notepad") -text "Hello World"
-		
-	.EXAMPLE
-		("Untitled - Notepad" | Get-WindowExists) | Set-WindowText -text "Hello World"
-		
-	.INPUTS
-		Window as String
-#>
-	[CmdletBinding()]
-    param (
-        [Parameter(Mandatory,
-			ValueFromPipeline)]
-        [string]$Window
-	)
-    $class = [vds]::FindWindowByClass($Window)
-    if ($class) {
-        return $class/1
-    }
-    else {
-        $title = [vds]::FindWindowByTitle($Window)
-        if ($title){
-            return $title/1
-        }
-        else {
-            if ($Window.handle) {
-                return $Window.handle
-            }
-        }   
-    }
-}
-
-function Set-WindowText {
-<#
-    .SYNOPSIS
-		Sets the text of a window
-			 
-	.DESCRIPTION
-		This function sets the text of a window
-
-	.PARAMETER Handle
-		The handle of the window
-		
-	.PARAMETER Text
-		The text to set the window to
-
-	.EXAMPLE
-		Set-WindowText (Get-WindowExists "Untitled - Notepad") "Hello World"
-
-	.EXAMPLE
-		Set-WindowText -handle (Get-WindowExists "Untitled - Notepad") -text "Hello World"
-		
-	.EXAMPLE
-		(Get-WindowExists "Untitled - Notepad") | Set-WindowText -text "Hello World"
-		
-	.INPUTS
-		Handle as Handle, String as String
-#>
-	[CmdletBinding()]
-    param (
-        [Parameter(Mandatory,
-			ValueFromPipeline)]
-        [int]$Handle,
-		[string]$Text
-	)
-	[vds]::SetWindowText($Handle,$Text)
-}
-
-function New-Timer {
-<#
-    .SYNOPSIS
-		Returns a timer object that ticks at the interval specified
-     
-    .DESCRIPTION
-		This function returns a timer object that ticks at the interval specified
-	
-	.PARAMETER Interval
-		The interval in milliseconds
-		
-	.EXAMPLE
-		$timer1 = New-Timer 1000
-	
-	.EXAMPLE
-		$timer1 = New-Timer -interval 1000
-		
-	.EXAMPLE
-		$timer1 = 1000 | New-Timer
-		
-	.EXAMPLE
-		$timer1 = 1000 | New-Timer
-		$timer1.Add_Tick({
-			Write-Host "Tick"
-		})
-	
-	.INPUTS
-		Interval as Integer
-	
-	.OUTPUTS
-		System.Windows.Forms.Timer
-#>
-	[CmdletBinding()]
-    param (
-        [Parameter(Mandatory,
-			ValueFromPipeline)]
-        [int]$Interval
-	)
-	$timer = New-Object System.Windows.Forms.Timer
-    $timer.Interval = $Interval
-    $timer.Enabled = $true
-    return $timer
-}
 
     function Convert-XmlToTreeView {
         param(
@@ -2503,7 +1350,21 @@ for($i=0; $i -lt $lst_Functions.Items.Count; $i++)
 					$projectName = $Script:refs['tpg_Form1'].Text
 					$generationPath = "$(Split-Path -Path $global:projectDirName)\$($projectName -replace "\..*$")"
 					
+						#bookmarkOpen
 						
+						<#				$designerpath = ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\functions.psm1")
+		New-Variable astTokens -Force
+		New-Variable astErr -Force
+		$AST = [System.Management.Automation.Language.Parser]::ParseFile($designerpath, [ref]$astTokens, [ref]$astErr)
+		$functions = $ast.FindAll({ $args[0] -is [System.Management.Automation.Language.FunctionDefinitionAst] }, $true)
+		
+		foreach ($function in $functions){
+			if ($function.name -eq $lst_Functions.SelectedItem.ToString()){
+				$parameters = $function.FindAll({ $args[0] -is [System.Management.Automation.Language.ParameterAst] }, $true)
+			#	$lst_functions.items.Add($function.name)
+			}
+		}
+#>
 					
 						if (Test-Path -path "$generationPath\Events.ps1") {
 							$FastText.OpenFile("$generationPath\Events.ps1")	
@@ -2762,7 +1623,7 @@ for($i=0; $i -lt $lst_Functions.Items.Count; $i++)
         }
 
 		'Generate Script File' = @{
-		#bookmark
+		#bookmarkGenerate
 			Click = {
 				$projectName = $Script:refs['tpg_Form1'].Text
 				if ("$global:projectDirName" -eq "") {
@@ -2786,23 +1647,14 @@ foreach ($item in $lst_Functions.items){
 	$checkItem = $lst_Functions.GetItemCheckState($lst_Functions.Items.IndexOf($item)).ToString()
 	$i = $lst_Functions.Items.IndexOf($item)
 	if ($checkItem -eq 'Checked') {
+		if (($functions[$i].Extent) -ne $null){
 		$outstring = "$outstring
-				
+
 $(($functions[$i].Extent).text)"	
 	}
+	}
 }
-
-<# 
-				$outstring = "$outstring$(($functions[0].Extent).text)"
-
-				for($i=1; $i -le 6; $i++){
-				$outstring = "$outstring
-				
-$(($functions[$i].Extent).text)"
-				}			
- #>
 			
-				
 				$xmlObj = [xml](([xml](Get-Content "$global:projectDirName" -Encoding utf8)).Data.Form.OuterXml)
 				$FormName = $xmlObj.Form.Name
 				$xmlText = (([xml](Get-Content "$global:projectDirName" -Encoding utf8)).Data.Form.OuterXml) | Out-String
@@ -3642,13 +2494,13 @@ $string = "`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Draw
 #brandoncomputer_FixWindowState
         ConvertFrom-WinFormsXML -Reference refs -Suppress -Xml @"
   <Form Name="MainForm" IsMdiContainer="True" Size="826, 654" WindowState="Maximized" Text="PowerShell Designer">
-     <TabControl Name="tcl_Top" Dock="Top" Size="198, 20">
-      <TabPage Name="tpg_Form1" Size="190, 0" Text="NewProject.fbs" />
+    <TabControl Name="tcl_Top" Dock="Top" Size="1058, 20">
+      <TabPage Name="tpg_Form1" Size="1050, 0" Text="NewProject.fbs" />
     </TabControl>
-    <Label Name="lbl_Left" Dock="Left" BackColor="35, 35, 35" Cursor="VSplit" Size="3, 570" />
-    <Label Name="lbl_Right" Dock="Right" BackColor="35, 35, 35" Cursor="VSplit" Size="3, 570" />
-    <Panel Name="pnl_Left" Dock="Left" BorderStyle="Fixed3D" Size="200, 570">
-      <SplitContainer Name="spt_Left" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="258">
+    <Label Name="lbl_Left" Dock="Left" BackColor="35, 35, 35" Cursor="VSplit" Size="3, 828" />
+    <Label Name="lbl_Right" Dock="Right" BackColor="35, 35, 35" Cursor="VSplit" Size="3, 828" />
+    <Panel Name="pnl_Left" Dock="Left" BorderStyle="Fixed3D" Size="200, 828">
+      <SplitContainer Name="spt_Left" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="411">
         <SplitterPanel Name="spt_Left_Panel1">
           <TreeView Name="trv_Controls" Dock="Fill" BackColor="Azure" />
         </SplitterPanel>
@@ -3657,15 +2509,15 @@ $string = "`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Draw
         </SplitterPanel>
       </SplitContainer>
     </Panel>
-    <Panel Name="pnl_Right" Dock="Right" BorderStyle="Fixed3D" Size="200, 570">
-      <SplitContainer Name="spt_Right" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="257">
+    <Panel Name="pnl_Right" Dock="Right" BorderStyle="Fixed3D" Size="200, 828">
+      <SplitContainer Name="spt_Right" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="418">
         <SplitterPanel Name="spt_Right_Panel1">
-          <PropertyGrid Name="PropertyGrid" Dock="Fill" ViewBackColor="Azure" />
+          <PropertyGrid Name="PropertyGrid" Dock="Fill" Cursor="HSplit" ViewBackColor="Azure" />
         </SplitterPanel>
         <SplitterPanel Name="spt_Right_Panel2" BackColor="Control">
           <TabControl Name="TabControl2" Dock="Fill">
-            <TabPage Name="Tab 1" Size="188, 279" Text="Events">
-              <SplitContainer Name="SplitContainer3" Dock="Fill" Orientation="Horizontal" SplitterDistance="120">
+            <TabPage Name="Tab 1" Size="188, 376" Text="Events">
+              <SplitContainer Name="SplitContainer3" Dock="Fill" Orientation="Horizontal" SplitterDistance="210">
                 <SplitterPanel Name="SplitContainer3_Panel1" AutoScroll="True">
                   <ListBox Name="lst_AvailableEvents" Dock="Fill" BackColor="Azure" />
                 </SplitterPanel>
@@ -3674,13 +2526,13 @@ $string = "`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Draw
                 </SplitterPanel>
               </SplitContainer>
             </TabPage>
-            <TabPage Name="TabPage3" Size="188, 304" Text="Functions">
-              <SplitContainer Name="SplitContainer4" Dock="Fill" Orientation="Horizontal" SplitterDistance="169">
+            <TabPage Name="TabPage3" Size="188, 376" Text="Functions">
+              <SplitContainer Name="SplitContainer4" Dock="Fill" Orientation="Horizontal" SplitterDistance="205">
                 <SplitterPanel Name="SplitContainer4_Panel1" AutoScroll="True">
                   <CheckedListBox Name="lst_Functions" Dock="Fill" BackColor="Azure" />
                 </SplitterPanel>
                 <SplitterPanel Name="SplitContainer4_Panel2" AutoScroll="True">
-                  <TextBox Name="lst_Params" Dock="Fill" BackColor="Azure" Multiline="True" ScrollBars="Both" Size="188, 131" />
+                  <TextBox Name="lst_Params" Dock="Fill" BackColor="Azure" Multiline="True" ScrollBars="Both" Size="188, 167" />
                 </SplitterPanel>
               </SplitContainer>
             </TabPage>
@@ -3688,13 +2540,13 @@ $string = "`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Draw
         </SplitterPanel>
       </SplitContainer>
     </Panel>
-    <MenuStrip Name="ms_Left" Dock="Left" AutoSize="False" BackColor="ControlDarkDark" Font="Verdana, 9pt" LayoutStyle="VerticalStackWithOverflow" Size="23, 570" TextDirection="Vertical90">
+    <MenuStrip Name="ms_Left" Dock="Left" AutoSize="False" BackColor="ControlDarkDark" Font="Verdana, 9pt" LayoutStyle="VerticalStackWithOverflow" Size="23, 828" TextDirection="Vertical90">
       <ToolStripMenuItem Name="ms_Toolbox" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" Size="23, 100" Text="Toolbox" />
       <ToolStripMenuItem Name="ms_FormTree" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" Size="23, 100" TextAlign="MiddleLeft" TextDirection="Vertical90" Text="Form Tree" />
     </MenuStrip>
-    <MenuStrip Name="ms_Right" Dock="Right" AutoSize="False" BackColor="ControlDarkDark" Font="Verdana, 9pt" LayoutStyle="VerticalStackWithOverflow" Size="23, 570" TextDirection="Vertical90">
+    <MenuStrip Name="ms_Right" Dock="Right" AutoSize="False" BackColor="ControlDarkDark" Font="Verdana, 9pt" LayoutStyle="VerticalStackWithOverflow" Size="23, 828" TextDirection="Vertical90">
       <ToolStripMenuItem Name="ms_Properties" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" Size="23, 100" TextAlign="MiddleLeft" TextDirection="Vertical270" Text="Properties" />
-      <ToolStripMenuItem Name="ms_Events" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" Size="23, 100" TextDirection="Vertical270" Text="Events" />
+      <ToolStripMenuItem Name="ms_Events" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" ImageTransparentColor="White" Size="23, 100" TextDirection="Vertical270" Text="Events" />
     </MenuStrip>
     <MenuStrip Name="MenuStrip" RenderMode="System">
       <ToolStripMenuItem Name="ts_File" DisplayStyle="Text" Text="File">
@@ -4113,7 +2965,7 @@ iex (Get-Content (([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Desi
 		
 		foreach ($function in $functions){
 			if ($function.name -eq $lst_Functions.SelectedItem.ToString()){
-				$parameters = $function.FindAll({ $args[0] -is [System.Management.Automation.Language.ParameterAst] }, $true)
+			#	$parameters = $function.FindAll({ $args[0] -is [System.Management.Automation.Language.ParameterAst] }, $true)
 			#	$lst_functions.items.Add($function.name)
 			}
 		}
@@ -4123,9 +2975,17 @@ iex (Get-Content (([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Desi
 #$FastText.SelectedText = ($parameters[0].Name.Extent.Text | Out-String).Replace("$","-").Trim()
 $lst_Functions.SetItemChecked($lst_Functions.Items.IndexOf($lst_Functions.SelectedItem.ToString()), $true)
 
-$bldStr = "`$$($lst_Functions.SelectedItem.ToString().Replace("-",'')) = $($lst_Functions.SelectedItem.ToString())"
+$bldStr = "$($lst_Functions.SelectedItem.ToString())"
+$parameters = (get-command ($lst_Functions.SelectedItem.ToString())).Parameters
 foreach ($param in $parameters){
-$bldStr = "$bldStr $(($param.Name.Extent.Text | Out-String).Replace("$","-").Trim()) $(($param.Name.Extent.Text | Out-String).Trim())"
+	foreach ($key in $param.Keys) {
+		switch ($key) {
+			Verbose{};Debug{};ErrorAction{};WarningAction{};InformationAction{};ErrorVariable{};WarningVariable{};InformationVariable{};OutVariable{};OutBuffer{};PipelineVariable{};
+			Default {
+				$bldStr = "$bldStr -$((($Key) | Out-String).Trim()) `$$((($Key) | Out-String).Trim())"
+			}
+		}
+	}
 }
 
 $FastText.SelectedText = $bldStr
@@ -4133,36 +2993,31 @@ $FastText.SelectedText = $bldStr
 	})
 
 	$lst_Functions.add_SelectedIndexChanged({param($sender, $e)
-	
-		$designerpath = ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\functions.psm1")
-		New-Variable astTokens -Force
-		New-Variable astErr -Force
-		$AST = [System.Management.Automation.Language.Parser]::ParseFile($designerpath, [ref]$astTokens, [ref]$astErr)
-		$functions = $ast.FindAll({ $args[0] -is [System.Management.Automation.Language.FunctionDefinitionAst] }, $true)
+		$lst_Params.text = "$(((Get-Help $lst_Functions.SelectedItem.ToString() -detailed) | Out-String))"
 		
-		foreach ($function in $functions){
-			if ($function.name -eq $lst_Functions.SelectedItem.ToString()){
-				$parameters = $function.FindAll({ $args[0] -is [System.Management.Automation.Language.ParameterAst] }, $true)
-			#	$lst_functions.items.Add($function.name)
+
+	$lst_Functions.SelectedItem.ToString() | out-file c:\temp\format.txt
+
+	})
+
+	
+	$lst_Functions.items.addrange(((((get-command -module Microsoft.PowerShell.Utility) | select -expandproperty Name) | Out-String).split((get-character 13)+(get-character 10))).Trim())
+	
+	function EmptyListString{
+		foreach ($item in $lst_Functions.items){
+			if ($item.ToString() -eq ""){
+				$lst_Functions.items.Remove($item)
+				EmptyListString
+				return
 			}
 		}
-		
-		$bldStr = "$($lst_Functions.SelectedItem.ToString())"
-		foreach ($param in $parameters){
-			$bldStr = "$bldStr 
-			
-$($param -replace '\s', '')"
-		}
-		
-		$bldStr = "$bldStr
-"
-
-	#	$lst_Params.items.clear()
-		$lst_Params.text = ($bldStr)
-		
-	})
+	}
+	EmptyListString
+	
 	
 	#region Images
+	
+
 $RunLast.BackgroundImage = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAQABADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDW8J+G9E8G+E7PUNQ0tbTUoFMtzcXKxyShiMNtcZwhGcYONvXktWb450LRvEvhu71HTrBLzUJds0c9uERwNpwWbuuB3ONvTkCqmg+OdM1zwza6dfXT3l7N8t2t20aE9CwA4BXGQOgx1Oc1Hr/iPR9L0J1ti0AXMKRwHacYwV4JBUgAAZxx2Arnq1nTkla/9fmZVKnI9j//2Q=="))
 $Generate.BackgroundImage = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAQABADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDrPCPgDRvCtnZ3FpaIdSmiSOa4nOYphjJJB3Fc9wOM49BiDxp4L0HxHbXUt7bJ/ascTxwTQNiKIYyDgYLY7A8Zz6nPPaD8U5PEmnNCIhaTWsB8qFpOJZAcKpbcvAHPbv1xzM/iJmSQGUpbrE/mSuwV1cL8qgCRtwJ9QT057gA//9k="))
 $functionsModule.BackgroundImage = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAQABADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwBuszaVYXl8IvBuhvbW1x5BcWsOQe2RtJGcHnocGq2kaho2p61ZWTeEtDjSaZUYiyiPB6/wVV17ydQ1e+eDxDoxs5blpkRtWhAyeN23d1xUegwWmn69Y3c+uaGIYZlZyNUgJAz/AL1fXRpZb9Wbk489tNXvb13uYpLlv1+Z/9k="))
