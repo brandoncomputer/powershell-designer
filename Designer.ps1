@@ -217,6 +217,16 @@ SOFTWARE.
 		Fixed bug with SMOVE buttions where on some configuratons they would appear above the top of the form this will cause some displays/configs to show them lower than they should be. This only occurs on-click.
 		Began new toolstrip GUI element, incomplete.		
 		
+	2.2.6a 4/28/2024
+		Completed GUI coding.
+		Begain alphabetically sorting functions, they have to be resorted in the module, which is a grind.
+		Various message box to statusbar changes, added exit question so people are less likely to lose work
+		Finished function alpha sorting
+		Other minor changes.
+		Users again should remove Documents\PowerShell Designer\funcitons folder before upgrading.
+		
+		
+		
 BASIC MODIFICATIONS License
 #This software has been modified from the original as tagged with #brandoncomputer
 Original available at https://www.pswinformscreator.com/ for deeper comparison.
@@ -280,7 +290,7 @@ $RunSpace = [RunspaceFactory]::CreateRunspacePool(); $RunSpace.ApartmentState = 
             $controlType = $Xml.ToString()
             $controlName = "$($Xml.Name)"
 			
-			if ($controlType -eq "Functions" -or $controlType -eq "Function"){
+			if (($controlType -eq "Functions") -or ($controlType -eq "Function")){
 				return
 			}
             
@@ -505,6 +515,8 @@ $RunSpace = [RunspaceFactory]::CreateRunspacePool(); $RunSpace.ApartmentState = 
                         param($Sender,$e)
                         $e.Cancel = $true
                     })
+					
+					$form.Add_MouseEnter({$Script:refs['tsl_StatusLabel'].text ="Current DPIScale: $ctscale"})
 					$form.Add_Click({
                         if (($Script:refs['PropertyGrid'].SelectedObject -ne $this ) -and ( $args[1].Button -eq 'Left')) {
                             $Script:refs['TreeView'].SelectedNode = $Script:refsFID.Form.TreeNodes[$this.Name]
@@ -734,29 +746,33 @@ $RunSpace = [RunspaceFactory]::CreateRunspacePool(); $RunSpace.ApartmentState = 
             $TreeNode,
             [switch]$Level
         )
-		#bookmarkFormatRefactor
         $returnVal = @()
-        if ( $TreeNode.Nodes.Count -gt 0 ) {
+        if ($TreeNode.Nodes.Count -gt 0) {
             try {
                 $TreeNode.Nodes.ForEach({
-                    $returnVal += $(if ( $Level ) { "$($_.Level):$($_.Name)" } else {$_.Name})
+                    $returnVal += $(if ($Level) { "$($_.Level):$($_.Name)" } else {$_.Name})
                     $returnVal += $(if ( $Level ) { Get-ChildNodeList -TreeNode $_ -Level } else { Get-ChildNodeList -TreeNode $_ })
                 })
-            } catch {Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered building Treenode list."}
+            } 
+			catch {
+				Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered building Treenode list."
+			}
         }
-
         return $returnVal
     }
 
     function Get-RootNodeObjRef {
-        param([System.Windows.Forms.TreeNode]$TreeNode)
-
+        param(
+			[System.Windows.Forms.TreeNode]$TreeNode
+		)
         try {
-            if ( $TreeNode.Level -gt 0 ) {while ( $TreeNode.Parent ) {$TreeNode = $TreeNode.Parent}}
-
+            if ($TreeNode.Level -gt 0) {
+				while ($TreeNode.Parent) {
+					$TreeNode = $TreeNode.Parent
+				}
+			}
             $type = $TreeNode.Text -replace " - .*$"
             $name = $TreeNode.Name
-
             $returnVal = [pscustomobject]@{
                 Success = $true
                 RootType = $type
@@ -767,128 +783,65 @@ $RunSpace = [RunspaceFactory]::CreateRunspacePool(); $RunSpace.ApartmentState = 
                 Events = ''
             }
 
-            if ( $type -eq 'Form' ) {
+            if ($type -eq 'Form') {
                 $returnVal.TreeNodes = $Script:refsFID[$type].TreeNodes
                 $returnVal.Objects = $Script:refsFID[$type].Objects
                 $returnVal.Changes = $Script:refsFID[$type].Changes
                 $returnVal.Events = $Script:refsFID[$type].Events
-            } elseif (( @('ContextMenuStrip','Timer') -contains $type ) -or ( $type -match "Dialog$" )) {
+            } 
+			elseif ((@('ContextMenuStrip','Timer') -contains $type) -or ($type -match "Dialog$")) {
                 $returnVal.TreeNodes = $Script:refsFID[$type][$name].TreeNodes
                 $returnVal.Objects = $Script:refsFID[$type][$name].Objects
                 $returnVal.Changes = $Script:refsFID[$type][$name].Changes
                 $returnVal.Events = $Script:refsFID[$type][$name].Events
-            } else {$returnVal.Success = $false}
-
+            } 
+			else {
+				$returnVal.Success = $false
+			}
             return $returnVal
-        } catch {Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered determining root node object reference."}
+        } 
+		catch {
+			Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered determining root node object reference."
+		}
     }
 
     function Move-SButtons {
         param($Object)
-			
-			if ($Object.GetType().Name -eq 'ToolStripProgressBar')
-			{return}
-		
-        if ( ($Script:supportedControls.Where({$_.Type -eq 'Parentless'}).Name + @('Form','ToolStripMenuItem','ToolStripComboBox','ToolStripTextBox','ToolStripSeparator','ContextMenuStrip')) -notcontains $Object.GetType().Name ) {
-				      
+			if ($Object.GetType().Name -eq 'ToolStripProgressBar') {
+				return
+			}
+        if (($Script:supportedControls.Where({$_.Type -eq 'Parentless'}).Name + @('Form','ToolStripMenuItem','ToolStripComboBox','ToolStripTextBox','ToolStripSeparator','ContextMenuStrip')) -notcontains $Object.GetType().Name ) {     
 		  $newSize = $Object.Size
-            if ( $Object.GetType().Name -ne 'HashTable' ) {
-
+            if ($Object.GetType().Name -ne 'HashTable') {
                 $refFID = $Script:refsFID.Form.Objects.Values.Where({$_.GetType().Name -eq 'Form'})
                 $Script:sButtons.GetEnumerator().ForEach({$_.Value.Visible = $true})
                 $newLoc = $Object.PointToClient([System.Drawing.Point]::Empty)
-                
                 if ( $Script:MouseMoving -eq $true ) {
                     $clientParent = $Object.Parent.PointToClient([System.Drawing.Point]::Empty)
                     $clientForm = $refFID.PointToClient([System.Drawing.Point]::Empty)
-					
                     $clientOffset = New-Object System.Drawing.Point((($clientParent.X - $clientForm.X) * -1),(($clientParent.Y - $clientForm.Y) * -1))
-                } else {
-					                    $clientParent = $Object.Parent.PointToClient([System.Drawing.Point]::Empty)
-                    $clientForm = $refFID.PointToClient([System.Drawing.Point]::Empty)
-					$clientOffset = New-Object System.Drawing.Point((($clientParent.X - $clientForm.X) * -1),(($clientParent.Y - $clientForm.Y) * -1))}
-                
-		#	info ($Object.Left).ToString()
-		#	$newLoc.X = ($newLoc.X * -1) - $Object.Left - ($refs['MainForm'].Location.X) - $clientOffset.X  - $Script:refs['ms_Left'].Size.Width #- (18 / $ctscale)
-		#	$newLoc.Y = ($newLoc.Y * -1) - $Object.Top - ($refs['MainForm'].Location.Y) - $clientOffset.Y #- (108 / $ctscale)
-#		if ($ctscale -eq 1){
-			if ($Object.Parent.WindowState -eq "Maximized"){
-		$newLoc.X = ($newLoc.X * -1) - $refFID.Location.X - $refs['MainForm'].Location.X - $clientOffset.X - $Script:refs['ms_Left'].Size.Width - [math]::Round((15 * $ctscale))
-		$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - (20 * $ctscale) - ($clientOffset.Y * $ctscale) - [math]::Round(((148 * $ctscale) - (($ctscale * 16)*$ctscale)) + (2 - ($ctscale)))
+                } 
+				else {
+					$clientOffset = New-Object System.Drawing.Point((($clientParent.X - $clientForm.X) * -1),(($clientParent.Y - $clientForm.Y) * -1))
+				}
+				if ($Object.Parent.WindowState -eq "Maximized"){
+					$newLoc.X = ($newLoc.X * -1) - $refFID.Location.X - $refs['MainForm'].Location.X - $clientOffset.X - $Script:refs['ms_Left'].Size.Width - [math]::Round((15 * $ctscale))
+					$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - (20 * $ctscale) - ($clientOffset.Y * $ctscale) - [math]::Round(((148 * $ctscale) - (($ctscale * 16)*$ctscale)) + (2 - ($ctscale)))
+				}
+				else{
+					$newLoc.X = ($newLoc.X * -1) - $refFID.Location.X - $refs['MainForm'].Location.X - $clientOffset.X - $Script:refs['ms_Left'].Size.Width - [math]::Round((15 * $ctscale))
+					$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - ($clientOffset.Y * $ctscale) - [math]::Round((148 * $ctscale) - (($ctscale * 16)*$ctscale) + (2 - ($ctscale)))
+				}
+                if ($Script:refs['pnl_Left'].Visible -eq $true) {
+					$newLoc.X = $newLoc.X - $Script:refs['pnl_Left'].Size.Width - $Script:refs['lbl_Left'].Size.Width
+				}
+			} 
+			else {
+				$newLoc = New-Object System.Drawing.Point(($Script:sButtons['btn_TLeft'].Location.X + $Object.LocOffset.X),($Script:sButtons['btn_TLeft'].Location.Y + $Object.LocOffset.Y))
 			}
-			else{
-                $newLoc.X = ($newLoc.X * -1) - $refFID.Location.X - $refs['MainForm'].Location.X - $clientOffset.X - $Script:refs['ms_Left'].Size.Width - [math]::Round((15 * $ctscale))
-		#$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - $clientOffset.Y - (100 * $ctscale)
-		$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - ($clientOffset.Y * $ctscale) - [math]::Round((148 * $ctscale) - (($ctscale * 16)*$ctscale) + (2 - ($ctscale)))
-			}
-#		}
-<#		else {
-						if ($Object.Parent.WindowState -eq "Maximized"){
-		$newLoc.X = ($newLoc.X * -1) - $refFID.Location.X - $refs['MainForm'].Location.X - $clientOffset.X - $Script:refs['ms_Left'].Size.Width - [math]::Round((15 * $ctscale))
-		$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - (20 * $ctscale) - $clientOffset.Y - [math]::Round((((132 - ($ctscale * 4 )) * $ctscale)/1))
-			}
-			else{
-                $newLoc.X = ($newLoc.X * -1) - $refFID.Location.X - $refs['MainForm'].Location.X - $clientOffset.X - $Script:refs['ms_Left'].Size.Width - [math]::Round((15 * $ctscale))
-		#$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - $clientOffset.Y - (100 * $ctscale)
-		$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - $clientOffset.Y - [math]::Round((((132 - ($ctscale * 4 )) * $ctscale)/1))
-			}
-		}
-		
-		if ($ctscale -eq 1.25){
-			if ($Object.Parent.WindowState -eq "Maximized"){
-		$newLoc.X = ($newLoc.X * -1) - $refFID.Location.X - $refs['MainForm'].Location.X - $clientOffset.X - $Script:refs['ms_Left'].Size.Width - [math]::Round((15 * $ctscale))
-		$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - (20 * $ctscale) - $clientOffset.Y - [math]::Round((((132 - ($ctscale * 4 )) * $ctscale)/1))
-			}
-			else{
-                $newLoc.X = ($newLoc.X * -1) - $refFID.Location.X - $refs['MainForm'].Location.X - $clientOffset.X - $Script:refs['ms_Left'].Size.Width - [math]::Round((15 * $ctscale))
-		#$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - $clientOffset.Y - (100 * $ctscale)
-		$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - $clientOffset.Y - [math]::Round((((132 - ($ctscale * 4 )) * $ctscale)/1))
-			}
-		}
-		if ($ctscale -eq 1.5){
-			if ($Object.Parent.WindowState -eq "Maximized"){
-		$newLoc.X = ($newLoc.X * -1) - $refFID.Location.X - $refs['MainForm'].Location.X - $clientOffset.X - $Script:refs['ms_Left'].Size.Width - [math]::Round((15 * $ctscale))
-		$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - (20 * $ctscale) - $clientOffset.Y - [math]::Round((((128 - ($ctscale * 4 )) * $ctscale)/1))
-			}
-			else{
-                $newLoc.X = ($newLoc.X * -1) - $refFID.Location.X - $refs['MainForm'].Location.X - $clientOffset.X - $Script:refs['ms_Left'].Size.Width - [math]::Round((15 * $ctscale))
-		#$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - $clientOffset.Y - (100 * $ctscale)
-		$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - $clientOffset.Y - [math]::Round((((128 - ($ctscale * 4 )) * $ctscale)/1))
-			}
-		}
-				if ($ctscale -eq 1.75){
-			if ($Object.Parent.WindowState -eq "Maximized"){
-		$newLoc.X = ($newLoc.X * -1) - $refFID.Location.X - $refs['MainForm'].Location.X - $clientOffset.X - $Script:refs['ms_Left'].Size.Width - [math]::Round((15 * $ctscale))
-		$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - (20 * $ctscale) - $clientOffset.Y - [math]::Round((((124 - ($ctscale * 4 )) * $ctscale)/1))
-			}
-			else{
-                $newLoc.X = ($newLoc.X * -1) - $refFID.Location.X - $refs['MainForm'].Location.X - $clientOffset.X - $Script:refs['ms_Left'].Size.Width - [math]::Round((15 * $ctscale))
-		#$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - $clientOffset.Y - (100 * $ctscale)
-		$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - $clientOffset.Y - [math]::Round((((124 - ($ctscale * 4 )) * $ctscale)/1))
-			}
-		}
-		#>
-<#		else
-	{
-			if ($Object.Parent.WindowState -eq "Maximized"){
-			$newLoc.X = ($newLoc.X * -1) - $refFID.Location.X - $refs['MainForm'].Location.X - $clientOffset.X - $Script:refs['ms_Left'].Size.Width - [math]::Round((18 * $ctscale))
-			$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - (20 * $ctscale) - $clientOffset.Y - [math]::Round((132 * $ctscale))}
-			else {$newLoc.X = ($newLoc.X * -1) - $refFID.Location.X - $refs['MainForm'].Location.X - $clientOffset.X - $Script:refs['ms_Left'].Size.Width - [math]::Round((18 * $ctscale))
-			$newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - $clientOffset.Y - [math]::Round((132 * $ctscale))}
-			
-			}
-			#>
-
-		
-
-                if ( $Script:refs['pnl_Left'].Visible -eq $true ) {$newLoc.X = $newLoc.X - $Script:refs['pnl_Left'].Size.Width - $Script:refs['lbl_Left'].Size.Width}
-		} else {$newLoc = New-Object System.Drawing.Point(($Script:sButtons['btn_TLeft'].Location.X + $Object.LocOffset.X),($Script:sButtons['btn_TLeft'].Location.Y + $Object.LocOffset.Y))}
-
             $Script:sRect = New-Object System.Drawing.Rectangle($newLoc,$newSize)
-
             $Script:sButtons.GetEnumerator().ForEach({
                 $btn = $_.Value
-
                 switch ($btn.Name) {
                     btn_SizeAll {$btn.Location = New-Object System.Drawing.Point(($newLoc.X + 13),$newLoc.Y)}
                     btn_TLeft {$btn.Location = New-Object System.Drawing.Point($newLoc.X,$newLoc.Y)}
@@ -920,15 +873,16 @@ $RunSpace = [RunspaceFactory]::CreateRunspacePool(); $RunSpace.ApartmentState = 
                         } else {$btn.Visible = $false}
                     }
                 }
-
                 $btn.BringToFront()
                 $btn.Refresh()
-
             })
 
             $Script:refs['PropertyGrid'].SelectedObject.Refresh()
             $Script:refs['PropertyGrid'].SelectedObject.Parent.Refresh()
-        } else {$Script:sButtons.GetEnumerator().ForEach({$_.Value.Visible = $false})}
+        }
+		else {
+			$Script:sButtons.GetEnumerator().ForEach({$_.Value.Visible = $false})
+		}
 	}
 
     function Save-Project {
@@ -937,30 +891,32 @@ $RunSpace = [RunspaceFactory]::CreateRunspacePool(); $RunSpace.ApartmentState = 
             [switch]$Suppress,
             [switch]$ReturnXML
         )
-
         $projectName = $refs['tpg_Form1'].Text
-
-        if ( $ReturnXML -eq $false ) {
-            if (( $SaveAs ) -or ( $projectName -eq 'NewProject.fbs' )) {
+        if ($ReturnXML -eq $false) {
+            if (($SaveAs) -or ($projectName -eq 'NewProject.fbs')) {
                 $saveDialog = ConvertFrom-WinFormsXML -Xml @"
 <SaveFileDialog InitialDirectory="$($Script:projectsDir)" AddExtension="True" DefaultExt="fbs" Filter="fbs files (*.fbs)|*.fbs" FileName="$($projectName)" OverwritePrompt="True" ValidateNames="True" RestoreDirectory="True" />
 "@
                 $saveDialog.Add_FileOK({
                     param($Sender,$e)
-                    if ( $($this.FileName | Split-Path -Leaf) -eq 'NewProject.fbs' ) {
+                    if ($($this.FileName | Split-Path -Leaf) -eq 'NewProject.fbs') {
                         [void][System.Windows.Forms.MessageBox]::Show("You cannot save a project with the file name 'NewProject.fbs'",'Validation Error')
                         $e.Cancel = $true
                     }
                 })
-
                 try {
                     [void]$saveDialog.ShowDialog()
-
-                    if (( $saveDialog.FileName -ne '' ) -and ( $saveDialog.FileName -ne 'NewProject.fbs' )) {$projectName = $saveDialog.FileName | Split-Path -Leaf} else {$projectName = ''}
-                } catch {
+                    if (( $saveDialog.FileName -ne '') -and ($saveDialog.FileName -ne 'NewProject.fbs')) {
+						$projectName = $saveDialog.FileName | Split-Path -Leaf
+					} else {
+						$projectName = ''
+					}
+                } 
+				catch {
                     Update-ErrorLog -ErrorRecord $_ -Message 'Exception encountered while selecting Save file name.'
                     $projectName = ''
-                } finally {
+                } 
+				finally {
                     $saveDialog.Dispose()
 #brandoncomputer_SaveDialogFix
 					$global:projectDirName = $saveDialog.FileName
@@ -969,101 +925,90 @@ $RunSpace = [RunspaceFactory]::CreateRunspacePool(); $RunSpace.ApartmentState = 
             }
         }
 
-        if ( $projectName -ne '' ) {
+        if ($projectName -ne '') {
             try {
                 $xml = New-Object -TypeName XML
                 $xml.LoadXml('<Data><Events Desc="Events associated with controls"></Events><Functions Desc="Functions associated with project"></Functions></Data>')
                 $tempPGrid = New-Object System.Windows.Forms.PropertyGrid
                 $tempPGrid.PropertySort = 'Alphabetical'
-
                 $Script:refs['TreeView'].Nodes.ForEach({
                     $currentNode = $xml.Data
                     $rootControlType = $_.Text -replace " - .*$"
                     $rootControlName = $_.Name
-
                     $objRef = Get-RootNodeObjRef -TreeNode $($Script:refs['TreeView'].Nodes | Where-Object { $_.Name -eq $rootControlName -and $_.Text -match "^$($rootControlType)" })
-
                     $nodeIndex = @("0:$($rootControlName)")
                     $nodeIndex += Get-ChildNodeList -TreeNode $objRef.TreeNodes[$rootControlName] -Level
-
                     @(0..($nodeIndex.Count-1)).ForEach({
                         $nodeName = $nodeIndex[$_] -replace "^\d+:"
                         $newElementType = $objRef.Objects[$nodeName].GetType().Name
                         [int]$nodeDepth = $nodeIndex[$_] -replace ":.*$"
-
                         $newElement = $xml.CreateElement($newElementType)
                         $newElement.SetAttribute("Name",$nodeName)
-
                         $tempPGrid.SelectedObject = $objRef.Objects[$nodeName]
-
-                            # Set certain properties first
                         $Script:specialProps.Before.ForEach({
                             $prop = $_
                             $tempGI = $tempPGrid.SelectedGridItem.Parent.GridItems.Where({$_.PropertyLabel -eq $prop})
 
-                            if ( $tempGI.Count -gt 0 ) {
-                                if ( $tempGI.PropertyDescriptor.ShouldSerializeValue($tempGI.Component) ) {$newElement.SetAttribute($tempGI.PropertyLabel,$tempGI.GetPropertyTextValue())}
+                            if ($tempGI.Count -gt 0) {
+                                if ($tempGI.PropertyDescriptor.ShouldSerializeValue($tempGI.Component)) {
+									$newElement.SetAttribute($tempGI.PropertyLabel,$tempGI.GetPropertyTextValue())
+								}
                             }
                         })
-
-                            # Set other attributes
                         $tempPGrid.SelectedGridItem.Parent.GridItems.ForEach({
                             $checkReflector = $true
                             $tempGI = $_
-                            
-                            if ( $Script:specialProps.All -contains $tempGI.PropertyLabel ) {
+                            if ($Script:specialProps.All -contains $tempGI.PropertyLabel) {
                                 switch ($tempGI.PropertyLabel) {
                                     Location {
-                                        if (( $tempPGrid.SelectedObject.Dock -ne 'None' ) -or
-                                           ( $tempPGrid.SelectedObject.Parent.GetType().Name -eq 'FlowLayoutPanel' ) -or
-                                           (( $newElementType -eq 'Form' ) -and ( $tempPGrid.SelectedObject.StartPosition -ne 'Manual' )) -or
-                                           ( $tempGI.GetPropertyTextValue() -eq '0, 0' )) {
-                                               $checkReflector = $false
+                                        if (($tempPGrid.SelectedObject.Dock -ne 'None') -or
+                                           ($tempPGrid.SelectedObject.Parent.GetType().Name -eq 'FlowLayoutPanel') -or
+                                           (($newElementType -eq 'Form') -and ($tempPGrid.SelectedObject.StartPosition -ne 'Manual')) -or
+                                           ($tempGI.GetPropertyTextValue() -eq '0, 0')) {
+											$checkReflector = $false
                                         }
                                     }
                                     Size {
-                                            # Only check reflector for Size when AutoSize is false and Dock not set to Fill
-                                        if (( $tempPGrid.SelectedObject.AutoSize -eq $true ) -or ( $tempPGrid.SelectedObject.Dock -eq 'Fill' )) {
-                                                # If control is disabled sometimes AutoSize will return $true even if $false
+                                        if (($tempPGrid.SelectedObject.AutoSize -eq $true) -or ( $tempPGrid.SelectedObject.Dock -eq 'Fill')) {
                                             if (( $tempPGrid.SelectedObject.AutoSize -eq $true ) -and ( $tempPGrid.SelectedObject.Enabled -eq $false )) {
                                                 $tempPGrid.SelectedObject.Enabled = $true
-
-                                                if ( $tempGI.PropertyDescriptor.ShouldSerializeValue($tempGI.Component) ) {$newElement.SetAttribute($tempGI.PropertyLabel,$tempGI.GetPropertyTextValue())}
-
+                                                if ($tempGI.PropertyDescriptor.ShouldSerializeValue($tempGI.Component)) {
+													$newElement.SetAttribute($tempGI.PropertyLabel,$tempGI.GetPropertyTextValue())
+												}
                                                 $tempPGrid.SelectedObject.Enabled = $false
                                             }
-
                                             $checkReflector = $false
-
-                                                # Textbox has an issue here
-                                            if (( $newElementType -eq 'Textbox' ) -and ( $tempPGrid.SelectedObject.Size.Width -ne 100 )) {$checkReflector = $true}
+                                            if (($newElementType -eq 'Textbox') -and ($tempPGrid.SelectedObject.Size.Width -ne 100)) {
+												$checkReflector = $true
+											}
                                         }
-                                            # Form has an issue here
-                                        if (( $newElementType -eq 'Form' ) -and ( $tempPGrid.SelectedObject.Size -eq (New-Object System.Drawing.Size(300,300)) )) {$checkReflector = $false}
+                                        if (($newElementType -eq 'Form') -and ($tempPGrid.SelectedObject.Size -eq (New-Object System.Drawing.Size(300,300)))) {
+											$checkReflector = $false
+										}
                                     }
                                     FlatAppearance {
-                                        if ( $tempPGrid.SelectedObject.FlatStyle -eq 'Flat' ) {
+                                        if ($tempPGrid.SelectedObject.FlatStyle -eq 'Flat') {
                                             $value = ''
-
                                             $tempGI.GridItems.ForEach({
                                                 if ( $_.PropertyDescriptor.ShouldSerializeValue($_.Component.FlatAppearance) ) {$value += "$($_.PropertyLabel)=$($_.GetPropertyTextValue())|"}
                                             })
-
-                                            if ( $value -ne '' ) {$newElement.SetAttribute('FlatAppearance',$($value -replace "\|$"))}
+                                            if ($value -ne '') {
+												$newElement.SetAttribute('FlatAppearance',$($value -replace "\|$"))
+											}
                                         }
-
                                         $checkReflector = $false
                                     }
                                     default {
-                                            # If property has a bad reflector and it has been changed manually add the attribute
-                                        if (( $Script:specialProps.BadReflector -contains $_ ) -and ( $null -ne $objRef.Changes[$_] )) {$newElement.SetAttribute($_,$objRef.Changes[$_])}
-
+										#bookmarkRefactorFormatting
+                                        if (($Script:specialProps.BadReflector -contains $_) -and ( $null -ne $objRef.Changes[$_] )) {
+											$newElement.SetAttribute($_,$objRef.Changes[$_])
+										}
                                         $checkReflector = $false
                                     }
                                 }
                             }
 
-                            if ( $checkReflector ) {
+                            if ($checkReflector) {
                                 if ( $tempGI.PropertyDescriptor.ShouldSerializeValue($tempGI.Component) ) {
                                     $newElement.SetAttribute($tempGI.PropertyLabel,$tempGI.GetPropertyTextValue())
                                 } elseif (( $newElementType -eq 'Form' ) -and ( $tempGI.PropertyLabel -eq 'Size') -and ( $tempPGrid.SelectedObject.AutoSize -eq $false )) {
@@ -1239,26 +1184,78 @@ foreach ($item in $lst_Functions.items){
     }
     
 
-    #region Event ScriptBlocks
+#bookmarkRefs
+function bookMarkRefs{}
+function ChangeView {($e, $r)
+	try {
+                switch ($this.Text) {
+                    'Toolbox' {
+                        $pnlChanged = $refs['pnl_Left']
+                        $sptChanged = $refs['spt_Left']
+                        $tsViewItem = $refs['Toolbox']
+                        $tsMenuItem = $refs['ms_Toolbox']
+						$tsBtn = $tsToolBoxBtn
+                        $thisNum = '1'
+                        $otherNum = '2'
+                        $side = 'Left'
+                    }
+                    'Form Tree' {
+                        $pnlChanged = $refs['pnl_Left']
+                        $sptChanged = $refs['spt_Left']
+                        $tsViewItem = $refs['FormTree']
+                        $tsMenuItem = $refs['ms_FormTree']
+						$tsBtn = $tsFormTreeBtn
+                        $thisNum = '2'
+                        $otherNum = '1'
+                        $side = 'Left'
+                    }
+                    'Properties' {
+                        $pnlChanged = $refs['pnl_Right']
+                        $sptChanged = $refs['spt_Right']
+                        $tsViewItem = $refs['Properties']
+                        $tsMenuItem = $refs['ms_Properties']
+						$tsBtn = $tsPropertiesBtn
+                        $thisNum = '1'
+                        $otherNum = '2'
+                        $side = 'Right'
+                    }
+                    'Events' {
+                        $pnlChanged = $refs['pnl_Right']
+                        $sptChanged = $refs['spt_Right']
+                        $tsViewItem = $refs['Events']
+                        $tsMenuItem = $refs['ms_Events']
+						$tsBtn = $tsEventsBtn
+                        $thisNum = '2'
+                        $otherNum = '1'
+                        $side = 'Right'
+                    }
+                }
+#brandoncomputer_TabColorSchemeChange
+                if (( $pnlChanged.Visible ) -and ( $sptChanged."Panel$($thisNum)Collapsed" )) {
+                    $sptChanged."Panel$($thisNum)Collapsed" = $false
+                    $tsViewItem.Checked = $true
+					$tsBtn.Checked = $true
+                    $tsMenuItem.BackColor = 'RoyalBlue'
+                } elseif (( $pnlChanged.Visible ) -and ( $sptChanged."Panel$($thisNum)Collapsed" -eq $false )) {
+                    $tsViewItem.Checked = $false
+					$tsBtn.Checked = $false
+                    $tsMenuItem.BackColor = 'MidnightBlue'
 
-    $eventSB = @{
-        'MainForm' = @{
-            FormClosing = {
-                try {
-                    $Script:refs['TreeView'].Nodes.ForEach({
-                        $controlName = $_.Name
-                        $controlType = $_.Text -replace " - .*$"
+                    if ( $sptChanged."Panel$($otherNum)Collapsed" ) {$pnlChanged.Visible = $false} else {$sptChanged."Panel$($thisNum)Collapsed" = $true}
+                } else {
+                    $tsViewItem.Checked = $true
+					$tsBtn.Checked = $true
+                    $tsMenuItem.BackColor = 'RoyalBlue'
+                    $sptChanged."Panel$($thisNum)Collapsed" = $false
+                    $sptChanged."Panel$($otherNum)Collapsed" = $true
+                    $pnlChanged.Visible = $true
+                }
 
-                        if ( $controlType -eq 'Form' ) {$Script:refsFID.Form.Objects[$controlName].Dispose()}
-                        else {$Script:refsFID[$controlType][$controlName].Objects[$controlName].Dispose()}
-						$MainForm.Dispose()
-                    })
-                } catch {Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered during Form closure."}
-            }
-        }
-        'New' = @{
-            Click = {
-				
+                if ( $pnlChanged.Visible -eq $true ) {$refs["lbl_$($side)"].Visible = $true} else {$refs["lbl_$($side)"].Visible = $false}
+            } catch {Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered during View change."}
+}
+
+	function NewProjectClick {
                 try {
 					
 					if ( [System.Windows.Forms.MessageBox]::Show("Unsaved changes to the current project will be lost.  Are you sure you want to start a new project?", 'Confirm', 4) -eq 'Yes' ) {
@@ -1296,233 +1293,233 @@ $FastText.SelectedText = "#region Images
 					
 					}
                 } catch {Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered during start of New Project."}
-            }
-        }
-        'Open' = @{
-            Click = {
-                if ( [System.Windows.Forms.MessageBox]::Show("You will lose all changes to the current project.  Are you sure?", 'Confirm', 4) -eq 'Yes' ) {
-                    $openDialog = ConvertFrom-WinFormsXML -Xml @"
+		
+	}
+	
+	function OpenProjectClick {
+		if ( [System.Windows.Forms.MessageBox]::Show("You will lose all changes to the current project.  Are you sure?", 'Confirm', 4) -eq 'Yes' ) {
+			$openDialog = ConvertFrom-WinFormsXML -Xml @"
 <OpenFileDialog InitialDirectory="$($Script:projectsDir)" AddExtension="True" DefaultExt="fbs" Filter="fbs files (*.fbs)|*.fbs" FilterIndex="1" ValidateNames="True" CheckFileExists="True" RestoreDirectory="True" />
 "@
-                    try {
-                        $Script:openingProject = $true
+			try {
+				$Script:openingProject = $true
 
-                        if ( $openDialog.ShowDialog() -eq 'OK' ) {
-                            $fileName = $openDialog.FileName
-							 if ($openDialog.FileName) {
-	
-for($i=0; $i -lt $lst_Functions.Items.Count; $i++)
-{$lst_Functions.SetItemChecked($i,$false)}
-	
-							 
-								 $global:control_track = @{}
-                            
-                            New-Object -TypeName XML | ForEach-Object {
-                                $_.Load("$($fileName)")				
-								
-                                $Script:refs['TreeView'].BeginUpdate()
+				if ( $openDialog.ShowDialog() -eq 'OK' ) {
+					$fileName = $openDialog.FileName
+					if ($openDialog.FileName) {
 
-                                $Script:refs['TreeView'].Nodes.ForEach({
-                                    $controlName = $_.Name
-                                    $controlType = $_.Text -replace " - .*$"
-
-                                    if ( $controlType -eq 'Form' ) {$Script:refsFID.Form.Objects[$controlName].Dispose()}
-                                    else {$Script:refsFID[$controlType][$controlName].Objects[$ControlName].Dispose()}
-                                })
-
-                                $Script:refs['TreeView'].Nodes.Clear()
-
-                                Convert-XmlToTreeView -XML $_.Data.Form -TreeObject $Script:refs['TreeView']
-
-                                $_.Data.ChildNodes.Where({$_.ToString() -notmatch 'Form' -and $_.ToString() -notmatch 'Events'}) | ForEach-Object {Convert-XmlToTreeView -XML $_ -TreeObject $Script:refs['TreeView']}
-
-                                $Script:refs['TreeView'].EndUpdate()
-
-                                if ( $_.Data.Events.ChildNodes.Count -gt 0 ) {
-                                    $_.Data.Events.ChildNodes | ForEach-Object {
-                                        $rootControlType = $_.Root.Split('|')[0]
-                                        $rootControlName = $_.Root.Split('|')[1]
-                                        $controlName = $_.Name
-
-                                        if ( $rootControlType -eq 'Form' ) {
-                                            $Script:refsFID.Form.Events[$controlName] = @()
-                                            $_.Events.Split(' ') | ForEach-Object {$Script:refsFID.Form.Events[$controlName] += $_}
-                                        } else {
-                                            $Script:refsFID[$rootControlType][$rootControlName].Events[$controlName] = @()
-                                            $_.Events.Split(' ') | ForEach-Object {$Script:refsFID[$rootControlType][$rootControlName].Events[$controlName] += $_}
-                                        }
-                                    }
-                                }
-								
-								if ( $_.Data.Functions.ChildNodes.Count -gt 0 ) {
-                                    $_.Data.Functions.ChildNodes | ForEach-Object {
-										$lst_Functions.SetItemChecked($lst_Functions.Items.IndexOf($_.Name),$true)
-									}
-								}
-                            }
-                            #>
-                            $objRef = Get-RootNodeObjRef -TreeNode $Script:refs['TreeView'].SelectedNode
-
-                            if ( $objRef.Events[$Script:refs['TreeView'].SelectedNode.Name] ) {
-                                $Script:refs['lst_AssignedEvents'].BeginUpdate()
-                                $Script:refs['lst_AssignedEvents'].Items.Clear()
-
-                                [void]$Script:refs['lst_AssignedEvents'].Items.AddRange($objRef.Events[$Script:refs['TreeView'].SelectedNode.Name])
-
-                                $Script:refs['lst_AssignedEvents'].EndUpdate()
-
-                                $Script:refs['lst_AssignedEvents'].Enabled = $true
-                            }
-                        }
+						for($i=0; $i -lt $lst_Functions.Items.Count; $i++){
+							$lst_Functions.SetItemChecked($i,$false)
 						}
 
-                        $Script:openingProject = $false
-						
-						 if ($openDialog.FileName) {
-
-                        $Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].Visible = $true
-						$Script:refs['tpg_Form1'].Text = "$($openDialog.FileName -replace "^.*\\")"
-                        $Script:refs['TreeView'].SelectedNode = $Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }
-#brandoncomputer_OpenDialogFix					
-
-						$global:projectDirName = $openDialog.FileName
-#brandoncomputer_FastTextOpenFile
-					$projectName = $Script:refs['tpg_Form1'].Text
-					$generationPath = "$(Split-Path -Path $global:projectDirName)\$($projectName -replace "\..*$")"
+					 
+						 $global:control_track = @{}
 					
-						#bookmarkOpen
+					New-Object -TypeName XML | ForEach-Object {
+						$_.Load("$($fileName)")				
 						
-						<#				$designerpath = ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\functions.psm1")
-		New-Variable astTokens -Force
-		New-Variable astErr -Force
-		$AST = [System.Management.Automation.Language.Parser]::ParseFile($designerpath, [ref]$astTokens, [ref]$astErr)
-		$functions = $ast.FindAll({ $args[0] -is [System.Management.Automation.Language.FunctionDefinitionAst] }, $true)
-		
-		foreach ($function in $functions){
-			if ($function.name -eq $lst_Functions.SelectedItem.ToString()){
-				$parameters = $function.FindAll({ $args[0] -is [System.Management.Automation.Language.ParameterAst] }, $true)
-			#	$lst_functions.items.Add($function.name)
-			}
-		}
-#>
-					
-						if (Test-Path -path "$generationPath\Events.ps1") {
-							$FastText.OpenFile("$generationPath\Events.ps1")	
-							$fastArr = ($FastText.Text).split("
-")
-							foreach ($arrItem in $fastArr){
-								$dotSplit = $arrItem.split(".")
-								if ($dotSplit[1]) {
-									$spaceSplit = $dotSplit[1].Split(" ")
-											$baseStr = $arrItem.split(" ")[0]
-											$noCash = $baseStr.split("`$")[1]
-									if ($noCash.count -gt 0) {
-										$Control = $noCash.Split(".")[0]
-										$b64 = $arrItem.split("`"")[1]
-										switch ($spaceSplit[0]) {
-											'Icon'{
-												$objRef.Objects[$Control].Icon = [System.Drawing.Icon]::FromHandle(([System.Drawing.Bitmap][System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String($b64))).GetHicon())
-											}
-											'Image'{
-												$objRef.Objects[$Control].Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String($b64))
-											}
-											'BackgroundImage'{
-												$objRef.Objects[$Control].BackgroundImage = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String($b64))
-											}
-											'ErrorImage'{
-												$objRef.Objects[$Control].ErrorImage = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String($b64))
-											}
-											'InitialImage'{
-												$objRef.Objects[$Control].BackgroundImage = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String($b64))
-											}
-										}
-									}
+						$Script:refs['TreeView'].BeginUpdate()
+
+						$Script:refs['TreeView'].Nodes.ForEach({
+							$controlName = $_.Name
+							$controlType = $_.Text -replace " - .*$"
+
+							if ( $controlType -eq 'Form' ) {$Script:refsFID.Form.Objects[$controlName].Dispose()}
+							else {$Script:refsFID[$controlType][$controlName].Objects[$ControlName].Dispose()}
+						})
+
+						$Script:refs['TreeView'].Nodes.Clear()
+
+						Convert-XmlToTreeView -XML $_.Data.Form -TreeObject $Script:refs['TreeView']
+
+						$_.Data.ChildNodes.Where({$_.ToString() -notmatch 'Form' -and $_.ToString() -notmatch 'Events'}) | ForEach-Object {Convert-XmlToTreeView -XML $_ -TreeObject $Script:refs['TreeView']}
+
+						$Script:refs['TreeView'].EndUpdate()
+
+						if ( $_.Data.Events.ChildNodes.Count -gt 0 ) {
+							$_.Data.Events.ChildNodes | ForEach-Object {
+								$rootControlType = $_.Root.Split('|')[0]
+								$rootControlName = $_.Root.Split('|')[1]
+								$controlName = $_.Name
+
+								if ( $rootControlType -eq 'Form' ) {
+									$Script:refsFID.Form.Events[$controlName] = @()
+									$_.Events.Split(' ') | ForEach-Object {$Script:refsFID.Form.Events[$controlName] += $_}
+								} else {
+									$Script:refsFID[$rootControlType][$rootControlName].Events[$controlName] = @()
+									$_.Events.Split(' ') | ForEach-Object {$Script:refsFID[$rootControlType][$rootControlName].Events[$controlName] += $_}
 								}
 							}
 						}
 						
-						try{
-						$FastText.CollapseFoldingBlock(0)}
-						catch{}
-					
-
-
+						if ( $_.Data.Functions.ChildNodes.Count -gt 0 ) {
+							$_.Data.Functions.ChildNodes | ForEach-Object {
+								$lst_Functions.SetItemChecked($lst_Functions.Items.IndexOf($_.Name),$true)
+							}
+						}
 					}
-					
-                    } catch {Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered while opening $($fileName)."}
-                    finally {
-                        $Script:openingProject = $false
+					#>
+					$objRef = Get-RootNodeObjRef -TreeNode $Script:refs['TreeView'].SelectedNode
 
-                        $openDialog.Dispose()
-                        Remove-Variable -Name openDialog
+					if ( $objRef.Events[$Script:refs['TreeView'].SelectedNode.Name] ) {
+						$Script:refs['lst_AssignedEvents'].BeginUpdate()
+						$Script:refs['lst_AssignedEvents'].Items.Clear()
 
-                        $Script:refs['TreeView'].Focus()
-						
-                    }
-                }
-            }
-        }
-        'Rename' = @{
-            Click = {
-                if ( $Script:refs['TreeView'].SelectedNode.Text -notmatch "^SplitterPanel" ) {
-                    $currentName = $Script:refs['TreeView'].SelectedNode.Name
-                    $userInput = Get-UserInputFromForm -SetText $currentName
+						[void]$Script:refs['lst_AssignedEvents'].Items.AddRange($objRef.Events[$Script:refs['TreeView'].SelectedNode.Name])
 
-                    if ( $userInput.Result -eq 'OK' ) {
-                        try {
-                            $newName = $userInput.NewName
+						$Script:refs['lst_AssignedEvents'].EndUpdate()
 
-                            $objRef = Get-RootNodeObjRef -TreeNode $Script:refs['TreeView'].SelectedNode
+						$Script:refs['lst_AssignedEvents'].Enabled = $true
+					}
+				}
+				}
 
-                            $objRef.Objects[$currentName].Name = $newName
-                            $objRef.Objects[$newName] = $objRef.Objects[$currentName]
-                            $objRef.Objects.Remove($currentName)
+				$Script:openingProject = $false
+				
+				 if ($openDialog.FileName) {
 
-                            if ( $objRef.Changes[$currentName] ) {
-                                $objRef.Changes[$newName] = $objRef.Changes[$currentName]
-                                $objRef.Changes.Remove($currentName)
-                            }
+				$Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].Visible = $true
+				$Script:refs['tpg_Form1'].Text = "$($openDialog.FileName -replace "^.*\\")"
+				$Script:refs['TreeView'].SelectedNode = $Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }
+#brandoncomputer_OpenDialogFix					
 
-                            if ( $objRef.Events[$currentName] ) {
-                                $objRef.Events[$newName] = $objRef.Events[$currentName]
-                                $objRef.Events.Remove($currentName)
-                            }
+				$global:projectDirName = $openDialog.FileName
+#brandoncomputer_FastTextOpenFile
+			$projectName = $Script:refs['tpg_Form1'].Text
+			$generationPath = "$(Split-Path -Path $global:projectDirName)\$($projectName -replace "\..*$")"
+			
+				#bookmarkOpen
+				
+				<#				$designerpath = ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\functions.psm1")
+New-Variable astTokens -Force
+New-Variable astErr -Force
+$AST = [System.Management.Automation.Language.Parser]::ParseFile($designerpath, [ref]$astTokens, [ref]$astErr)
+$functions = $ast.FindAll({ $args[0] -is [System.Management.Automation.Language.FunctionDefinitionAst] }, $true)
 
-                            $objRef.TreeNodes[$currentName].Name = $newName
-                            $objRef.TreeNodes[$currentName].Text = $Script:refs['TreeView'].SelectedNode.Text -replace "-.*$","- $($newName)"
-                            $objRef.TreeNodes[$newName] = $objRef.TreeNodes[$currentName]
-                            $objRef.TreeNodes.Remove($currentName)
+foreach ($function in $functions){
+	if ($function.name -eq $lst_Functions.SelectedItem.ToString()){
+		$parameters = $function.FindAll({ $args[0] -is [System.Management.Automation.Language.ParameterAst] }, $true)
+	#	$lst_functions.items.Add($function.name)
+	}
+}
+#>
+			
+				if (Test-Path -path "$generationPath\Events.ps1") {
+					$FastText.OpenFile("$generationPath\Events.ps1")	
+					$fastArr = ($FastText.Text).split("
+")
+					foreach ($arrItem in $fastArr){
+						$dotSplit = $arrItem.split(".")
+						if ($dotSplit[1]) {
+							$spaceSplit = $dotSplit[1].Split(" ")
+									$baseStr = $arrItem.split(" ")[0]
+									$noCash = $baseStr.split("`$")[1]
+							if ($noCash.count -gt 0) {
+								$Control = $noCash.Split(".")[0]
+								$b64 = $arrItem.split("`"")[1]
+								switch ($spaceSplit[0]) {
+									'Icon'{
+										$objRef.Objects[$Control].Icon = [System.Drawing.Icon]::FromHandle(([System.Drawing.Bitmap][System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String($b64))).GetHicon())
+									}
+									'Image'{
+										$objRef.Objects[$Control].Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String($b64))
+									}
+									'BackgroundImage'{
+										$objRef.Objects[$Control].BackgroundImage = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String($b64))
+									}
+									'ErrorImage'{
+										$objRef.Objects[$Control].ErrorImage = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String($b64))
+									}
+									'InitialImage'{
+										$objRef.Objects[$Control].BackgroundImage = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String($b64))
+									}
+								}
+							}
+						}
+					}
+				}
+				
+				try{
+				$FastText.CollapseFoldingBlock(0)}
+				catch{}
+			
 
-                            if ( $objRef.TreeNodes[$newName].Text -match "^SplitContainer" ) {
-                                @('Panel1','Panel2').ForEach({
-                                    $objRef.Objects["$($currentName)_$($_)"].Name = "$($newName)_$($_)"
-                                    $objRef.Objects["$($newName)_$($_)"] = $objRef.Objects["$($currentName)_$($_)"]
-                                    $objRef.Objects.Remove("$($currentName)_$($_)")
 
-                                    if ( $objRef.Changes["$($currentName)_$($_)"] ) {
-                                        $objRef.Changes["$($newName)_$($_)"] = $objRef.Changes["$($currentName)_$($_)"]
-                                        $objRef.Changes.Remove("$($currentName)_$($_)")
-                                    }
+			}
+			
+			} catch {Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered while opening $($fileName)."}
+			finally {
+				$Script:openingProject = $false
 
-                                    if ( $objRef.Events["$($currentName)_$($_)"] ) {
-                                        $objRef.Events["$($newName)_$($_)"] = $objRef.Events["$($currentName)_$($_)"]
-                                        $objRef.Events.Remove("$($currentName)_$($_)")
-                                    }
+				$openDialog.Dispose()
+				Remove-Variable -Name openDialog
 
-                                    $objRef.TreeNodes["$($currentName)_$($_)"].Name = "$($newName)_$($_)"
-                                    $objRef.TreeNodes["$($currentName)_$($_)"].Text = $Script:refs['TreeView'].SelectedNode.Text -replace "-.*$","- $($newName)_$($_)"
-                                    $objRef.TreeNodes["$($newName)_$($_)"] = $objRef.TreeNodes["$($currentName)_$($_)"]
-                                    $objRef.TreeNodes.Remove("$($currentName)_$($_)")
-                                })
-                            }
-                        } catch {Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered renaming '$($Script:refs['TreeView'].SelectedNode.Text)'."}
-                    }
-                } else {[void][System.Windows.Forms.MessageBox]::Show("Cannot perform any action from the 'Edit' Menu against a SplitterPanel control.",'Restricted Action')}
-            }
-        }
-        'Delete' = @{
-            Click = {
-                if ( $Script:refs['TreeView'].SelectedNode.Text -notmatch "^SplitterPanel" ) {
+				$Script:refs['TreeView'].Focus()
+				
+			}
+		}
+	}
+	
+	function RenameClick {
+		if ( $Script:refs['TreeView'].SelectedNode.Text -notmatch "^SplitterPanel" ) {
+			$currentName = $Script:refs['TreeView'].SelectedNode.Name
+			$userInput = Get-UserInputFromForm -SetText $currentName
+
+			if ( $userInput.Result -eq 'OK' ) {
+				try {
+					$newName = $userInput.NewName
+
+					$objRef = Get-RootNodeObjRef -TreeNode $Script:refs['TreeView'].SelectedNode
+
+					$objRef.Objects[$currentName].Name = $newName
+					$objRef.Objects[$newName] = $objRef.Objects[$currentName]
+					$objRef.Objects.Remove($currentName)
+
+					if ( $objRef.Changes[$currentName] ) {
+						$objRef.Changes[$newName] = $objRef.Changes[$currentName]
+						$objRef.Changes.Remove($currentName)
+					}
+
+					if ( $objRef.Events[$currentName] ) {
+						$objRef.Events[$newName] = $objRef.Events[$currentName]
+						$objRef.Events.Remove($currentName)
+					}
+
+					$objRef.TreeNodes[$currentName].Name = $newName
+					$objRef.TreeNodes[$currentName].Text = $Script:refs['TreeView'].SelectedNode.Text -replace "-.*$","- $($newName)"
+					$objRef.TreeNodes[$newName] = $objRef.TreeNodes[$currentName]
+					$objRef.TreeNodes.Remove($currentName)
+
+					if ( $objRef.TreeNodes[$newName].Text -match "^SplitContainer" ) {
+						@('Panel1','Panel2').ForEach({
+							$objRef.Objects["$($currentName)_$($_)"].Name = "$($newName)_$($_)"
+							$objRef.Objects["$($newName)_$($_)"] = $objRef.Objects["$($currentName)_$($_)"]
+							$objRef.Objects.Remove("$($currentName)_$($_)")
+
+							if ( $objRef.Changes["$($currentName)_$($_)"] ) {
+								$objRef.Changes["$($newName)_$($_)"] = $objRef.Changes["$($currentName)_$($_)"]
+								$objRef.Changes.Remove("$($currentName)_$($_)")
+							}
+
+							if ( $objRef.Events["$($currentName)_$($_)"] ) {
+								$objRef.Events["$($newName)_$($_)"] = $objRef.Events["$($currentName)_$($_)"]
+								$objRef.Events.Remove("$($currentName)_$($_)")
+							}
+
+							$objRef.TreeNodes["$($currentName)_$($_)"].Name = "$($newName)_$($_)"
+							$objRef.TreeNodes["$($currentName)_$($_)"].Text = $Script:refs['TreeView'].SelectedNode.Text -replace "-.*$","- $($newName)_$($_)"
+							$objRef.TreeNodes["$($newName)_$($_)"] = $objRef.TreeNodes["$($currentName)_$($_)"]
+							$objRef.TreeNodes.Remove("$($currentName)_$($_)")
+						})
+					}
+				} catch {Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered renaming '$($Script:refs['TreeView'].SelectedNode.Text)'."}
+			}
+		} else {[void][System.Windows.Forms.MessageBox]::Show("Cannot perform any action from the 'Edit' Menu against a SplitterPanel control.",'Restricted Action')
+		}	
+	}
+	
+	function DeleteClick{
+	                if ( $Script:refs['TreeView'].SelectedNode.Text -notmatch "^SplitterPanel" ) {
                     try {
                         $objRef = Get-RootNodeObjRef -TreeNode $Script:refs['TreeView'].SelectedNode
                         
@@ -1556,21 +1553,20 @@ for($i=0; $i -lt $lst_Functions.Items.Count; $i++)
                         } else {$Script:refs['tsl_StatusLabel'].text = 'Cannot delete the root Form.  Start a New Project instead.'}
                     } catch {Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered deleting '$($Script:refs['TreeView'].SelectedNode.Text)'."}
                 } else {[void][System.Windows.Forms.MessageBox]::Show("Cannot perform any action from the 'Edit' Menu against a SplitterPanel control.",'Restricted Action')}
-            }
-        }
-        'CopyNode' = @{
-            Click = {
-                if ( $Script:refs['TreeView'].SelectedNode.Level -gt 0 ) {
+
+	}
+	
+	function CopyNodeClick {
+		if ( $Script:refs['TreeView'].SelectedNode.Level -gt 0 ) {
                     $Script:nodeClipboard = @{
                         ObjRef = Get-RootNodeObjRef -TreeNode $Script:refs['TreeView'].SelectedNode
                         Node = $Script:refs['TreeView'].SelectedNode
                     }
                 } else {[void][System.Windows.Forms.MessageBox]::Show('You cannot copy a root node.  It will be necessary to copy each individual subnode separately after creating the root node manually.')}
-            }
-        }
-        'PasteNode' = @{
-            Click = {
-                try {
+	}
+	
+function PasteNodeClick {
+		             try {
                     if ( $Script:nodeClipboard ) {
                         $pastedObjType = $Script:nodeClipboard.Node.Text -replace " - .*$"
                         $currentObjType = $Script:refs['TreeView'].SelectedNode.Text -replace " - .*$"
@@ -1616,11 +1612,11 @@ for($i=0; $i -lt $lst_Functions.Items.Count; $i++)
 						}
                     }
                 } catch {Update-ErrorLog -ErrorRecord $_ -Message 'Exception encountered while pasting node from clipboard.'}
-            }
-        }
-        'Move Up' = @{
-            Click = {
-                try {
+   
+	}
+	
+	function MoveUpClick {
+		                try {
                     $selectedNode = $Script:refs['TreeView'].SelectedNode
                     $objRef = Get-RootNodeObjRef -TreeNode $selectedNode
                     $nodeName = $selectedNode.Name
@@ -1637,11 +1633,11 @@ for($i=0; $i -lt $lst_Functions.Items.Count; $i++)
                         $Script:refs['TreeView'].SelectedNode = $objRef.TreeNodes[$nodeName]
                     }
                 } catch {Update-ErrorLog -ErrorRecord $_ -Message 'Exception encountered increasing index of TreeNode.'}
-            }
-        }
-        'Move Down' = @{
-            Click = {
-                try {
+
+	}
+	
+	function MoveDownClick {
+	                try {
                     $selectedNode = $Script:refs['TreeView'].SelectedNode
                     $objRef = Get-RootNodeObjRef -TreeNode $selectedNode
                     $nodeName = $selectedNode.Name
@@ -1659,15 +1655,13 @@ for($i=0; $i -lt $lst_Functions.Items.Count; $i++)
                         $Script:refs['TreeView'].SelectedNode = $objRef.TreeNodes[$nodeName]
                     }
                 } catch {Update-ErrorLog -ErrorRecord $_ -Message 'Exception encountered decreasing index of TreeNode.'}
-            }
-        }
 
-		'Generate Script File' = @{
-		#bookmarkGenerate
-			Click = {
-				$projectName = $Script:refs['tpg_Form1'].Text
+	}
+	
+	function GenerateClick {
+						$projectName = $Script:refs['tpg_Form1'].Text
 				if ("$global:projectDirName" -eq "") {
-					[System.Windows.Forms.MessageBox]::Show("Please save this project before generating a script file","Script not generated",'OK',64) | Out-Null
+					$Script:refs['tsl_StatusLabel'].text = "Please save this project before generating a script file","Script not generated"
 					return
 				}
 				#iex (Get-Content (([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\Dependencies.ps1")) | Out-String)
@@ -1712,7 +1706,64 @@ Show-Form `$$FormName}); `$PowerShell.Invoke(); `$PowerShell.Dispose()"
 				$ascii = new-object System.Text.ASCIIEncoding
 				$FastText.SaveToFile("$generationPath\Events.ps1",$ascii)
 				$outstring | Out-File "$($generationPath)\$($projectName -replace "fbs$","ps1")" -Encoding ASCII -Force
-				[System.Windows.Forms.MessageBox]::Show("Script saved to $($generationPath)\$($projectName -replace "fbs$","ps1")","Script output successful",'OK',64) | Out-Null
+				$Script:refs['tsl_StatusLabel'].text = "Script saved to $($generationPath)\$($projectName -replace "fbs$","ps1")"
+	}
+	
+
+    #region Event ScriptBlocks
+
+
+    $eventSB = @{
+        'MainForm' = @{
+            FormClosing = {
+				show-informationdialog "hi"
+            }
+        }
+        'New' = @{
+            Click = {
+				NewProjectClick
+            }
+        }
+        'Open' = @{
+            Click = {
+				OpenProjectClick
+			}
+        }
+        'Rename' = @{
+            Click = {
+				RenameClick
+            }
+        }
+        'Delete' = @{
+            Click = {
+				DeleteClick
+            }
+        }
+        'CopyNode' = @{
+            Click = {
+                CopyNodeClick
+            }
+        }
+        'PasteNode' = @{
+            Click = {
+				PasteNodeClick
+            }
+        }
+        'Move Up' = @{
+            Click = {
+				MoveUpClick
+            }
+        }
+        'Move Down' = @{
+            Click = {
+				MoveDownClick
+            }
+        }
+
+		'Generate Script File' = @{
+		#bookmarkGenerate
+			Click = {
+				GenerateClick
 			}
 		}
 		
@@ -2018,65 +2069,7 @@ $string = "`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Draw
             }
         }
         'ChangeView' = {
-            try {
-                switch ($this.Text) {
-                    'Toolbox' {
-                        $pnlChanged = $refs['pnl_Left']
-                        $sptChanged = $refs['spt_Left']
-                        $tsViewItem = $refs['Toolbox']
-                        $tsMenuItem = $refs['ms_Toolbox']
-                        $thisNum = '1'
-                        $otherNum = '2'
-                        $side = 'Left'
-                    }
-                    'Form Tree' {
-                        $pnlChanged = $refs['pnl_Left']
-                        $sptChanged = $refs['spt_Left']
-                        $tsViewItem = $refs['FormTree']
-                        $tsMenuItem = $refs['ms_FormTree']
-                        $thisNum = '2'
-                        $otherNum = '1'
-                        $side = 'Left'
-                    }
-                    'Properties' {
-                        $pnlChanged = $refs['pnl_Right']
-                        $sptChanged = $refs['spt_Right']
-                        $tsViewItem = $refs['Properties']
-                        $tsMenuItem = $refs['ms_Properties']
-                        $thisNum = '1'
-                        $otherNum = '2'
-                        $side = 'Right'
-                    }
-                    'Events' {
-                        $pnlChanged = $refs['pnl_Right']
-                        $sptChanged = $refs['spt_Right']
-                        $tsViewItem = $refs['Events']
-                        $tsMenuItem = $refs['ms_Events']
-                        $thisNum = '2'
-                        $otherNum = '1'
-                        $side = 'Right'
-                    }
-                }
-#brandoncomputer_TabColorSchemeChange
-                if (( $pnlChanged.Visible ) -and ( $sptChanged."Panel$($thisNum)Collapsed" )) {
-                    $sptChanged."Panel$($thisNum)Collapsed" = $false
-                    $tsViewItem.Checked = $true
-                    $tsMenuItem.BackColor = 'RoyalBlue'
-                } elseif (( $pnlChanged.Visible ) -and ( $sptChanged."Panel$($thisNum)Collapsed" -eq $false )) {
-                    $tsViewItem.Checked = $false
-                    $tsMenuItem.BackColor = 'MidnightBlue'
-
-                    if ( $sptChanged."Panel$($otherNum)Collapsed" ) {$pnlChanged.Visible = $false} else {$sptChanged."Panel$($thisNum)Collapsed" = $true}
-                } else {
-                    $tsViewItem.Checked = $true
-                    $tsMenuItem.BackColor = 'RoyalBlue'
-                    $sptChanged."Panel$($thisNum)Collapsed" = $false
-                    $sptChanged."Panel$($otherNum)Collapsed" = $true
-                    $pnlChanged.Visible = $true
-                }
-
-                if ( $pnlChanged.Visible -eq $true ) {$refs["lbl_$($side)"].Visible = $true} else {$refs["lbl_$($side)"].Visible = $false}
-            } catch {Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered during View change."}
+			ChangeView
         }
         'ChangePanelSize' = @{
             'MouseMove' = {
@@ -2530,17 +2523,19 @@ $string = "`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Draw
 
     #region Main Form Initialization
 
+function MainForm{}
+
     try {
 #brandoncomputer_FixWindowState
         ConvertFrom-WinFormsXML -Reference refs -Suppress -Xml @"
   <Form Name="MainForm" IsMdiContainer="True" Size="826, 654" WindowState="Maximized" Text="PowerShell Designer">
-    <TabControl Name="tcl_Top" Dock="Top" Size="1058, 20">
-      <TabPage Name="tpg_Form1" Size="1050, 0" Text="NewProject.fbs" />
+    <TabControl Name="tcl_Top" Dock="Top" Size="1058,20">
+      <TabPage Name="tpg_Form1" Size="1050,0" Text="NewProject.fbs" />
     </TabControl>
-    <Label Name="lbl_Left" Dock="Left" BackColor="35, 35, 35" Cursor="VSplit" Size="3, 828" />
-    <Label Name="lbl_Right" Dock="Right" BackColor="35, 35, 35" Cursor="VSplit" Size="3, 828" />
-    <Panel Name="pnl_Left" Dock="Left" BorderStyle="Fixed3D" Size="200, 828">
-      <SplitContainer Name="spt_Left" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="411">
+    <Label Name="lbl_Left" Dock="Left" BackColor="35, 35, 35" Cursor="VSplit" Size="3,828" />
+    <Label Name="lbl_Right" Dock="Right" BackColor="35, 35, 35" Cursor="VSplit" Size="3,828" />
+    <Panel Name="pnl_Left" Dock="Left" BorderStyle="Fixed3D" Size="200,828">
+      <SplitContainer Name="spt_Left" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="276">
         <SplitterPanel Name="spt_Left_Panel1">
           <TreeView Name="trv_Controls" Dock="Fill" BackColor="Azure" />
         </SplitterPanel>
@@ -2549,15 +2544,15 @@ $string = "`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Draw
         </SplitterPanel>
       </SplitContainer>
     </Panel>
-    <Panel Name="pnl_Right" Dock="Right" BorderStyle="Fixed3D" Size="200, 828">
-      <SplitContainer Name="spt_Right" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="418">
+    <Panel Name="pnl_Right" Dock="Right" BorderStyle="Fixed3D" Size="200,828">
+      <SplitContainer Name="spt_Right" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="293">
         <SplitterPanel Name="spt_Right_Panel1">
-          <PropertyGrid Name="PropertyGrid" Dock="Fill" Cursor="HSplit" ViewBackColor="Azure" />
+          <PropertyGrid Name="PropertyGrid" Dock="Fill" ViewBackColor="Azure" />
         </SplitterPanel>
         <SplitterPanel Name="spt_Right_Panel2" BackColor="Control">
           <TabControl Name="TabControl2" Dock="Fill">
-            <TabPage Name="Tab 1" Size="188, 376" Text="Events">
-              <SplitContainer Name="SplitContainer3" Dock="Fill" Orientation="Horizontal" SplitterDistance="210">
+            <TabPage Name="Tab 1" Size="188,501" Text="Events">
+              <SplitContainer Name="SplitContainer3" Dock="Fill" Orientation="Horizontal" SplitterDistance="234">
                 <SplitterPanel Name="SplitContainer3_Panel1" AutoScroll="True">
                   <ListBox Name="lst_AvailableEvents" Dock="Fill" BackColor="Azure" />
                 </SplitterPanel>
@@ -2566,13 +2561,13 @@ $string = "`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Draw
                 </SplitterPanel>
               </SplitContainer>
             </TabPage>
-            <TabPage Name="TabPage3" Size="188, 376" Text="Functions">
+            <TabPage Name="TabPage3" Size="188,449" Text="Functions">
               <SplitContainer Name="SplitContainer4" Dock="Fill" Orientation="Horizontal" SplitterDistance="205">
                 <SplitterPanel Name="SplitContainer4_Panel1" AutoScroll="True">
                   <CheckedListBox Name="lst_Functions" Dock="Fill" BackColor="Azure" />
                 </SplitterPanel>
                 <SplitterPanel Name="SplitContainer4_Panel2" AutoScroll="True">
-                  <TextBox Name="lst_Params" Dock="Fill" BackColor="Azure" Multiline="True" ScrollBars="Both" Size="188, 167" />
+                  <TextBox Name="lst_Params" Dock="Fill" BackColor="Azure" Multiline="True" ScrollBars="Both" Size="188,240" />
                 </SplitterPanel>
               </SplitContainer>
             </TabPage>
@@ -2580,15 +2575,15 @@ $string = "`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Draw
         </SplitterPanel>
       </SplitContainer>
     </Panel>
-    <MenuStrip Name="ms_Left" Dock="Left" AutoSize="False" BackColor="ControlDarkDark" Font="Verdana, 9pt" LayoutStyle="VerticalStackWithOverflow" Size="23, 828" TextDirection="Vertical90">
-      <ToolStripMenuItem Name="ms_Toolbox" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" Size="23, 100" Text="Toolbox" />
-      <ToolStripMenuItem Name="ms_FormTree" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" Size="23, 100" TextAlign="MiddleLeft" TextDirection="Vertical90" Text="Form Tree" />
+    <MenuStrip Name="ms_Left" Dock="Left" AutoSize="False" BackColor="ControlDarkDark" Font="Verdana, 9pt" LayoutStyle="VerticalStackWithOverflow" Size="23,828" TextDirection="Vertical90">
+      <ToolStripMenuItem Name="ms_Toolbox" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" Size="23,100" Text="Toolbox" />
+      <ToolStripMenuItem Name="ms_FormTree" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" Size="23,100" TextAlign="MiddleLeft" TextDirection="Vertical90" Text="Form Tree" />
     </MenuStrip>
-    <MenuStrip Name="ms_Right" Dock="Right" AutoSize="False" BackColor="ControlDarkDark" Font="Verdana, 9pt" LayoutStyle="VerticalStackWithOverflow" Size="23, 828" TextDirection="Vertical90">
-      <ToolStripMenuItem Name="ms_Properties" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" Size="23, 100" TextAlign="MiddleLeft" TextDirection="Vertical270" Text="Properties" />
-      <ToolStripMenuItem Name="ms_Events" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" ImageTransparentColor="White" Size="23, 100" TextDirection="Vertical270" Text="Events" />
+    <MenuStrip Name="ms_Right" Dock="Right" AutoSize="False" BackColor="ControlDarkDark" Font="Verdana, 9pt" LayoutStyle="VerticalStackWithOverflow" Size="23,828" TextDirection="Vertical90">
+      <ToolStripMenuItem Name="ms_Properties" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" Size="23,100" TextAlign="MiddleLeft" TextDirection="Vertical270" Text="Properties" />
+      <ToolStripMenuItem Name="ms_Events" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" ImageTransparentColor="White" Size="23,100" TextDirection="Vertical270" Text="Events" />
     </MenuStrip>
-    <MenuStrip Name="ToolStrip" Text="ToolStrip1">
+    <MenuStrip Name="ToolStrip" Text="ToolStrip1" ImageScalingSize="16,16">
       <ToolStripButton Name="tsNewBtn" BackColor="Control" DisplayStyle="Image" ImageTransparentColor="Control" Text="New" />
       <ToolStripButton Name="tsOpenbtn" DisplayStyle="Image" Text="ToolStripButton2" />
       <ToolStripButton Name="tsSavebtn" DisplayStyle="Image" Text="ToolStripButton4" />
@@ -2613,10 +2608,10 @@ $string = "`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Draw
       <ToolStripButton Name="tsMoveUpBtn" DisplayStyle="Image" Text="ToolStripButton21" />
       <ToolStripButton Name="tsMoveDownBtn" DisplayStyle="Image" Text="ToolStripButton22" />
       <ToolStripSeparator Name="ToolStripSeparator10" Margin="10, 0, 10, 0" />
-      <ToolStripButton Name="tsToolBoxBtn" Checked="True" CheckState="Checked" DisplayStyle="Image" Text="ToolStripButton24" />
-      <ToolStripButton Name="tsFormTreeBtn" Checked="True" CheckState="Checked" DisplayStyle="Image" Text="ToolStripButton25" />
-      <ToolStripButton Name="tsPropertiesBtn" Checked="True" CheckState="Checked" DisplayStyle="Image" Text="ToolStripButton26" />
-      <ToolStripButton Name="tsEventsBtn" Checked="True" CheckState="Checked" DisplayStyle="Image" Text="ToolStripButton27" />
+      <ToolStripButton Name="tsToolBoxBtn" Checked="True" CheckState="Checked" DisplayStyle="Image" Text="Toolbox" />
+      <ToolStripButton Name="tsFormTreeBtn" Checked="True" CheckState="Checked" DisplayStyle="Image" Text="Form Tree" />
+      <ToolStripButton Name="tsPropertiesBtn" Checked="True" CheckState="Checked" DisplayStyle="Image" Text="Properties" />
+      <ToolStripButton Name="tsEventsBtn" Checked="True" CheckState="Checked" DisplayStyle="Image" Text="Events" />
       <ToolStripSeparator Name="ToolStripSeparator11" Margin="10, 0, 10, 0" />
       <ToolStripButton Name="tsTermBtn" DisplayStyle="Image" ImageTransparentColor="White" Text="ToolStripButton28" />
       <ToolStripButton Name="tsGenerateBtn" DisplayStyle="Image" Text="ToolStripButton29" />
@@ -2672,7 +2667,7 @@ $string = "`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Draw
     <StatusStrip Name="sta_Status">
       <ToolStripStatusLabel Name="tsl_StatusLabel" />
     </StatusStrip>
-	</Form>
+  </Form>
 "@
     } catch {Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered during Form Initialization."}
 
@@ -2682,7 +2677,7 @@ $string = "`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Draw
 
     try {
             # Call to ScriptBlock
-        $Script:refs['MainForm'].Add_FormClosing($eventSB['MainForm'].FormClosing)
+        #$Script:refs['MainForm'].Add_FormClosing($eventSB['MainForm'].FormClosing)
         $Script:refs['MainForm'].Add_Load($eventSB['MainForm'].Load)
         $Script:refs['ms_Toolbox'].Add_Click($eventSB.ChangeView)
         $Script:refs['ms_FormTree'].Add_Click($eventSB.ChangeView)
@@ -2712,8 +2707,8 @@ $string = "`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Draw
         $Script:refs['lst_AvailableEvents'].Add_DoubleClick($eventSB['lst_AvailableEvents'].DoubleClick)
         $Script:refs['lst_AssignedEvents'].Add_DoubleClick($eventSB['lst_AssignedEvents'].DoubleClick)
 		
-		$Script:refs['RunLast'].Add_Click({
-			$projectName = $refs['tpg_Form1'].Text	
+		function RunLast {
+						$projectName = $refs['tpg_Form1'].Text	
 			if ($projectName -ne "NewProject.fbs") { 					
 			$generationPath = "$(Split-Path -Path $global:projectDirName)\$($projectName -replace "\..*$")"
 				if (Test-Path -path $generationPath) {
@@ -2728,16 +2723,24 @@ $string = "`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Draw
 
 				start-process -filepath powershell.exe -argumentlist '-ep bypass','-sta',"-file $file"
 			}
+		}
+		
+		$Script:refs['RunLast'].Add_Click({
+			RunLast
 		})
 		
-		$functionsModule.Add_Click({
-			start-process -filepath powershell.exe -argumentlist '-noexit', "-command import-module '$([Environment]::GetFolderPath('MyDocuments'))\PowerShell Designer\functions\functions.psm1'" #-workingdirectory "$($global:projectDirName)"
+		function LoadFunctionModule {
+						start-process -filepath powershell.exe -argumentlist '-noexit', "-command import-module '$([Environment]::GetFolderPath('MyDocuments'))\PowerShell Designer\functions\functions.psm1'" #-workingdirectory "$($global:projectDirName)"
 			start-sleep -s 1
 			$PS = Get-WindowExists "Windows PowerShell"
 			if ($PS -eq $Null){
 				$PS = Get-WindowExists "Administrator: Windows PowerShell"
 			}
 			Set-WindowText $PS "Windows PowerShell - PowerShell Designer Custom Functions Enabled"
+		}
+		
+		$functionsModule.Add_Click({
+			LoadFunctionModule
 		})
 		
 		$Script:refs['Undo'].Add_Click({
@@ -2783,11 +2786,72 @@ $string = "`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Draw
 		$Script:refs['Collapse All'].Add_Click({
 			$FastText.CollapseAllFoldingBlocks()
 		})
+		
+		function SaveProjectClick{
+			 try {Save-Project} catch {if ( $_.Exception.Message -ne 'SaveCancelled' ) {throw $_}}
+		}
+		
+		function SaveAsProjectClick{
+			 try {Save-Project -SaveAs} catch {if ( $_.Exception.Message -ne 'SaveCancelled' ) {throw $_}} 
+		}
+		
+		
+		function bookmarkTS{}
+		
+	#show-informationdialog $toolstrip | get-member
+		
+			$MainForm.Add_FormClosing({($e)
+				$ClosingAsk = Get-Answer "Have you saved your work?" "Close PowerShell Designer?"
+				if ($ClosingAsk -eq 'Yes'){
+	                try {
+                    $Script:refs['TreeView'].Nodes.ForEach({
+                        $controlName = $_.Name
+                        $controlType = $_.Text -replace " - .*$"
+
+                        if ( $controlType -eq 'Form' ) {$Script:refsFID.Form.Objects[$controlName].Dispose()}
+                        else {$Script:refsFID[$controlType][$controlName].Objects[$controlName].Dispose()}
+						$MainForm.Dispose()
+                    })
+                } catch {Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered during Form closure."}
+				}
+				else {$e.cancel}
+	})
+		
+		#bookmarkTs
+		$tsNewBtn.Add_Click({NewProjectClick})
+		$tsSaveBtn.Add_Click({SaveProjectClick})
+		$tsSaveAsBtn.Add_Click({SaveAsProjectClick})
+		$tsOpenbtn.Add_Click({OpenProjectClick})
+		$tsRenameBtn.Add_Click({RenameClick})
+		$tsDeleteBtn.Add_Click({DeleteClick})
+		$tsControlCopyBtn.Add_Click({CopyNodeClick})
+		$tsControlPasteBtn.add_Click({PasteNodeClick})
+		$tsMoveUpBtn.Add_Click({MoveUpClick})
+		$tsMoveDownBtn.Add_Click({MoveDownClick})
+		$tsGenerateBtn.Add_Click({GenerateClick})
+		$tsUndoBtn.Add_Click({$FastText.Undo()})
+		$tsRedoBtn.Add_Click({$FastText.Redo()})
+		$tsCutBtn.Add_Click({$FastText.Cut()})
+		$tsCopyBtn.Add_Click({$FastText.Copy()})
+		$tsPasteBtn.Add_Click({$FastText.Paste()})
+		$tsSelectAllBtn.Add_Click({$FastText.SelectAll()})
+		$tsFindBtn.Add_Click({$FastText.ShowFindDialog()})
+		$tsReplaceBtn.Add_Click({$FastText.ShowReplaceDialog()})
+		$tsGoToLineBtn.Add_Click({$FastText.ShowGotoDialog()})
+		$tsCollapseAllBtn.Add_Click({$FastText.CollapseAllFoldingBlocks()})
+		$tsExpandAllBtn.Add_Click({$FastText.ExpandAllFoldingBlocks()})
+		$tsToolBoxBtn.Add_Click({ChangeView})
+		$tsFormTreeBtn.Add_Click({ChangeView})
+		$tsPropertiesBtn.Add_Click({ChangeView})
+		$tsEventsBtn.Add_Click({ChangeView})
+		$tsTermBtn.Add_Click({LoadFunctionModule})
+		$tsRunBtn.Add_Click({RunLast})
+		
 
             # ScriptBlock Here
         $Script:refs['Exit'].Add_Click({$Script:refs['MainForm'].Close()})
-        $Script:refs['Save'].Add_Click({ try {Save-Project} catch {if ( $_.Exception.Message -ne 'SaveCancelled' ) {throw $_}} })
-        $Script:refs['Save As'].Add_Click({ try {Save-Project -SaveAs} catch {if ( $_.Exception.Message -ne 'SaveCancelled' ) {throw $_}} })
+        $Script:refs['Save'].Add_Click({SaveProjectClick})
+        $Script:refs['Save As'].Add_Click({SaveAsProjectClick})
         $Script:refs['TreeView'].Add_DrawNode({$args[1].DrawDefault = $true})
         $Script:refs['TreeView'].Add_NodeMouseClick({$this.SelectedNode = $args[1].Node})
     } catch {Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered during Event Assignment."}
@@ -3008,21 +3072,6 @@ $FastText.SelectedText = "#region Images
 
 $eventForm.Show()
 
-$Script:refs['tsl_StatusLabel'].add_TextChanged({
-		
-		if ($Script:refs['tsl_StatusLabel'].text -ne "Current DPIScale: $ctscale")
-		{
-		$errT = new-object System.Windows.Forms.Timer
-		$errT.Interval = 10000
-		$errT.Enabled = $True
-			$errT.add_Tick({$Script:refs['tsl_StatusLabel'].text ="Current DPIScale: $ctscale" 
-			$this.Enabled = $false
-			$this.Dispose()
-		})
-		}
-		
-})
-
 $Script:refs['tsl_StatusLabel'].text = "Current DPIScale: $ctscale - for resize events multiply all location and size modifiers by `$ctscale."
 
 $Script:refs['spt_Right'].splitterdistance = $Script:refs['spt_Right'].splitterdistance * $ctscale
@@ -3068,10 +3117,6 @@ $FastText.SelectedText = $bldStr
 
 	$lst_Functions.add_SelectedIndexChanged({param($sender, $e)
 		$lst_Params.text = "$(((Get-Help $lst_Functions.SelectedItem.ToString() -detailed) | Out-String))"
-		
-
-	$lst_Functions.SelectedItem.ToString() | out-file c:\temp\format.txt
-
 	})
 
 	
@@ -3088,9 +3133,41 @@ $FastText.SelectedText = $bldStr
 	}
 	EmptyListString
 	
-	
+	$MainForm.Add_Shown({
+		
+	})
+		
 	#region Images
 	
+$tsRunBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Run Script File | F9"})
+$tsGenerateBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Generate Script File | F8"})
+$tsTermBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Load Functions Module in PowerShell | F7"})
+$tsFormTreeBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Form Tree | F2"})
+$tsEventsBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Events | F4"})
+$tsPropertiesBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Properties | F3"})
+$tsToolBoxBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "ToolBox | F1"})
+$tsMoveDownBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Move Down | F5"})
+$tsMoveUpBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Move Up | F6"})
+$tsControlPasteBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Paste Control | Ctrl+Alt+V"})
+$tsControlCopyBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Copy Control | Ctrl+Alt+C"})
+$tsDeleteBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Delete Control | Ctrl+D"})
+$tsRenameBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Rename Control | Ctrl+R"})
+$tsExpandAllBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Expand All | F11"})
+$tsCollapseAllBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Collapse All | F10"})
+$tsGoToLineBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Go To Line... | Ctrl+G"})
+$tsReplaceBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Replace | Ctrl+H"})
+$tsFindBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Find | Ctrl+F"})
+$tsSelectAllBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Select All | Ctrl+A"})
+$tsPasteBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Paste | Ctrl+V"})
+$tsCopyBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Copy | Ctrl+C"})
+$tsCutBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Cut | Ctrl+X"})
+$tsRedoBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Redo | Ctrl+Z"})
+$tsUndoBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Undo | Ctrl+Y"})
+$tsSaveAsbtn.Add_MouseEnter{($tsl_StatusLabel.Text = "Save As | Ctrl+Alt+S")}
+$tsSavebtn.Add_MouseEnter{($tsl_StatusLabel.Text = "Save | Ctrl+S")}
+$tsOpenbtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Open | Ctrl+O"})
+$tsNewBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "New | Ctrl+N"})
+
 $tsRunBtn.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBsRXhpZgAATU0AKgAAAAgABQExAAIAAAARAAAASgMBAAUAAAABAAAAXFEQAAEAAAABAQAAAFERAAQAAAABAAAAAFESAAQAAAABAAAAAAAAAABBZG9iZSBJbWFnZVJlYWR5AAAAAYagAACvyP/bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/APVbTRr+4sLef+27oCSJXxuckZAPXfz9aia0ntbmNhrlxM8NzbiWHzG6NIowRvOMg9xzVmb+1T4bgsYNMvY7pI4ULpNEv3Su7BEmeQCPxriLhdTudeGl2STJriyK7GR93lAbXDyNlgUHycHPIAAzxRXxk6c1G10/T+rnLK0bafmf/9k="))
 $tsGenerateBtn.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBsRXhpZgAATU0AKgAAAAgABQExAAIAAAARAAAASgMBAAUAAAABAAAAXFEQAAEAAAABAQAAAFERAAQAAAABAAAAAFESAAQAAAABAAAAAAAAAABBZG9iZSBJbWFnZVJlYWR5AAAAAYagAACvyP/bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/APVbTRr+4sLef+27oCSJXxuckZAPXfz9abLpt7ZSQTtq93Iq3MAKFnAYNKqkffPr6Vga54oudKNrorrJaXcOmrKsTyKPOk+4o3K4+XKt/EDx0PAPPXXiue9tZ4rm+uI4I4TiYSBHWVcFANspzzk7sE5C89x0OtK9unyMVTVr/wCZ/9k="))
 $tsTermBtn.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAQABADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwBuszaVYXl8IvBuhvbW1x5BcWsOQe2RtJGcHnocGq2kaho2p61ZWTeEtDjSaZUYiyiPB6/wVV17ydQ1e+eDxDoxs5blpkRtWhAyeN23d1xUegwWmn69Y3c+uaGIYZlZyNUgJAz/AL1fXRpZb9Wbk489tNXvb13uYpLlv1+Z/9k="))
@@ -3120,24 +3197,6 @@ $tsSavebtn.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][S
 $tsOpenbtn.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBsRXhpZgAATU0AKgAAAAgABQExAAIAAAARAAAASgMBAAUAAAABAAAAXFEQAAEAAAABAQAAAFERAAQAAAABAAAAAFESAAQAAAABAAAAAAAAAABBZG9iZSBJbWFnZVJlYWR5AAAAAYagAACvyP/bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/APWPEkSeItChsfsivDPd2csiXGwq8S3ETsCuTnKqRjHOawfGvgrw5a+DtYvbLRLCxvLK0lu7a6sYEglhliQujK6AHqo71rC/01tOtg0lo0ohjB8xw2CFHYnGeKz9QtI/EOmXGjWd1YWs98j25mW3VyqPFIHO1WUnjpzgHB56Hy6eYfvFTlq316fkdUsO7OXY/9k="))
 $tsNewBtn.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBsRXhpZgAATU0AKgAAAAgABQExAAIAAAARAAAASgMBAAUAAAABAAAAXFEQAAEAAAABAQAAAFERAAQAAAABAAAAAFESAAQAAAABAAAAAAAAAABBZG9iZSBJbWFnZVJlYWR5AAAAAYagAACvyP/bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/APUodOs5lnleytpJGurjczwqxP75+5FQvYQWl9Z31kgtLmOaKKQwxqqyxvKqlSB7N6ds9QDVRtcjtZbiFb2xjKXVwGWWVAwPnydQXBHGO3esS81yG6sLp01KT+2Y7kC1gt3Dq7BiY9qBiGyQh6Hn17deIquhFSlqmcClFu3Y/9k="))
 $MainForm.Icon = [System.Drawing.Icon]::FromHandle(([System.Drawing.Bitmap][System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAQAQAAAAAAAAAAAAAAAAAAAAAAACPWjAUj1owhI9aMKOPWjC2j1owyY9aMNqPWjDrj1ow+pRgOP+ZaED/Bnwi/wN6Hf96Xizej1owNAAAAAAAAAAAk14yaLePbP/WuaL/38Wy/+fUwv/u39P/9eri//v07//9+vb///79/wuGMf9CoF7/E34o/2dmKoUAAAAAAAAAAJhjNYnHo4T//////////////////////yGWUf8bkEn/FY5D/xCKO/85nl3/f8CV/0WiYf8Iex/0AHgYKgAAAACdaDhXnWg49rOEWP/ZpHr/2J1u/9eaaf8omlr/j8qo/4zIpP+JxaD/h8Sd/2m1hP+BwZb/R6Rl/wB8IOoAeBowo247FKNuO6vVrYv//fDl//fHof/3z6z/MJ5i/5PNrP9uuY3/areI/2W1hP9gsn//ZrSB/4LBl/87n1v/AH4k/AAAAACpdD8otoVV//7+/f/63sH/+ty+/zaiav+Vzq//k82s/5DLqf+Py6f/c7uP/4nHoP9FpGf/B4Y0/QGCLA8AAAAAsHpCHriFUf/+/Pn/+dy+//jbvv88pG7/OKJt/zSgZ/8wnWH/VK57/5DLqf9OqnP/F45E/xGKPAwAAAAAAAAAALaBRgm4hEr//vv3//ncwP/43L7/+Ny+//jbv//53b//+d2//zigZv9ZsoD/J5dW/7GCRvu2gUYBAAAAAAAAAAAAAAAAvIdK+fz28P/538f/+dy8//rcvv/628D/+t3C//rdwf8+pG3/MJ5k//j59f/AjFL/vIdKDwAAAAAAAAAAAAAAAMONTdr159j/+uXS//nau//527v/+tu+//rdwP/63cD/+d3D//vhyP///fv/yJNW/8ONTRIAAAAAAAAAAAAAAADKk1G78NnA//vt4f/52r//+dzB//nexP/64Mf/+uLK//rizf/65dD///79/8uOWf/Kk1HxypNRRQAAAAAAAAAA0JlUpO3Qsf//9vD/+uHK//vjzP/749D/++bT//vp1f/86dj//Orb/////f/SnHD/7tnA/9CZVOUAAAAAAAAAANWeV5LryqT///37//3p1f/969j//erb//3t3//98OL//fHk//zw5P//////4J9v///7+f/ft4b/AAAAAAAAAADao1qE68WZ///////87+L//fDn//3x6//99e7//fjx//369////Pr///////779//02r//2qNa6gAAAAAAAAAA3qdcbeq/i////////////////////////fn0//vz6v/469n/+ObT//Xfxf/py6X/3qdc7d6nXF0AAAAAAAAAAOKrXjbiq17G6ruA/+i2dv/msWz/5K9n/+KrXvDiq17j4qtez+KrXsziq1674qteqOKrXkviq14FAAMAAAADAAAAAQAAAAAAAAAAAACAAAAAgAEAAIABAADAAQAAwAEAAMAAAADAAAAAwAAAAMAAAADAAAAAwAAAAA=="))).GetHicon())
-
-$RunLast.BackgroundImage = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAQABADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDW8J+G9E8G+E7PUNQ0tbTUoFMtzcXKxyShiMNtcZwhGcYONvXktWb450LRvEvhu71HTrBLzUJds0c9uERwNpwWbuuB3ONvTkCqmg+OdM1zwza6dfXT3l7N8t2t20aE9CwA4BXGQOgx1Oc1Hr/iPR9L0J1ti0AXMKRwHacYwV4JBUgAAZxx2Arnq1nTkla/9fmZVKnI9j//2Q=="))
-$Generate.BackgroundImage = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAQABADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDrPCPgDRvCtnZ3FpaIdSmiSOa4nOYphjJJB3Fc9wOM49BiDxp4L0HxHbXUt7bJ/ascTxwTQNiKIYyDgYLY7A8Zz6nPPaD8U5PEmnNCIhaTWsB8qFpOJZAcKpbcvAHPbv1xzM/iJmSQGUpbrE/mSuwV1cL8qgCRtwJ9QT057gA//9k="))
-$functionsModule.BackgroundImage = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAQABADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwBuszaVYXl8IvBuhvbW1x5BcWsOQe2RtJGcHnocGq2kaho2p61ZWTeEtDjSaZUYiyiPB6/wVV17ydQ1e+eDxDoxs5blpkRtWhAyeN23d1xUegwWmn69Y3c+uaGIYZlZyNUgJAz/AL1fXRpZb9Wbk489tNXvb13uYpLlv1+Z/9k="))
-$Script:refs['Find'].BackgroundImage = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBsRXhpZgAATU0AKgAAAAgABQExAAIAAAARAAAASgMBAAUAAAABAAAAXFEQAAEAAAABAQAAAFERAAQAAAABAAAAAFESAAQAAAABAAAAAAAAAABBZG9iZSBJbWFnZVJlYWR5AAAAAYagAACvyP/bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/ANK58eQzX1xezaZYSLPKshM0YZlQIQUyx64jXGQPvE47V2F1bWMukrqumqltcRQtdWtzbRquRs3DOOoI/PODxXKXvh6awvbqzk8TWiTQOkQ8yNU+UQjDBWlHXzCM56r71rx6jFZeF209tT0+ZbfTngDCePe5WEqMASHkkDjHevRpQqWT6HDUnBO1tT//2Q=="))
-$Find.Image = $Script:refs['Find'].BackgroundImage
-$Script:refs['Paste'].BackgroundImage = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBsRXhpZgAATU0AKgAAAAgABQExAAIAAAARAAAASgMBAAUAAAABAAAAXFEQAAEAAAABAQAAAFERAAQAAAABAAAAAFESAAQAAAABAAAAAAAAAABBZG9iZSBJbWFnZVJlYWR5AAAAAYagAACvyP/bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/AOmtPJMcNxNax311cRxM73SGd3bb2ySec4wPQV0HhzUDogvP7SGpRWaQx+V5kE8iIF37scHaANvoOK5u1MumzaVJfxTWcSywoz3MLxqCMZG5gB2PftWrq+qaUuials1TS2kNnMqrHdRFmJjYAABQSSfQ15mBou/tJXud2KqJLkR//9k="))
-$Paste.Image = $Script:refs['Paste'].BackgroundImage
-$Script:refs['Copy'].BackgroundImage = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBsRXhpZgAATU0AKgAAAAgABQExAAIAAAARAAAASgMBAAUAAAABAAAAXFEQAAEAAAABAQAAAFERAAQAAAABAAAAAFESAAQAAAABAAAAAAAAAABBZG9iZSBJbWFnZVJlYWR5AAAAAYagAACvyP/bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/APSrPTLBtHsC2n2j+bBCrboVBJZVGS2M9TnNW4L+58PaMsSWf2u1tSSxW4JkSLJPAZQDtXgDI6DpRc2V5oml2zT6haPa2z28bE2zIdodFyWMhA9elVdU1PSpNMvAmo2bubeQKq3CEklCAAM16GlTzV/M49YeTP/Z"))
-$Copy.Image = $Script:refs['Copy'].BackgroundImage
-$Script:refs['Cut'].BackgroundImage = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBsRXhpZgAATU0AKgAAAAgABQExAAIAAAARAAAASgMBAAUAAAABAAAAXFEQAAEAAAABAQAAAFERAAQAAAABAAAAAFESAAQAAAABAAAAAAAAAABBZG9iZSBJbWFnZVJlYWR5AAAAAYagAACvyP/bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/APavEckS+HtQikkRWmtpo41ZgC7eWxwPU4BOPQGub8LwatHeW1kqiHTbC4uGdUfAcM0hXdxyfnBCdABuJyUFYfjPTr5fE+o6n/Z9zcQ28SXAd9vkiBEG4bm4GG3NtBDcMdp3ZF74eane3fiLV4o1jOnOPtMxyu5Z2IVSMMeGCv8AhGpwpJB6+Tlo3TucfPzVrNWP/9k="))
-$Cut.Image = $Script:refs['Cut'].BackgroundImage
-$Script:refs['Undo'].BackGroundImage = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBsRXhpZgAATU0AKgAAAAgABQExAAIAAAARAAAASgMBAAUAAAABAAAAXFEQAAEAAAABAQAAAFERAAQAAAABAAAAAFESAAQAAAABAAAAAAAAAABBZG9iZSBJbWFnZVJlYWR5AAAAAYagAACvyP/bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/APX9SOvi+m+xrObfI8vy/JxjaM/f565rCt/Euq2uuQW9zK8qG4S1nt5o1Roy5ADAqOeoPcEH8Q3U5dbHjG4jtRKb/wAgmEW/lY+zbuP9Zxnd175zjiqdj4a8Q3niK3uL23ktoVuUu7i5uJkkeUoQQgVGOM4A7AAfQHjbk5e7ff5HG3Jy92+/yP/Z"))
-$Undo.Image = $Script:refs['Undo'].BackGroundImage
-$Save.BackgroundImage = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBsRXhpZgAATU0AKgAAAAgABQExAAIAAAARAAAASgMBAAUAAAABAAAAXFEQAAEAAAABAQAAAFERAAQAAAABAAAAAFESAAQAAAABAAAAAAAAAABBZG9iZSBJbWFnZVJlYWR5AAAAAYagAACvyP/bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/AOz0j+wotOsEvLSxD7Y3lL2QcshhHcKed5z1zS69c+HzYStpVpbRXEas6SRWxidCqkhg2AQQwFV9Mm0ptGtWlmsGnCIrCW6VSoEaAceYvfdVbX5tKTQ52glsBcElFEN0HJUo+ePMbvt9K9Tnj7bltK/4Hn3fL0P/2Q=="))
-$Open.BackGroundImage = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBsRXhpZgAATU0AKgAAAAgABQExAAIAAAARAAAASgMBAAUAAAABAAAAXFEQAAEAAAABAQAAAFERAAQAAAABAAAAAFESAAQAAAABAAAAAAAAAABBZG9iZSBJbWFnZVJlYWR5AAAAAYagAACvyP/bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/APWPEkSeItChsfsivDPd2csiXGwq8S3ETsCuTnKqRjHOawfGvgrw5a+DtYvbLRLCxvLK0lu7a6sYEglhliQujK6AHqo71rC/01tOtg0lo0ohjB8xw2CFHYnGeKz9QtI/EOmXGjWd1YWs98j25mW3VyqPFIHO1WUnjpzgHB56Hy6eYfvFTlq316fkdUsO7OXY/9k="))
-$MainForm.Icon = [System.Drawing.Icon]::FromHandle(([System.Drawing.Bitmap][System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAQAQAAAAAAAAAAAAAAAAAAAAAAACPWjAUj1owhI9aMKOPWjC2j1owyY9aMNqPWjDrj1ow+pRgOP+ZaED/Bnwi/wN6Hf96Xizej1owNAAAAAAAAAAAk14yaLePbP/WuaL/38Wy/+fUwv/u39P/9eri//v07//9+vb///79/wuGMf9CoF7/E34o/2dmKoUAAAAAAAAAAJhjNYnHo4T//////////////////////yGWUf8bkEn/FY5D/xCKO/85nl3/f8CV/0WiYf8Iex/0AHgYKgAAAACdaDhXnWg49rOEWP/ZpHr/2J1u/9eaaf8omlr/j8qo/4zIpP+JxaD/h8Sd/2m1hP+BwZb/R6Rl/wB8IOoAeBowo247FKNuO6vVrYv//fDl//fHof/3z6z/MJ5i/5PNrP9uuY3/areI/2W1hP9gsn//ZrSB/4LBl/87n1v/AH4k/AAAAACpdD8otoVV//7+/f/63sH/+ty+/zaiav+Vzq//k82s/5DLqf+Py6f/c7uP/4nHoP9FpGf/B4Y0/QGCLA8AAAAAsHpCHriFUf/+/Pn/+dy+//jbvv88pG7/OKJt/zSgZ/8wnWH/VK57/5DLqf9OqnP/F45E/xGKPAwAAAAAAAAAALaBRgm4hEr//vv3//ncwP/43L7/+Ny+//jbv//53b//+d2//zigZv9ZsoD/J5dW/7GCRvu2gUYBAAAAAAAAAAAAAAAAvIdK+fz28P/538f/+dy8//rcvv/628D/+t3C//rdwf8+pG3/MJ5k//j59f/AjFL/vIdKDwAAAAAAAAAAAAAAAMONTdr159j/+uXS//nau//527v/+tu+//rdwP/63cD/+d3D//vhyP///fv/yJNW/8ONTRIAAAAAAAAAAAAAAADKk1G78NnA//vt4f/52r//+dzB//nexP/64Mf/+uLK//rizf/65dD///79/8uOWf/Kk1HxypNRRQAAAAAAAAAA0JlUpO3Qsf//9vD/+uHK//vjzP/749D/++bT//vp1f/86dj//Orb/////f/SnHD/7tnA/9CZVOUAAAAAAAAAANWeV5LryqT///37//3p1f/969j//erb//3t3//98OL//fHk//zw5P//////4J9v///7+f/ft4b/AAAAAAAAAADao1qE68WZ///////87+L//fDn//3x6//99e7//fjx//369////Pr///////779//02r//2qNa6gAAAAAAAAAA3qdcbeq/i////////////////////////fn0//vz6v/469n/+ObT//Xfxf/py6X/3qdc7d6nXF0AAAAAAAAAAOKrXjbiq17G6ruA/+i2dv/msWz/5K9n/+KrXvDiq17j4qtez+KrXsziq1674qteqOKrXkviq14FAAMAAAADAAAAAQAAAAAAAAAAAACAAAAAgAEAAIABAADAAQAAwAEAAMAAAADAAAAAwAAAAMAAAADAAAAAwAAAAA=="))).GetHicon())
-$New.BackGroundImage = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBsRXhpZgAATU0AKgAAAAgABQExAAIAAAARAAAASgMBAAUAAAABAAAAXFEQAAEAAAABAQAAAFERAAQAAAABAAAAAFESAAQAAAABAAAAAAAAAABBZG9iZSBJbWFnZVJlYWR5AAAAAYagAACvyP/bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/APUodOs5lnleytpJGurjczwqxP75+5FQvYQWl9Z31kgtLmOaKKQwxqqyxvKqlSB7N6ds9QDVRtcjtZbiFb2xjKXVwGWWVAwPnydQXBHGO3esS81yG6sLp01KT+2Y7kC1gt3Dq7BiY9qBiGyQh6Hn17deIquhFSlqmcClFu3Y/9k="))
 #endregion
 	}
 		catch {Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered unexpectedly at ShowDialog."}
