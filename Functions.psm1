@@ -39,6 +39,9 @@ function Add-Alt {
 <#
     .SYNOPSIS
 		Sends the ALT key plus string. 
+
+		ALIASES
+			Alt
      
     .DESCRIPTION
 		This function will prepend a the string parameter with the alt key
@@ -68,6 +71,7 @@ function Add-Alt {
 	.NOTES
 		Only useful with 'Send-Window'.
 #>
+	[Alias("Alt")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -82,6 +86,10 @@ function Add-CommonControl {
 <#
 	.SYNOPSIS
 		Adds a common control to a vdsForm object
+	
+	
+		ALIASES
+			Dialog-Add
 		
     .DESCRIPTION
 		This function adds a common control to a vdsForm object.
@@ -132,6 +140,7 @@ function Add-CommonControl {
 		Normally precedented by the New-Form command.
 	
 #>
+	[Alias("Dialog-Add")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -313,6 +322,9 @@ function Add-CTRL {
 <#
     .SYNOPSIS
 		Sends the CTRL key plus string. Only useful with 'Send-Window'.
+		
+		ALIASES
+			Ctrl
      
     .DESCRIPTION
 		This function will prepend a the string parameter with the ctrl key
@@ -339,6 +351,7 @@ function Add-CTRL {
 	.OUTPUTS
 		String
 #>
+	[Alias("Ctrl")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -451,6 +464,104 @@ function Add-Font {
 	$shellapp =  New-Object -ComoObject Shell.Application
 	$Fonts = $shellapp.NameSpace(0x14)
 	$Fonts.CopyHere($Path)
+}
+
+function Add-Hotkey {
+<#
+    .SYNOPSIS
+		Registers a global hotkey to a form.
+		
+		ALIAS
+			Hotkey-Add
+			 
+	.DESCRIPTION
+		This function registers a hotkey to a form of type vdsForm
+	 
+	.PARAMETER Form
+		The form to register the hotkey to.
+		
+	.EXAMPLE
+		Add-Hotkey $Form1 1 ((Get-VirtualKey Alt)+(Get-VirtualKey Control)) (Get-VirtualKey v)
+		function hotkeyEvent {
+			[CmdletBinding()]
+			param (
+				[Parameter(Mandatory)]
+				[string]$Event
+			)
+			switch ($Event) {
+				'1' {
+					#Process event here
+				}
+			}
+		}
+	
+	.EXAMPLE
+		Add-Hotkey -form $Form1 -registerindex 1 -ModifierVirtualKeys $null -VirtualKey (Get-VirtualKey F1)
+		function hotkeyEvent {
+			[CmdletBinding()]
+			param (
+				[Parameter(Mandatory)]
+				[string]$Event
+			)
+			switch ($Event) {
+				'1' {
+					#Process event here
+				}
+			}
+		}
+		
+	.EXAMPLE
+		$Form1 | Add-Hotkey -registerindex 1 -ModifierVirtualKeys $null -VirtualKey (Get-VirtualKey F1)
+		function hotkeyEvent {
+			[CmdletBinding()]
+			param (
+				[Parameter(Mandatory)]
+				[string]$Event
+			)
+			switch ($Event) {
+				'1' {
+					#Process event here
+				}
+			}
+		}
+		
+	.INPUTS
+		Form as vdsForm, RegisterIndex as Integer, 
+		ModifierVirtualKeys[] as Hexidecimal, 
+		VirtualKey as Hexidecimal
+	
+	.OUTPUTS
+		Registered Event
+	
+	.NOTES
+		The use of this function REQUIRES the event to be caught by the 
+		hotkeyEvent function which processes the event by hotkey index.
+#>
+	[Alias("Hotkey-Add")]
+	[CmdletBinding()]
+    param (
+        [Parameter(Mandatory,
+			ValueFromPipeline)]
+        [vdsForm]$Form,
+		[Parameter(Mandatory)]
+        [int]$RegisterIndex,
+		[Parameter(Mandatory)]
+		[string]$ModifierVirtualKeys,
+		[Parameter(Mandatory)]
+		[string]$VirtualKey
+	)
+	[vdsForm]::RegisterHotKey($Form.handle,$RegisterIndex,$ModifierVirtualKeys,$VirtualKey) | out-null
+	if ($global:hotkeyobject -ne $true) {
+		$hotkey = Add-CommonControl -Form $Form -ControlType 'label' -top 0 -left 0 -width 0 -height 0
+		$hotkey.Name = 'hotkey'
+		$hotkey.add_TextChanged({
+			if ($this.text -ne ""){
+				hotkeyEvent $this.text
+			}
+			$this.text = ""
+		})
+		$global:hotkeyobject = $true
+	}
 }
 
 function Add-MenuColumn {
@@ -647,6 +758,9 @@ function Add-Shift {
 <#
     .SYNOPSIS
 		Sends the SHIFT key plus string. 
+
+		ALIASES
+			Shift
      
     .DESCRIPTION
 		This function will prepend a the string parameter with the shift key
@@ -676,6 +790,7 @@ function Add-Shift {
 	.NOTES
 		Only useful with 'Send-Window'.
 #>
+	[Alias("Shift")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -727,10 +842,13 @@ function Add-StatusStrip {
 	return $statusstrip
 }
 
-function Add-Tab {
+function Add-Tab() {
 <#
     .SYNOPSIS
 		Sends the tab key 
+
+		ALIASES
+			Tab
      
     .DESCRIPTION
 		This function sends the tab key
@@ -743,7 +861,9 @@ function Add-Tab {
 		
 	.NOTES
 		Only useful with 'Send-Window'.
-#>
+#>	
+	[Alias("Tab")]
+	param()
     return "`t" 
 }
 
@@ -1510,6 +1630,9 @@ function Clear-Clipboard {
 <#
     .SYNOPSIS
     Clears the text from the clipboard.
+
+		ALIASES
+			Clipboard-Clear
      
     .DESCRIPTION
     This function will clear the value from the Text portion of the clipboard.
@@ -1517,6 +1640,8 @@ function Clear-Clipboard {
 	.EXAMPLE
 	Clear-Clipboard
 #>
+	[Alias("Clipboard-Clear")]
+	param()
 	echo $null | clip
 }
 
@@ -1559,6 +1684,9 @@ function Close-Window {
 <#
     .SYNOPSIS
 		Closes a window
+
+		ALIASES
+			Window-Close
 			 
 	.DESCRIPTION
 		This function closes a window
@@ -1578,6 +1706,7 @@ function Close-Window {
 	.INPUTS
 		Handle as Handle
 #>
+	[Alias("Window-Close")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -1591,6 +1720,9 @@ function Compress-Window {
 <#
     .SYNOPSIS
 		Minimizes a window
+
+		ALIASES
+			Window-Iconize
 			 
 	.DESCRIPTION
 		This function minimizes a window
@@ -1610,6 +1742,7 @@ function Compress-Window {
 	.INPUTS
 		Handle as Handle
 #>
+	[Alias("Window-Iconize")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -2151,6 +2284,9 @@ function ConvertTo-DateTime {
 <#
 	.SYNOPSIS
 		Returns back the value of a string as datetime.
+
+		ALIASES
+			Datetime
 		
     .DESCRIPTION
 		This function will return the value of the string parameter as a 
@@ -2177,6 +2313,7 @@ function ConvertTo-DateTime {
 	.OUTPUTS
 		DateTime
 #>
+	[Alias("Datetime")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -2190,6 +2327,9 @@ function ConvertTo-String {
 <#
     .SYNOPSIS
 		Converts the input to string
+
+		ALIASES
+			String
      
     .DESCRIPTION
 		This function converts the input to string
@@ -2212,6 +2352,7 @@ function ConvertTo-String {
 	.OUTPUTS
 		String
 #>
+	[Alias("String")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -2225,6 +2366,9 @@ function Copy-File {
 <#
 	.SYNOPSIS
 		Copies a file to a destination
+
+		ALIASES
+			File-Copy
 		
     .DESCRIPTION
 		This function copies a file to a destination
@@ -2247,6 +2391,7 @@ function Copy-File {
 	.INPUTS
 		Path as String, Destination as String
 #>
+	[Alias("File-Copy")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -2295,6 +2440,9 @@ function Expand-Window {
 <#
     .SYNOPSIS
 		Maximizes a window
+
+		ALIASES
+			Window-Maximize
 			 
 	.DESCRIPTION
 		This function maximizes a window
@@ -2314,6 +2462,7 @@ function Expand-Window {
 	.INPUTS
 		Handle as Handle
 #>
+	[Alias("Window-Maximize")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -2327,6 +2476,9 @@ function Find-ListMatch {
 <#
     .SYNOPSIS
 		Finds and seeks the index of an item in a list
+
+		ALIASES
+			Match
 			 
 	.DESCRIPTION
 		This function finds and seeks the index of an item in a list
@@ -2355,6 +2507,7 @@ function Find-ListMatch {
 	.OUTPUTS
 		Integer
 #>
+	[Alias("Match")]
 	[CmdletBinding()]
     param (
 		[Parameter(Mandatory,
@@ -2380,6 +2533,9 @@ function Get-Abs {
 <#
     .SYNOPSIS
 		Returns the absolute value of a number.
+
+		ALIASES
+			Abs
 			 
 	.DESCRIPTION
 		This function will call upon the math module to take the input of a 
@@ -2406,6 +2562,7 @@ function Get-Abs {
 	.Outputs
 		Decimal
 #>
+	[Alias("Abs")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -2419,6 +2576,9 @@ function Get-ActiveWindow {
 <#
     .SYNOPSIS
 		Returns the handle of the active window
+
+		ALIASES
+			Winactive
 			 
 	.DESCRIPTION
 		This function returns the handle of the active window
@@ -2429,6 +2589,8 @@ function Get-ActiveWindow {
 	.OUTPUTS
 		Handle
 #>
+	[Alias("Winactive")]
+	param()
 	return [vds]::GetForegroundWindow()
 }
 
@@ -2436,6 +2598,9 @@ function Get-Answer {
 <#
 	.SYNOPSIS
 		Opens a dialog window to ask the user a yes or no question.
+
+		ALIASES
+			Ask
      
     .DESCRIPTION
 		This function will call upon Windows Forms to display a Information
@@ -2464,6 +2629,7 @@ function Get-Answer {
 	.OUTPUTS
 		Yes or No as String
 #>
+	[Alias("Ask")]
 	[CmdletBinding()]
     param (
 		[Parameter(Mandatory,
@@ -2479,6 +2645,9 @@ function Get-Arctangent {
 <#
 	.SYNOPSIS
 		Returns arctangent
+
+		ALIASES
+			Atan
 		
     .DESCRIPTION
 		This function returns the arctangent of a number
@@ -2500,6 +2669,7 @@ function Get-Arctangent {
 	.OUTPUTS
 		Decimal
 #>
+	[Alias("Atan")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -2514,6 +2684,9 @@ function Get-Ascii {
 	.SYNOPSIS
 		Returns the ascii code number related to the character specified 
 		in the string parameter.
+
+		ALIASES
+			Asc
      
     .DESCRIPTION
 		This function will return the ascii code number or 'byte character'
@@ -2540,6 +2713,7 @@ function Get-Ascii {
 	.OUTPUTS
 		Int
 #>
+	[Alias("Asc")]
 	[CmdletBinding()]
     param (
 		[ValidateLength(1, 1)]
@@ -2556,12 +2730,17 @@ function Get-BootTime {
     .SYNOPSIS
 		Returns the system boot time
 
+		ALIASES
+			Winboot
+
     .DESCRIPTION
 		This function returns the system boot time
 
 	.EXAMPLE
 		$BootTime = Get-BootTime
 #>
+	[Alias("Winboot")]
+	param()
 	$return = Get-CimInstance -ClassName win32_operatingsystem | fl lastbootuptime | Out-String
 	$return = $return.split('e')[1].Trim()
 	$return = $(Get-Substring $return 2 $return.length)
@@ -2572,6 +2751,9 @@ function Get-CarriageReturn {
 <#
 	.SYNOPSIS
 		Returns a carriage return character.
+
+		ALIASES
+			Cr
 		     
     .DESCRIPTION
 		This function returns a carriage return character and does not include a line feed.
@@ -2582,6 +2764,8 @@ function Get-CarriageReturn {
 	.OUTPUTS
 		string
 #>
+	[Alias("Cr")]
+	param()
     return Get-Character(13)
 }
 
@@ -2590,6 +2774,9 @@ function Get-Character {
 	.SYNOPSIS
 		Returns the text character related to the ascii code specified 
 		in the string parameter.
+
+		ALIASES
+			Chr
      
     .DESCRIPTION
 		This function will return the text character or 'character byte'
@@ -2616,6 +2803,7 @@ function Get-Character {
 	.OUTPUTS
 		String
 #>
+	[Alias("Chr")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -2629,6 +2817,9 @@ function Get-ChildWindow {
 <#
     .SYNOPSIS
 		Gets the first child window handle from a window handle
+
+		ALIASES
+			Winchild
 			 
 	.DESCRIPTION
 		This function gets the first child window handle from a window handle
@@ -2651,6 +2842,7 @@ function Get-ChildWindow {
 	.OUTPUTS
 		Handle
 #>
+	[Alias("Winchild")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -2750,6 +2942,9 @@ function Get-Cosine {
 <#
 	.SYNOPSIS
 		Returns cosine
+
+		ALIASES
+			Cos
 		
     .DESCRIPTION
 		This function returns the cosine of a number
@@ -2771,6 +2966,7 @@ function Get-Cosine {
 	.OUTPUTS
 		Decimal
 #>
+	[Alias("Cos")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -2784,6 +2980,9 @@ function Get-CurrentDirectory {
 <#
 	.SYNOPSIS
 		Returns the current directory as string
+
+		ALIASES
+			Curdir
 		     
     .DESCRIPTION
 		This function returns the current directory of the application as string.
@@ -2794,6 +2993,8 @@ function Get-CurrentDirectory {
 	.OUTPUTS
 		String
 #>
+	[Alias("Curdir")]
+	param()
     return (Get-Location | Select-Object -expandproperty Path | Out-String).Trim()
 }
 
@@ -2847,6 +3048,9 @@ function Get-EnvironmentVariable {
 <#
 	.SYNOPSIS
 		Returns the environment variable specified
+
+		ALIASES
+			Env
 		
     .DESCRIPTION
 		This function will return an environment variable
@@ -2869,6 +3073,7 @@ function Get-EnvironmentVariable {
 	.OUTPUTS
 		String
 #>
+	[Alias("Env")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -2886,6 +3091,9 @@ function Get-Escape {
 <#
 	.SYNOPSIS
 		Returns a escape character
+
+		ALIASES
+			Esc
 		     
     .DESCRIPTION
 		This function returns a escape character
@@ -2896,6 +3104,8 @@ function Get-Escape {
 	.OUTPUTS
 		string
 #>
+	[Alias("Esc")]
+	param()
     return Get-Character 27
 }
 
@@ -3030,6 +3240,9 @@ function Get-Exponent {
 <#
 	.SYNOPSIS
 		Returns exponent
+
+		ALIASES
+			Exp
 		
     .DESCRIPTION
 		This function returns the exponent of a number
@@ -3051,6 +3264,7 @@ function Get-Exponent {
 	.OUTPUTS
 		Decimal
 #>
+	[Alias("Exp")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -3064,6 +3278,9 @@ function Get-FileExtension {
 <#
 	.SYNOPSIS
 		Gets the extension of a file at the path specified.
+
+		ALIASES
+			Ext
 		
     .DESCRIPTION
 		This function will get the extension of a file at the path specified.
@@ -3086,6 +3303,7 @@ function Get-FileExtension {
 	.OUTPUTS
 		String
 #>
+	[Alias("Ext")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -3102,6 +3320,9 @@ function Get-FileName {
 <#
     .SYNOPSIS
 		Returns the name of the file from the full path
+
+		ALIASES
+			Name
 			 
 	.DESCRIPTION
 		This function returns the name of the file from the full path
@@ -3124,6 +3345,7 @@ function Get-FileName {
 	.OUTPUTS
 		String
 #>
+	[Alias("Name")]
 	[CmdletBinding()]
     param (
 		[Parameter(Mandatory,
@@ -3137,6 +3359,9 @@ function Get-FilePath {
 <#
     .SYNOPSIS
 		This function returns the root folder of the file specified
+
+		ALIASES
+			Path
 			 
 	.DESCRIPTION
 		This function returns the root folder of the file specified
@@ -3159,6 +3384,7 @@ function Get-FilePath {
 	.OUTPUTS
 		String
 #>
+	[Alias("Path")]
 	[CmdletBinding()]
     param (
 		[Parameter(Mandatory,
@@ -3172,6 +3398,9 @@ function Get-FileShortname {
 <#
     .SYNOPSIS
 		Returns the shortname from a path
+
+		ALIASES
+			Shortname
      
     .DESCRIPTION
 		This function returns the 8.3 shortname from a path specified
@@ -3194,6 +3423,7 @@ function Get-FileShortname {
 	.OUTPUTS
 		String
 #>
+	[Alias("Shortname")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -3216,6 +3446,9 @@ function Get-Focus {
 <#
     .SYNOPSIS
 		Returns the control that has focus on a given form.
+
+		ALIASES
+			Focus
 			 
 	.DESCRIPTION
 		This function returns the control that has focus on a given form.
@@ -3238,6 +3471,7 @@ function Get-Focus {
 	.Outputs
 		Active Control
 #>
+	[Alias("Focus")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -3251,6 +3485,9 @@ function Get-Fractional {
 <#
     .SYNOPSIS
 		Returns the portion of a number after the decimal point
+
+		ALIASES
+			Frac
 			 
 	.DESCRIPTION
 		This function returns the portion of a number after the decimal point
@@ -3273,6 +3510,7 @@ function Get-Fractional {
 	.OUTPUTS
 		Integer
 #>
+	[Alias("Frac")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -3287,6 +3525,9 @@ function Get-FreeMemory {
 <#
     .SYNOPSIS
 		Returns the free memory in kilobytes
+
+		ALIASES
+			Mem
 		
     .DESCRIPTION
 		This function returns the free memory in kilobytes
@@ -3295,6 +3536,8 @@ function Get-FreeMemory {
 		$memory = Get-FreeMemory
 
 #>
+	[Alias("Mem")]
+	param()
 	return (Get-CIMInstance Win32_OperatingSystem | Select FreePhysicalMemory).FreePhysicalMemory
 }
 
@@ -3302,6 +3545,9 @@ function Get-Hex {
 <#
     .SYNOPSIS
 		Returns hexidecimal from text
+
+		ALIASES
+			Hex
 			 
 	.DESCRIPTION
 		This function returns hexidecimal from text
@@ -3324,6 +3570,7 @@ function Get-Hex {
 	.OUTPUTS
 		Hexidecimal
 #>	
+	[Alias("Hex")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -3457,6 +3704,9 @@ function Get-InputBox {
 <#
     .SYNOPSIS
 		Displays a dialog for user input.
+
+		ALIASES
+			Input
 			 
 	.DESCRIPTION
 		This function displays a dialog for user input.
@@ -3485,6 +3735,7 @@ function Get-InputBox {
 	.OUTPUTS
 		String
 #>
+	[Alias("Input")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -3501,6 +3752,9 @@ function Get-Key {
 <#
     .SYNOPSIS
 		Gets a operation character for the Send-Window function.
+
+		ALIASES
+			Key
 			 
 	.DESCRIPTION
 		This function gets a operation character for the Send-Window function.
@@ -3528,6 +3782,7 @@ function Get-Key {
 	.OUTPUTS
 		String
 #>
+	[Alias("Key")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -3546,6 +3801,9 @@ function Get-LastEvent {
 <#
 	.SYNOPSIS
 		Returns the last event in the call stack.
+
+		ALIASES
+			Event
 		     
     .DESCRIPTION
 		This function returns the last event in the call stack.
@@ -3556,6 +3814,8 @@ function Get-LastEvent {
 	.OUTPUTS
 		string
 #>
+	[Alias("Event")]
+	param()
     return (Get-PSCallStack)[1].Command
 }
 
@@ -3563,6 +3823,9 @@ function Get-LineFeed {
 <#
     .SYNOPSIS
 		Returns a line feed character.
+
+		ALIASES
+			Lf
 			 
 	.DESCRIPTION
 		This function returns a line feed character.
@@ -3573,6 +3836,8 @@ function Get-LineFeed {
 	.OUTPUTS
 		String
 #>
+	[Alias("Lf")]
+	param()
     return Get-Character 10
 }
 
@@ -3580,6 +3845,9 @@ function Get-ListText {
 <#
     .SYNOPSIS
 		Gets all the items in a list object and converts them to string
+
+		ALIASES
+			Text
      
     .DESCRIPTION
 		This function gets all the items in a list object and converts them to string
@@ -3602,6 +3870,7 @@ function Get-ListText {
 	.OUTPUTS
 		String
 #>
+	[Alias("Text")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -3615,6 +3884,9 @@ function Get-Log {
 <#
     .SYNOPSIS
 		Returns the logarithm value of a number.
+
+		ALIASES
+			Log
 			 
 	.DESCRIPTION
 		This function will call upon the math module to take the input of a 
@@ -3641,6 +3913,7 @@ function Get-Log {
 	.Outputs
 		Decimal
 #>
+	[Alias("Log")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -3654,6 +3927,9 @@ function Get-MouseButtonDown {
 <#
     .SYNOPSIS
 		Returns the mouse button that is pressed down.
+
+		ALIASES
+			Mousedown
 			 
 	.DESCRIPTION
 		This function returns the mouse button that is pressed down.
@@ -3664,6 +3940,8 @@ function Get-MouseButtonDown {
 	.OUTPUTS
 		MouseButtons as String
 #>
+	[Alias("Mousedown")]
+	param()
 	return [System.Windows.Forms.UserControl]::MouseButtons | Out-String
 }
 
@@ -3671,6 +3949,9 @@ function Get-MousePosition {
 <#
     .SYNOPSIS
 		Returns the X and Y of the mouse position.
+
+		ALIASES
+			Mousepos
 			 
 	.DESCRIPTION
 		This function returns the X and Y of the mouse position.
@@ -3684,6 +3965,8 @@ function Get-MousePosition {
 	.OUTPUTS
 		PSCustomObject
 #>
+	[Alias("Mousepos")]
+	param()
 	$return = [PSCustomObject] | Select-Object -Property X, Y
 	$return.X = [System.Windows.Forms.Cursor]::Position.X
 	$return.Y = [System.Windows.Forms.Cursor]::Position.Y
@@ -3694,6 +3977,9 @@ function Get-ObjectPosition {
 <#
 	.SYNOPSIS
 		Returns the position of an object specified
+
+		ALIASES
+			Dlgpos
 		
     .DESCRIPTION
 		This function will return the top, left, width and height properties of
@@ -3717,7 +4003,7 @@ function Get-ObjectPosition {
 	.OUTPUTS
 		Object
 #>
-
+	[Alias("Dlgpos")]
 		[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -3736,6 +4022,9 @@ function Get-OK {
 <#
     .SYNOPSIS
 		Returns if the previous command was successful.
+
+		ALIASES
+			Ok
 			 
 	.DESCRIPTION
 		This function returns if the previous command was successful.
@@ -3746,6 +4035,8 @@ function Get-OK {
 	.OUTPUTS
 		Boolean
 #>
+	[Alias("Ok")]
+	param()
     return $?
 }
 
@@ -3753,6 +4044,9 @@ function Get-OKCancelDialog {
 <#
     .SYNOPSIS
 		Displays an OK Cancel dialog window for input from the user.
+
+		ALIASES
+			Query
 			 
 	.DESCRIPTION
 		This function displays an OK Cancel dialog window for input from the user.
@@ -3778,6 +4072,7 @@ function Get-OKCancelDialog {
 	.OUTPUTS
 		MessageBox
 #>
+	[Alias("Query")]
 	[CmdletBinding()]
     param (
 		[Parameter(Mandatory,
@@ -3839,6 +4134,9 @@ function Get-RegistryExists {
 <#
     .SYNOPSIS
 		Returns if a registry key or value exists as boolean.
+
+		ALIASES
+			Regexists
 			 
 	.DESCRIPTION
 		This function returns if a registry key or value exists as boolean.
@@ -3864,6 +4162,7 @@ function Get-RegistryExists {
 	.OUTPUTS
 		Boolean
 #>
+	[Alias("Regexists")]
 	[CmdletBinding()]
     param (
 		[Parameter(Mandatory,
@@ -3899,6 +4198,9 @@ function Get-RegistryType {
 <#
     .SYNOPSIS
 		Returns a registry type from the path to the value
+
+		ALIASES
+			Regtype
 			 
 	.DESCRIPTION
 		This function returns a registry type from the path to the value
@@ -3918,6 +4220,7 @@ function Get-RegistryType {
 	.OUTPUTS
 		String
 #>
+	[Alias("Regtype")]
 	[CmdletBinding()]
 	param (
 		[Parameter(Mandatory)]
@@ -3951,6 +4254,9 @@ function Get-RegistryValue {
 <#
     .SYNOPSIS
 		Returns a registry value
+
+		ALIASES
+			Regread
 			 
 	.DESCRIPTION
 		This function returns a registry value
@@ -3967,6 +4273,7 @@ function Get-RegistryValue {
 	.INPUTS
 		Path as String, Name as String
 #>
+	[Alias("Regread")]
 	[CmdletBinding()]
 	param (
 		[Parameter(Mandatory)]
@@ -3981,6 +4288,9 @@ function Get-ScreenHeight {
 <#
     .SYNOPSIS
 		Returns screen physical screen height as a PSCustomObject
+
+		ALIASES
+			Screenheight
 		
     .DESCRIPTION
 		This function returns screen physical screen height as a PSCustomObject
@@ -3997,6 +4307,8 @@ function Get-ScreenHeight {
 		The 'Primary' attribute of the object returns the primary screen. Each
 		screen height is returned in the Screen# property.
 #>
+	[Alias("Screenheight")]
+	param()
 	$return = [PSCustomObject] | Select-Object -Property Primary
 	$i = 1
 	foreach ($screen in [system.windows.forms.screen]::AllScreens) {
@@ -4079,6 +4391,9 @@ function Get-ScreenWidth {
 <#
     .SYNOPSIS
 		Returns screen physical screen width as a PSCustomObject
+
+		ALIASES
+			Screenwidth
 		
     .DESCRIPTION
 		This function returns screen physical screen width as a PSCustomObject
@@ -4095,6 +4410,8 @@ function Get-ScreenWidth {
 		The 'Primary' attribute of the object returns the primary screen. Each
 		screen Width is returned in the Screen# property.
 #>
+	[Alias("Screenwidth")]
+	param()
 	$return = [PSCustomObject] | Select-Object -Property Primary
 	$i = 1
 	foreach ($screen in [system.windows.forms.screen]::AllScreens) {
@@ -4196,6 +4513,9 @@ function Get-Sine {
 <#
     .SYNOPSIS
 		Returns sine from a number
+
+		ALIASES
+			Sin
 			 
 	.DESCRIPTION
 		This function returns sine from a given number
@@ -4218,6 +4538,7 @@ function Get-Sine {
 	.OUTPUTS
 		Decimal
 #>
+	[Alias("Sin")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -4231,6 +4552,9 @@ function Get-SquareRoot {
 <#
     .SYNOPSIS
 		Returns square root from a number
+
+		ALIASES
+			Sqt
 			 
 	.DESCRIPTION
 		This function returns  square root from a given number
@@ -4253,6 +4577,7 @@ function Get-SquareRoot {
 	.OUTPUTS
 		Decimal
 #>
+	[Alias("Sqt")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -4311,6 +4636,9 @@ function Get-SubString {
 <#
 	.SYNOPSIS
 	Gets the value of a string between a start index and a end index.
+
+		ALIASES
+			Substr
 		
     .DESCRIPTION
 		This function returns the value of a string between a start index and a 
@@ -4337,7 +4665,7 @@ function Get-SubString {
 	.OUTPUTS
 		String
 #>
-
+	[Alias("Substr")]
 	[CmdletBinding()]
     param (
 		[Parameter(Mandatory,
@@ -4355,6 +4683,9 @@ function Get-SystemDirectory {
 <#
     .SYNOPSIS
 		Returns the system directory
+
+		ALIASES
+			Sysdir
 			 
 	.DESCRIPTION
 		This function returns the system directory
@@ -4365,6 +4696,8 @@ function Get-SystemDirectory {
 	.OUTPUTS
 		String
 #>
+	[Alias("Sysdir")]
+	param()
 	return [System.Environment]::SystemDirectory
 }
 
@@ -4386,6 +4719,9 @@ function Get-TextPosition {
 <#
     .SYNOPSIS
 		Retrieves the Text position within a specified string.
+
+		ALIASES
+			Pos
 			 
 	.DESCRIPTION
 		This function retrieves the Text position within a specified string.
@@ -4411,6 +4747,7 @@ function Get-TextPosition {
 	.OUTPUTS
 		Integer || Boolean
 #>
+	[Alias("Pos")]
 	[CmdletBinding()]
     param (
 		[Parameter(Mandatory,
@@ -4433,6 +4770,9 @@ function Get-VirtualKey {
 <#
     .SYNOPSIS
 		Returns a virtual key
+
+		ALIASES
+			VKey
      
     .DESCRIPTION
 		This function returns a virtual key
@@ -4480,6 +4820,7 @@ function Get-VirtualKey {
 	.OUTPUTS
 		Hex
 #>
+	[Alias("VKey")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -4849,6 +5190,9 @@ function Get-WindowClass {
 <#
     .SYNOPSIS
 		Gets the class of a window by handle
+
+		ALIASES
+			Winclass
 			 
 	.DESCRIPTION
 		This function gets the class of a window by handle
@@ -4871,6 +5215,7 @@ function Get-WindowClass {
 	.OUTPUTS
 		String
 #>
+	[Alias("winclass")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -4886,6 +5231,9 @@ function Get-WindowExists {
 <#
     .SYNOPSIS
 		Returns the handle of a window, or null if it doesn't exists
+
+		ALIASES
+			Winexists
 			 
 	.DESCRIPTION
 		This function returns the handle of a window, or null if it doesn't exists
@@ -4905,6 +5253,7 @@ function Get-WindowExists {
 	.INPUTS
 		Window as String
 #>
+	[Alias("Winexists")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -4932,6 +5281,9 @@ function Get-WindowFromPoint {
 <#
     .SYNOPSIS
 		Returns the window panel from an x y point
+
+		ALIASES
+			Winatpoint
 			 
 	.DESCRIPTION
 		This function returns the window panel from an x y point
@@ -4954,6 +5306,7 @@ function Get-WindowFromPoint {
 	.OUTPUTS
 		Handle
 #>
+	[Alias("Winatpoint")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory)]
@@ -4970,6 +5323,9 @@ function Get-WindowParent {
 <#
     .SYNOPSIS
 		Returns the handle of a windows parent
+		
+		ALIASES
+			Winparent
 			 
 	.DESCRIPTION
 		This function returns the handle of a windows parent
@@ -4992,6 +5348,7 @@ function Get-WindowParent {
 	.OUTPUTS
 		Integer
 #>
+	[Alias("Winparent")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -5005,6 +5362,9 @@ function Get-WindowPosition {
 <#
     .SYNOPSIS
 		Returns an object with Left, Top, Width and Height properties of a windows position
+
+		ALIASES
+			Winpos
 			 
 	.DESCRIPTION
 		This function returns an object with Left, Top, Width and Height properties of a windows position according to a handle specified
@@ -5027,6 +5387,7 @@ function Get-WindowPosition {
 	.OUTPUTS
 		Integer
 #>
+	[Alias("Winpos")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -5047,6 +5408,9 @@ function Get-WindowsDirectory {
 <#
     .SYNOPSIS
 		Returns the windows directory
+
+		ALIASES
+			Windir
 			 
 	.DESCRIPTION
 		This function returns the windows directory
@@ -5057,7 +5421,8 @@ function Get-WindowsDirectory {
 	.OUTPUTS
 		String
 #>
-
+	[Alias("Windir")]
+	param()
 	return Get-EnvironmentVariable windir
 }
 
@@ -5065,6 +5430,9 @@ function Get-WindowSibling {
 <#
     .SYNOPSIS
 		Returns the sibling of a window
+		
+		ALIASES
+			Winsib
 			 
 	.DESCRIPTION
 		This function returns the sibling of a window
@@ -5087,6 +5455,7 @@ function Get-WindowSibling {
 	.OUTPUTS
 		Integer
 #>
+	[Alias("Winsib")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -5100,6 +5469,9 @@ function Get-WindowsVersion {
 <#
     .SYNOPSIS
 		Returns the current version of Microsoft Windows.
+		
+		ALIASES
+			Winver
 
     .DESCRIPTION
 		This function returns the current version of Microsoft Windows.
@@ -5107,6 +5479,8 @@ function Get-WindowsVersion {
 	.EXAMPLE
 		$WinVersion = Get-WindowsVersion
 #>
+	[Alias("Winver")]
+	param()
 	$major = [System.Environment]::OSVersion.Version | Select-Object -expandproperty Major | Out-String
 	$minor = [System.Environment]::OSVersion.Version | Select-Object -expandproperty Minor | Out-String
 	$build = [System.Environment]::OSVersion.Version | Select-Object -expandproperty Build | Out-String
@@ -5118,6 +5492,9 @@ function Get-WindowText {
 <#
     .SYNOPSIS
 		Returns the text of a window
+		
+		ALIASES
+			Wintext
 			 
 	.DESCRIPTION
 		This function returns the text of a window
@@ -5140,6 +5517,7 @@ function Get-WindowText {
 	.OUTPUTS
 		Integer
 #>
+	[Alias("Wintext")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -5188,6 +5566,9 @@ function Hide-TaskBar {
 <#
     .SYNOPSIS
 		Hides the taskbar
+		
+		ALIASES
+			Taskbar-Hide
      
     .DESCRIPTION
 		This function will hide the taskbar
@@ -5195,6 +5576,8 @@ function Hide-TaskBar {
 	.EXAMPLE
 		Hide-TaskBar
 #>
+	[Alias("Taskbar-Hide")]
+	param()
 	$hWnd = [vds]::FindWindowByClass("Shell_TrayWnd")
 	[vds]::ShowWindow($hWnd, "SW_HIDE")	
 }
@@ -5203,6 +5586,9 @@ function Hide-Window {
 <#
     .SYNOPSIS
 		Hides a window
+		
+		ALIASES
+			Window-Hide
 			 
 	.DESCRIPTION
 		This function hides a window
@@ -5222,6 +5608,7 @@ function Hide-Window {
 	.INPUTS
 		Handle as Handle
 #>
+	[Alias("Window-Hide")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -5309,6 +5696,9 @@ function Move-File {
 	.SYNOPSIS
 		Moves a file to a destination
 		
+		ALIASES
+			File-Move
+		
     .DESCRIPTION
 		This function moves a file to a destination
 	
@@ -5330,6 +5720,7 @@ function Move-File {
 	.INPUTS
 		Path as String, Destination as String
 #>
+	[Alias("File-Move")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -5345,6 +5736,9 @@ function Move-RegistryKey {
 <#
     .SYNOPSIS
 		Moves a registry key
+		
+		ALIASES
+			Registry-Move
 			 
 	.DESCRIPTION
 		This function moves a registry key
@@ -5364,6 +5758,7 @@ function Move-RegistryKey {
 	.INPUTS
 		Path as String, Destination as String
 #>
+	[Alias("Registry-Move")]
 	[CmdletBinding()]
     param (
 		[Parameter(Mandatory)]
@@ -5379,6 +5774,9 @@ function Move-Window {
 <#
     .SYNOPSIS
 		Moves a window
+		
+		ALIASES
+			Window-Position
 			 
 	.DESCRIPTION
 		This function moves a window per left, top, width and height parameters
@@ -5410,6 +5808,7 @@ function Move-Window {
 	.INPUTS
 		Handle as Handle
 #>
+	[Alias("Window-Position")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -5431,6 +5830,9 @@ function New-Beep {
 <#
     .SYNOPSIS
 		Beeps
+		
+		ALIASES
+			Beep
      
     .DESCRIPTION
 		Plays a system beep sound.
@@ -5441,6 +5843,8 @@ function New-Beep {
 	.OUTPUTS
 		System Beep Sound
 #>
+	[Alias("Beep")]
+	param()
     [console]::beep(500,300)
 }
 
@@ -5523,6 +5927,9 @@ function New-Folder {
 	.SYNOPSIS
 		Creates a new folder at the path specified
 		
+		ALIASES
+			Directory-Create
+		
     .DESCRIPTION
 		This function with create a new folder at the path specified
 	
@@ -5541,6 +5948,7 @@ function New-Folder {
 	.INPUTS
 		Path as String
 #>
+	[Alias("Directory-Create")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -5553,7 +5961,10 @@ function New-Folder {
 function New-Form {
 <#
 	.SYNOPSIS
-		Creates a new vdsForm.
+		Creates a new vdsForm
+		
+		ALIASES
+			Dialog-Create
 		
     .DESCRIPTION
 		This function creates a new vdsForm.
@@ -5592,6 +6003,7 @@ function New-Form {
 		Usually precedes the Add-CommonControl command and is usually followed by the Show-Form or Show-FormModal command.
 	
 #>
+	[Alias("Dialog-Create")]
 	[CmdletBinding()]
     param (
 		[Parameter(Mandatory, 
@@ -5620,6 +6032,9 @@ function New-RegistryKey {
 <#
     .SYNOPSIS
 		Creates a registry key
+		
+		ALIASES
+			Regkey
 			 
 	.DESCRIPTION
 		This function creates a registry key
@@ -5639,6 +6054,7 @@ function New-RegistryKey {
 	.INPUTS
 		Path as String, Name as String
 #>
+	[Alias("Regkey")]
 	[CmdletBinding()]
     param (
 		[Parameter(Mandatory)]
@@ -5698,6 +6114,9 @@ function New-SendMessage {
 <#
     .SYNOPSIS
 		Sends a message to a window object using sendmessage API
+		
+		ALIASES
+			Sendmsg
 			 
 	.DESCRIPTION
 		This function sends a message to a window object using sendmessage API
@@ -5723,6 +6142,7 @@ function New-SendMessage {
 	.NOTES
 		A powerful magic, from an ancient time.
 #>
+	[Alias("Sendmsg")]
 	[CmdletBinding()]
 	param (
 		[Parameter(Mandatory)]
@@ -5741,6 +6161,9 @@ function New-ShellVerb {
 <#
     .SYNOPSIS
 		Invokes a shell call by verb
+		
+		ALIASES
+			Shell
 			 
 	.DESCRIPTION
 		This function invokes a shell call by verb
@@ -5764,6 +6187,7 @@ function New-ShellVerb {
 		Verb as String, Path as String
 
 #>
+	[Alias("Shell")]
 	[CmdletBinding()]
 	param (
 		[Parameter(Mandatory,
@@ -5825,7 +6249,7 @@ function New-ShortCut {
 	.OUTPUTS
 		ShortCut file
 #>
-
+	[Alias("Link")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -5867,6 +6291,9 @@ function New-Sound {
 <#
     .SYNOPSIS
 		Plays a sound according to the path specified. 
+
+		ALIASES
+			Play
 			 
 	.DESCRIPTION
 		This function plays a sound according to the path specified. If the 
@@ -5895,6 +6322,7 @@ function New-Sound {
 	.OUTPUTS
 		Sound
 #>
+	[Alias("Play")]
 	[CmdletBinding()]
     param (
 		[Parameter(Mandatory,
@@ -6203,6 +6631,9 @@ function Protect-Secret {
 	.SYNOPSIS
 		Encrypts a secret with a value key pair.
 		
+		ALIASES
+			Encrypt
+		
     .DESCRIPTION
 		This function takes the text that you input and returns the encrypted 
 		value locked with a AES Key to a single object that has "Secret" and 
@@ -6227,6 +6658,7 @@ function Protect-Secret {
 	.OUTPUTS
 		PSCustomObject
 #>
+	[Alias("Encrypt")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -6327,6 +6759,9 @@ function Read-InitializationFile {
 <#
     .SYNOPSIS
 		Reads a key value pair from a section of a initialization file.
+		
+		ALIASES
+			Iniread
 			 
 	.DESCRIPTION
 		This function reads a key value pair from a section of a initialization file.
@@ -6355,6 +6790,7 @@ function Read-InitializationFile {
 	.OUTPUTS
 		Value
 #>
+	[Alias("Iniread")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -6471,6 +6907,9 @@ function Remove-File {
 	.SYNOPSIS
 		Removes a file at the path specified
 		
+		ALIASES
+			File-Delete
+		
     .DESCRIPTION
 		This function removes a file at the path specified
 	
@@ -6489,6 +6928,7 @@ function Remove-File {
 	.INPUTS
 		Path as String
 #>
+	[Alias("File-Delete")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -6502,6 +6942,9 @@ function Remove-Folder {
 <#
 	.SYNOPSIS
 		Removes a folder at the path specified
+		
+		ALIASES
+			Directory-Delete
 		
     .DESCRIPTION
 		This function will remove a folder at the path specified
@@ -6521,6 +6964,7 @@ function Remove-Folder {
 	.INPUTS
 		Path as String
 #>
+	[Alias("Directory-Delete")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -6607,6 +7051,9 @@ function Remove-RegistryValue {
 <#
     .SYNOPSIS
 		Removes a registry value
+		
+		ALIASES
+			Registry-Delete
 			 
 	.DESCRIPTION
 		This function removes a registry value
@@ -6623,6 +7070,7 @@ function Remove-RegistryValue {
 	.INPUTS
 		Path as String, Name as String
 #>
+	[Alias("Registry-Delete")]
 	[CmdletBinding()]
 	param (
 		[Parameter(Mandatory)]
@@ -6637,6 +7085,9 @@ function Rename-File {
 <#
 	.SYNOPSIS
 		Renames a file
+
+		ALIASES
+			File-Rename
 		
     .DESCRIPTION
 		This function renames a file
@@ -6659,6 +7110,7 @@ function Rename-File {
 	.INPUTS
 		Path as String, NewName as String
 #>
+	[Alias("File-Rename")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -6674,6 +7126,9 @@ function Rename-Folder {
 <#
 	.SYNOPSIS
 		Renames a folder at the path specified
+		
+		ALIASES
+			Directory-Rename
 		
     .DESCRIPTION
 		This function will rename a folder at the path specified
@@ -6696,6 +7151,7 @@ function Rename-Folder {
 	.INPUTS
 		Path as String
 #>
+	[Alias("Directory-Rename")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -6948,6 +7404,9 @@ function Send-ClickToWindow {
 <#
     .SYNOPSIS
 		Sends a click to a window by the handle, x and y specified.
+		
+		ALIASES
+			Window-Click
 			 
 	.DESCRIPTION
 		This function sends a click to a window by the handle, x and y specified.
@@ -6973,6 +7432,7 @@ function Send-ClickToWindow {
 	.INPUTS
 		Handle as Handle
 #>
+	[Alias("Window-Click")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -7028,6 +7488,9 @@ function Send-RightClickToWindow {
 <#
     .SYNOPSIS
 		Sends a right click to a window by the handle, x and y specified.
+
+		ALIASES
+			Window-RClick
 			 
 	.DESCRIPTION
 		This function sends a right click to a window by the handle, x and y specified.
@@ -7053,6 +7516,7 @@ function Send-RightClickToWindow {
 	.INPUTS
 		Handle as Handle
 #>
+	[Alias("Window-RClick")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -7162,6 +7626,9 @@ function Send-Window {
 <#
     .SYNOPSIS
 		Sends a string to a window
+
+		ALIASES
+			Window-Send
 			 
 	.DESCRIPTION
 		This function sends a string to a window
@@ -7184,6 +7651,7 @@ function Send-Window {
 	.INPUTS
 		Handle as Handle, String as String
 #>
+	[Alias("Window-Send")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -7200,6 +7668,9 @@ function Set-ActiveWindow {
 <#
     .SYNOPSIS
 		Sets the window as active
+		
+		ALIASES
+			Window-Activate
 			 
 	.DESCRIPTION
 		This function sets the active window
@@ -7219,6 +7690,7 @@ function Set-ActiveWindow {
 	.INPUTS
 		Handle as Handle
 #>
+	[Alias("Window-Activate")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -7232,6 +7704,9 @@ function Set-CurrentDirectory {
 <#
 	.SYNOPSIS
 		Changes the current working directory to the path specified.
+		
+		ALIASES
+			Directory-Change
 		
     .DESCRIPTION
 		This function will change the current working directory to the path
@@ -7252,6 +7727,7 @@ function Set-CurrentDirectory {
 	.INPUTS
 		Path as String
 #>
+	[Alias("Directory-Change")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -7341,10 +7817,13 @@ function Set-ExcelCell {
 function Set-ExitCode {
 <#
 	.SYNOPSIS
-		Sets the application exit code
+		Exits the application with the code specified.
+		
+		ALIASES
+			Exit
 		
     .DESCRIPTION
-		This function sets the application exit code
+		This function exits the application with the code specified.
 	
 	.PARAMETER ExitCode
 		The code to exit the application with
@@ -7361,10 +7840,10 @@ function Set-ExitCode {
 	.INPUTS
 		ExitCode as Integer
 #>
+	[Alias("Exit")]
 	[CmdletBinding()]
     param (
-        [Parameter(Mandatory,
-			ValueFromPipeline)]
+        [Parameter(ValueFromPipeline)]
         [int]$ExitCode
 	)	
 	exit $ExitCode
@@ -7374,6 +7853,9 @@ function Set-FileAttribute {
 <#
 	.SYNOPSIS
 		Sets the attribute of a file
+
+		ALIAS
+			File-Setattr
 		
     .DESCRIPTION
 		This function sets the attributes of a file
@@ -7405,6 +7887,7 @@ function Set-FileAttribute {
 	.INPUTS
 		Path as String, Attribute as ValidatedString, Unset as Switch
 #>
+	[Alias("File-Setattr")]
 	[CmdletBinding()]
     param (
 		[Parameter(Mandatory,
@@ -7433,6 +7916,9 @@ function Set-FlashWindow {
 <#
     .SYNOPSIS
 		Flashes the icon of a window
+		
+		ALIAS
+			Window-Flash
 			 
 	.DESCRIPTION
 		This function flashes the tasktray icon of a window
@@ -7452,6 +7938,7 @@ function Set-FlashWindow {
 	.INPUTS
 		Handle as Handle
 #>
+	[Alias("Window-Flash")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -7465,6 +7952,9 @@ function Set-Focus {
 <#
     .SYNOPSIS
 		Sets the focus of a form to a control
+		
+		ALIAS
+			Dialog-Focus
 			 
 	.DESCRIPTION
 		This function Sets the focus of a form to a control
@@ -7490,6 +7980,7 @@ function Set-Focus {
 	.OUTPUTS
 		Object
 #>
+	[Alias("Dialog-Focus")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -7505,6 +7996,9 @@ function Set-Format {
 <#
     .SYNOPSIS
 		Formats text according to a specification string
+		
+		ALIAS
+			Format
 			 
 	.DESCRIPTION
 		This function formats text according to a specification string
@@ -7530,6 +8024,7 @@ function Set-Format {
 	.OUTPUTS
 		String
 #>
+	[Alias("Format")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -7541,100 +8036,6 @@ function Set-Format {
     return $a | % {
         $_.ToString($b)
     }
-}
-
-function Set-Hotkey {
-<#
-    .SYNOPSIS
-		Registers a global hotkey to a form.
-			 
-	.DESCRIPTION
-		This function registers a hotkey to a form of type vdsForm
-	 
-	.PARAMETER Form
-		The form to register the hotkey to.
-		
-	.EXAMPLE
-		Set-Hotkey $Form1 1 ((Get-VirtualKey Alt)+(Get-VirtualKey Control)) (Get-VirtualKey v)
-		function hotkeyEvent {
-			[CmdletBinding()]
-			param (
-				[Parameter(Mandatory)]
-				[string]$Event
-			)
-			switch ($Event) {
-				'1' {
-					#Process event here
-				}
-			}
-		}
-	
-	.EXAMPLE
-		Set-Hotkey -form $Form1 -registerindex 1 -ModifierVirtualKeys $null -VirtualKey (Get-VirtualKey F1)
-		function hotkeyEvent {
-			[CmdletBinding()]
-			param (
-				[Parameter(Mandatory)]
-				[string]$Event
-			)
-			switch ($Event) {
-				'1' {
-					#Process event here
-				}
-			}
-		}
-		
-	.EXAMPLE
-		$Form1 | Set-Hotkey -registerindex 1 -ModifierVirtualKeys $null -VirtualKey (Get-VirtualKey F1)
-		function hotkeyEvent {
-			[CmdletBinding()]
-			param (
-				[Parameter(Mandatory)]
-				[string]$Event
-			)
-			switch ($Event) {
-				'1' {
-					#Process event here
-				}
-			}
-		}
-		
-	.INPUTS
-		Form as vdsForm, RegisterIndex as Integer, 
-		ModifierVirtualKeys[] as Hexidecimal, 
-		VirtualKey as Hexidecimal
-	
-	.OUTPUTS
-		Registered Event
-	
-	.NOTES
-		The use of this function REQUIRES the event to be caught by the 
-		hotkeyEvent function which processes the event by hotkey index.
-#>
-	[CmdletBinding()]
-    param (
-        [Parameter(Mandatory,
-			ValueFromPipeline)]
-        [vdsForm]$Form,
-		[Parameter(Mandatory)]
-        [int]$RegisterIndex,
-		[Parameter(Mandatory)]
-		[string]$ModifierVirtualKeys,
-		[Parameter(Mandatory)]
-		[string]$VirtualKey
-	)
-	[vdsForm]::RegisterHotKey($Form.handle,$RegisterIndex,$ModifierVirtualKeys,$VirtualKey) | out-null
-	if ($global:hotkeyobject -ne $true) {
-		$hotkey = Add-CommonControl -Form $Form -ControlType 'label' -top 0 -left 0 -width 0 -height 0
-		$hotkey.Name = 'hotkey'
-		$hotkey.add_TextChanged({
-			if ($this.text -ne ""){
-				hotkeyEvent $this.text
-			}
-			$this.text = ""
-		})
-		$global:hotkeyobject = $true
-	}
 }
 
 function Set-Innertext {
@@ -7694,6 +8095,9 @@ function Set-ObjectPosition {
 	.SYNOPSIS
 		Properly sets the position of a DPIAware object created with this module.
 		
+		ALIAS
+			Dialog-Setpos
+		
     .DESCRIPTION
 		This function properly sets the position of a DPIAware object created with this module.
 	
@@ -7729,6 +8133,7 @@ function Set-ObjectPosition {
 		will mistake by a factor of the current system scale. This function 
 		allows you to reposition DPIAware objects properly.
 #>
+	[Alias("Dialog-Setpos")]
 	[CmdletBinding()]
     param (
 		[Parameter(Mandatory,
@@ -7782,7 +8187,7 @@ function Set-RegistryValue {
 
 function Set-Types {
 	
-	<#
+<#
     .SYNOPSIS
 		Various C# calls and references
 #>
@@ -8181,6 +8586,9 @@ function Set-WindowNotOnTop {
 <#
     .SYNOPSIS
 		Causes a window to not be on top of other windows
+		
+		ALIAS
+			Window-NotOnTop
 			 
 	.DESCRIPTION
 		This function causes a window to not be on top of other windows
@@ -8200,6 +8608,7 @@ function Set-WindowNotOnTop {
 	.INPUTS
 		Handle as Handle
 #>
+	[Alias("Window-NotOnTop")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -8213,6 +8622,9 @@ function Set-WindowOnTop {
 <#
     .SYNOPSIS
 		Causes a window to be on top of other windows
+		
+		ALIAS
+			Window-Ontop
 			 
 	.DESCRIPTION
 		This function causes a window to be on top of other windows
@@ -8232,6 +8644,7 @@ function Set-WindowOnTop {
 	.INPUTS
 		Handle as Handle
 #>
+	[Alias("Window-OnTop")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -8245,6 +8658,9 @@ function Set-WindowParent {
 <#
     .SYNOPSIS
 		This function fuses a window into another window
+		
+		ALIAS
+			Window-Fuse
 			 
 	.DESCRIPTION
 		This function fuses a child window into a parent window
@@ -8267,6 +8683,7 @@ function Set-WindowParent {
 	.INPUTS
 		Child as Handle,Parent as Handle
 #>
+	[Alias("Window-Fuse")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -8282,6 +8699,9 @@ function Set-WindowText {
 <#
     .SYNOPSIS
 		Sets the text of a window
+		
+		ALIAS
+			Window-Settext
 			 
 	.DESCRIPTION
 		This function sets the text of a window
@@ -8304,6 +8724,7 @@ function Set-WindowText {
 	.INPUTS
 		Handle as Handle, String as String
 #>
+	[Alias("Window-Settext")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -8318,6 +8739,9 @@ function Show-ColorDialog {
 <#
 	.SYNOPSIS
 		Presents a color dialog to the end user for color selection
+		
+		ALIAS
+			Colordlg
 		     
     .DESCRIPTION
 		This function presents a color dialog to the end user and returns
@@ -8349,6 +8773,7 @@ function Show-ColorDialog {
 		switch is specified this will return the color name as string, 
 		otherwise this will return a System Windows Forms ColorDialog object.
 #>
+	[Alias("Colordlg")]
 	[CmdletBinding()]
 	param([switch]$ColorNameText)
     $colorDialog = new-object System.Windows.Forms.ColorDialog
@@ -8402,6 +8827,9 @@ function Show-FolderBrowserDialog {
 	.SYNOPSIS
 		Returns the value from a Foloder Browser Dialog.
 		
+		ALIAS
+			Dirdlg
+		
     .DESCRIPTION
 		This function presents a folder browser dialog and returns the user selection.
 	
@@ -8438,7 +8866,8 @@ function Show-FolderBrowserDialog {
 	
 	.OUTPUTS
 		String
-#>
+#>	
+	[Alias("Dirdlg")]
 	[CmdletBinding()]
     param (
         [Parameter(ValueFromPipeline)]
@@ -8471,6 +8900,9 @@ function Show-FontDialog {
 <#
     .SYNOPSIS
 		Returns a font dialog
+		
+		ALIAS
+			Fontdlg
 			 
 	.DESCRIPTION
 		This function returns a font dialog
@@ -8481,6 +8913,8 @@ function Show-FontDialog {
 	.OUTPUTS
 		Windows.Forms.FontDialog
 #>
+	[Alias("Fontdlg")]
+	param()
     $fontdlg = new-object windows.forms.fontdialog
     $fontdlg.showcolor = $true
     $fontdlg.ShowDialog()
@@ -8492,6 +8926,9 @@ function Show-Form {
 	.SYNOPSIS
 		Ensures forms are ran in the correct application space, particularly 
 		when multiple forms are involved.
+		
+		ALIAS
+			Dialog-Show
 		
     .DESCRIPTION
 		This function runs the first form in an application space, and shows
@@ -8515,6 +8952,7 @@ function Show-Form {
 	.INPUTS
 		Form as Object
 #>
+	[Alias("Dialog-Show")]
 	[CmdletBinding()]
     param (
 		[Parameter(Mandatory,
@@ -8540,6 +8978,9 @@ function Show-HTMLHelp {
 <#
     .SYNOPSIS
 		Displays a page in a compiled html manual.
+		
+		ALIAS
+			HTMLHelp
 			 
 	.DESCRIPTION
 		This function displays a page in a compiled html manual.
@@ -8562,6 +9003,7 @@ function Show-HTMLHelp {
 	.OUTPUTS
 		Html Help Process displaying specified argument.
 #>
+	[Alias("HTMLHelp")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -8575,6 +9017,9 @@ function Show-InformationDialog {
 <#
     .SYNOPSIS
 		Displays a information dialog with a message and title specified.
+		
+		ALIAS
+			Info
 			 
 	.DESCRIPTION
 		This function displays a information dialog with a message and title specified.
@@ -8600,6 +9045,7 @@ function Show-InformationDialog {
 	.OUTPUTS
 		MessageBox
 #>
+	[Alias("Info")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -8615,6 +9061,9 @@ function Show-OpenFileDialog {
 <#
 	.SYNOPSIS
 		Shows a window for opening a file.
+		
+		ALIAS
+			Filedlg
 		
     .DESCRIPTION
 		This function shows a window for opening a file.
@@ -8640,6 +9089,7 @@ function Show-OpenFileDialog {
 	.OUTPUTS
 		String
 #>	
+	[Alias("Filedlg")]
 	[CmdletBinding()]
     param (
 		[Parameter(ValueFromPipeline)]
@@ -8657,6 +9107,9 @@ function Show-SaveFileDialog {
 <#
 	.SYNOPSIS
 		Shows a window for saving a file.
+		
+		ALIAS
+			Savedlg
 		
     .DESCRIPTION
 		This function shows a window for saving a file.
@@ -8682,6 +9135,7 @@ function Show-SaveFileDialog {
 	.OUTPUTS
 		String
 #>	
+	[Alias("Savedlg")]
 	[CmdletBinding()]
     param (
 		[Parameter(ValueFromPipeline)]
@@ -8699,6 +9153,9 @@ function Show-TaskBar {
 <#
     .SYNOPSIS
 		Shows the taskbar
+		
+		ALIASES
+			Taskbar-Show
      
     .DESCRIPTION
 		This function will show the taskbar
@@ -8706,6 +9163,8 @@ function Show-TaskBar {
 	.EXAMPLE
 		Show-TaskBar
 #>
+	[Alias("Taskbar-Show")]
+	param()
 	$hWnd = [vds]::FindWindowByClass("Shell_TrayWnd")
 	[vds]::ShowWindow($hWnd, "SW_SHOW_DEFAULT")
 }
@@ -8714,6 +9173,9 @@ function Show-Warning {
 	<#
     .SYNOPSIS
 		Displays a warning dialog
+		
+		ALIAS
+			Warn
 			 
 	.DESCRIPTION
 		This function displays a warning dialog
@@ -8736,6 +9198,7 @@ function Show-Warning {
 	.INPUTS
 		Message as String, Title as String
 #>
+	[Alias("Warn")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -8750,6 +9213,9 @@ function Show-Window {
 <#
     .SYNOPSIS
 		Shows a window
+		
+		ALIAS
+			Window-Normal
 			 
 	.DESCRIPTION
 		This function shows a window
@@ -8769,6 +9235,7 @@ function Show-Window {
 	.INPUTS
 		Handle as Handle
 #>
+	[Alias("Window-Normal")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -8844,6 +9311,9 @@ function Step-ListNext {
 <#
     .SYNOPSIS
 		Steps to the next item in a list
+		
+		ALIAS
+			Next
 			 
 	.DESCRIPTION
 		This function steps to the next item in a list
@@ -8866,6 +9336,7 @@ function Step-ListNext {
 	.OUTPUTS
 		String || Boolean
 #>
+	[Alias("Next")]
 	[CmdletBinding()]
     param (
 		[Parameter(Mandatory,
@@ -8975,6 +9446,9 @@ function Test-File {
 	.SYNOPSIS
 		Test for the existance of a file
 		
+		ALIAS
+			File
+		
     .DESCRIPTION
 		This function test for the existance of a file
 	
@@ -8996,6 +9470,7 @@ function Test-File {
 	.OUTPUTS
 		Boolean
 #>
+	[Alias("File")]
 	[CmdletBinding()]
     param (
 		[Parameter(Mandatory,
@@ -9014,6 +9489,9 @@ function Unprotect-Secret {
 <#
 	.SYNOPSIS
 		Decrypts a secret from a value key pair.
+		
+		ALIAS
+			Decrypt
 		
     .DESCRIPTION
 		This function decrypts a secret that has been created using the 
@@ -9044,6 +9522,7 @@ function Unprotect-Secret {
 		String
 	
 #>
+	[Alias("Decrypt")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory)]
@@ -9198,6 +9677,9 @@ function Write-InitializationFile {
 <#
     .SYNOPSIS
 		Writes a key value pair to a section of a initialization file.
+		
+		ALIAS
+			Inifile-Write
 			 
 	.DESCRIPTION
 		This function writes a key value pair to a section of a initialization file.
@@ -9229,6 +9711,7 @@ function Write-InitializationFile {
 	.OUTPUTS
 		Initialization File
 #>
+	[Alias("Inifile-Write")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,

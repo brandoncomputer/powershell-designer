@@ -230,6 +230,14 @@ SOFTWARE.
 		Added feature to open FBS file with argument passed to script (#8)
 		Decided Designer.ps1 will require a 'loose refactor' for legibility.
 		Completed style (loose) refactor.
+	
+	2.2.8 4/30/2024
+		VDS style alias's added to functions.
+		Very minor changes. Changed Set-Hotkey to Add-Hotkey.
+		Added Microsoft.PowerShell.Management to function list and dependencies.
+		Considering unchecking imported functions, part of me says 'check, because they can be used without export',
+			the other part of me says 'uncheck, because they take up space in the xml data'.
+		This is a release candidate.
 		
 BASIC MODIFICATIONS License
 #This software has been modified from the original as tagged with #brandoncomputer
@@ -2632,7 +2640,7 @@ Show-Form `$$FormName}); `$PowerShell.Invoke(); `$PowerShell.Dispose()"
 			$lst_Params.text = "$(((Get-Help $lst_Functions.SelectedItem.ToString() -detailed) | Out-String))"
 		})
 		$lst_Functions.items.addrange(((((get-command -module Microsoft.PowerShell.Utility) | select -expandproperty Name) | Out-String).split((get-character 13)+(get-character 10))).Trim())
-		
+		$lst_Functions.items.addrange(((((get-command -module Microsoft.PowerShell.Management) | select -expandproperty Name) | Out-String).split((get-character 13)+(get-character 10))).Trim())		
 		function EmptyListString{
 			foreach ($item in $lst_Functions.items){
 				if ($item.ToString() -eq ""){
