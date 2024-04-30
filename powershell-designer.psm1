@@ -8,21 +8,21 @@ function powershell-designer($a) {
     return [char][byte]$a
 	}
 	
-	if ($a -eq 'Dpi') {
+	if ($a) {
 		if ((get-host).version.major -eq 7) {
 			if ((Get-Module -ListAvailable powershell-designer).count -gt 1){
-				start-process -filepath pwsh.exe -argumentlist '-ep bypass',"-file $(chr 34)$(path $(Get-Module PowerShell-Designer)[0].path)\Designer.ps1$(chr 34)",'dpi'
+				start-process -filepath pwsh.exe -argumentlist '-ep bypass',"-file $(chr 34)$(path $(Get-Module PowerShell-Designer)[0].path)\Designer.ps1$(chr 34)","$($a)"
 			}
 			else {
-				start-process -filepath pwsh.exe -argumentlist '-ep bypass',"-file $(chr 34)$(path $(Get-Module PowerShell-Designer).path)\Designer.ps1$(chr 34)",'dpi'
+				start-process -filepath pwsh.exe -argumentlist '-ep bypass',"-file $(chr 34)$(path $(Get-Module PowerShell-Designer).path)\Designer.ps1$(chr 34)","$($a)"
 			}
 		}
 		else {
 			if ((Get-Module -ListAvailable powershell-designer).count -gt 1){
-				start-process -filepath powershell.exe -argumentlist '-ep bypass',"-file $(chr 34)$(path $(Get-Module PowerShell-Designer)[0].path)\Designer.ps1$(chr 34)",'dpi'
+				start-process -filepath powershell.exe -argumentlist '-ep bypass',"-file $(chr 34)$(path $(Get-Module PowerShell-Designer)[0].path)\Designer.ps1$(chr 34)","$($a)"
 			}
 			else {
-				start-process -filepath powershell.exe -argumentlist '-ep bypass',"-file $(chr 34)$(path $(Get-Module PowerShell-Designer).path)\Designer.ps1$(chr 34)",'dpi'
+				start-process -filepath powershell.exe -argumentlist '-ep bypass',"-file $(chr 34)$(path $(Get-Module PowerShell-Designer).path)\Designer.ps1$(chr 34)","$($a)"
 			}
 		}
 	}
