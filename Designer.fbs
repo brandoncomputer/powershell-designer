@@ -229,8 +229,8 @@
         <ToolStripMenuItem Name="Rename" ShortcutKeyDisplayString="Ctrl+R" ShortcutKeys="Ctrl+R" Text="Rename" />
         <ToolStripMenuItem Name="Delete" ShortcutKeyDisplayString="Ctrl+D" ShortcutKeys="Ctrl+D" Text="Delete" />
         <ToolStripSeparator Name="EditSep1" />
-        <ToolStripMenuItem Name="CopyNode" Text="Copy Control" />
-        <ToolStripMenuItem Name="PasteNode" Text="Paste Control" />
+        <ToolStripMenuItem Name="CopyNode" Text="Copy Control" ShortcutKeyDisplayString="Ctrl+Alt+C" ShortcutKeys="Ctrl+Alt+C" />
+        <ToolStripMenuItem Name="PasteNode" Text="Paste Control" ShortcutKeyDisplayString="Ctrl+Alt+V" ShortcutKeys="Ctrl+Alt+V" />
         <ToolStripSeparator Name="EditSep2" />
         <ToolStripMenuItem Name="Move Up" ShortcutKeyDisplayString="F5" ShortcutKeys="F5" Text="Move Up" />
         <ToolStripMenuItem Name="Move Down" ShortcutKeyDisplayString="F6" ShortcutKeys="F6" Text="Move Down" />

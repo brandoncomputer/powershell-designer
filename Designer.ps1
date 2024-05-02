@@ -239,6 +239,12 @@ SOFTWARE.
 			the other part of me says 'uncheck, because they take up space in the xml data'.
 		This is a release candidate.
 		
+	2.2.9rc 5/1/2024
+		Found bug (Issue #9) related to module differences between 5.1 and 7x PowerShell and function dependencies script.
+		Due to this bug, we are switching to 'unchecked' for standard modules, although I also error trapped the problem quite a bit as well.
+		Moved powershell module load into function checklistbox to the Dependencies.ps1 script, so that more modules can easily be added by the end user.
+		Logged issue #10, fixed issue #10 (Shortcuts)
+		
 BASIC MODIFICATIONS License
 #This software has been modified from the original as tagged with #brandoncomputer
 Original available at https://www.pswinformscreator.com/ for deeper comparison.
@@ -919,7 +925,7 @@ $RunSpace = [RunspaceFactory]::CreateRunspacePool(); $RunSpace.ApartmentState = 
                 })
                 try {
                     [void]$saveDialog.ShowDialog()
-                    if (( $saveDialog.FileName -ne '') -and ($saveDialog.FileName -ne 'NewProject.fbs')) {
+					if (( $saveDialog.FileName -ne '') -and ($saveDialog.FileName -ne 'NewProject.fbs')) {
 						$projectName = $saveDialog.FileName | Split-Path -Leaf
 					} else {
 						$projectName = ''
@@ -1340,7 +1346,10 @@ $RunSpace = [RunspaceFactory]::CreateRunspacePool(); $RunSpace.ApartmentState = 
 					}
 					if ( $_.Data.Functions.ChildNodes.Count -gt 0 ) {
 						$_.Data.Functions.ChildNodes | ForEach-Object {
-							$lst_Functions.SetItemChecked($lst_Functions.Items.IndexOf($_.Name),$true)
+							try{
+								$lst_Functions.SetItemChecked($lst_Functions.Items.IndexOf($_.Name),$true)
+							}
+							catch{}
 						}
 					}
 				}
@@ -2038,8 +2047,8 @@ Show-Form `$$FormName}); `$PowerShell.Invoke(); `$PowerShell.Dispose()"
     <ToolStripMenuItem Name="MoveUp" ShortcutKeys="F5" Text="Move Up" ShortcutKeyDisplayString="F5" />
     <ToolStripMenuItem Name="MoveDown" ShortcutKeys="F6" ShortcutKeyDisplayString="F6" Text="Move Down" />
     <ToolStripSeparator Name="Sep1" />
-    <ToolStripMenuItem Name="CopyNode" ShortcutKeys="Ctrl+C" Text="Copy" ShortcutKeyDisplayString="Ctrl+C" />
-    <ToolStripMenuItem Name="PasteNode" ShortcutKeys="Ctrl+P" Text="Paste" ShortcutKeyDisplayString="Ctrl+P" />
+    <ToolStripMenuItem Name="CopyNode" ShortcutKeys="Ctrl+Alt+C" Text="Copy" ShortcutKeyDisplayString="Ctrl+Alt+C" />
+    <ToolStripMenuItem Name="PasteNode" ShortcutKeys="Ctrl+Alt+V" Text="Paste" ShortcutKeyDisplayString="Ctrl+Alt+V" />
     <ToolStripSeparator Name="Sep2" />
     <ToolStripMenuItem Name="Rename" ShortcutKeys="Ctrl+R" Text="Rename" ShortcutKeyDisplayString="Ctrl+R" />
     <ToolStripMenuItem Name="Delete" ShortcutKeys="Ctrl+D" Text="Delete" ShortcutKeyDisplayString="Ctrl+D" />
@@ -2314,8 +2323,8 @@ Show-Form `$$FormName}); `$PowerShell.Invoke(); `$PowerShell.Dispose()"
         <ToolStripMenuItem Name="Rename" ShortcutKeyDisplayString="Ctrl+R" ShortcutKeys="Ctrl+R" Text="Rename" />
         <ToolStripMenuItem Name="Delete" ShortcutKeyDisplayString="Ctrl+D" ShortcutKeys="Ctrl+D" Text="Delete" />
         <ToolStripSeparator Name="EditSep1" />
-        <ToolStripMenuItem Name="CopyNode" Text="Copy Control" />
-        <ToolStripMenuItem Name="PasteNode" Text="Paste Control" />
+        <ToolStripMenuItem Name="CopyNode" Text="Copy Control" ShortcutKeyDisplayString="Ctrl+Alt+C" ShortcutKeys="Ctrl+Alt+C" />
+        <ToolStripMenuItem Name="PasteNode" Text="Paste Control" ShortcutKeyDisplayString="Ctrl+Alt+V" ShortcutKeys="Ctrl+Alt+V" />
         <ToolStripSeparator Name="EditSep2" />
         <ToolStripMenuItem Name="Move Up" ShortcutKeyDisplayString="F5" ShortcutKeys="F5" Text="Move Up" />
         <ToolStripMenuItem Name="Move Down" ShortcutKeyDisplayString="F6" ShortcutKeys="F6" Text="Move Down" />
@@ -2639,8 +2648,6 @@ Show-Form `$$FormName}); `$PowerShell.Invoke(); `$PowerShell.Dispose()"
 		$lst_Functions.add_SelectedIndexChanged({param($sender, $e)
 			$lst_Params.text = "$(((Get-Help $lst_Functions.SelectedItem.ToString() -detailed) | Out-String))"
 		})
-		$lst_Functions.items.addrange(((((get-command -module Microsoft.PowerShell.Utility) | select -expandproperty Name) | Out-String).split((get-character 13)+(get-character 10))).Trim())
-		$lst_Functions.items.addrange(((((get-command -module Microsoft.PowerShell.Management) | select -expandproperty Name) | Out-String).split((get-character 13)+(get-character 10))).Trim())		
 		function EmptyListString{
 			foreach ($item in $lst_Functions.items){
 				if ($item.ToString() -eq ""){
