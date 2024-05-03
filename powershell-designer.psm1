@@ -8,6 +8,29 @@ function powershell-designer($a) {
     return [char][byte]$a
 	}
 	
+	$folderExists = Test-Path -path ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions")
+	if ($folderExists -eq $false){
+		New-Item -ItemType directory -Path ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions")
+	}
+
+	$functionsExists = Test-Path -path ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\functions.psm1")
+	if ($functionsExists -eq $false){
+		Copy-Item -Path "$PSScriptRoot\functions.psm1" -destination ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\functions.psm1")
+	}
+
+	$dependenciesExists = Test-Path -path ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\Dependencies.ps1")
+	if ($dependenciesExists -eq $false){
+		Copy-Item -Path "$PSScriptRoot\Dependencies.ps1" -destination ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\Dependencies.ps1")
+	}
+	
+	$designerExists = Test-Path -path ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\designer\designer.ps1")
+	if ($designerExists -eq $false){
+		New-Item -ItemType directory -Path ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\Designer")
+		Copy-Item -Path "$PSScriptRoot\Designer.fbs" -destination ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer")
+		Copy-Item -Path "$PSScriptRoot\Designer\Designer.ps1" -destination ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\Designer")
+		Copy-Item -Path "$PSScriptRoot\Designer\Events.ps1" -destination ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\Designer") -recurse
+	}
+	
 	if ($a) {
 		if ((get-host).version.major -eq 7) {
 			if ((Get-Module -ListAvailable powershell-designer).count -gt 1){
