@@ -1,5 +1,6 @@
 <Data>
   <Events Desc="Events associated with controls">
+    <Button Name="btn_RemoveFind" Root="Form|MainForm" Events="Click" />
   </Events>
   <Functions Desc="Functions associated with project">
     <Function Name="ConvertFrom-WinFormsXML" />
@@ -17,7 +18,7 @@
     <Label Name="lbl_Left" Dock="Left" BackColor="35, 35, 35" Cursor="VSplit" Size="3,828" />
     <Label Name="lbl_Right" Dock="Right" BackColor="35, 35, 35" Cursor="VSplit" Size="3,828" />
     <Panel Name="pnl_Left" Dock="Left" BorderStyle="Fixed3D" Size="200,828">
-      <SplitContainer Name="spt_Left" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="345">
+      <SplitContainer Name="spt_Left" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="404">
         <SplitterPanel Name="spt_Left_Panel1">
           <TreeView Name="trv_Controls" Dock="Fill" BackColor="Azure" />
         </SplitterPanel>
@@ -27,14 +28,14 @@
       </SplitContainer>
     </Panel>
     <Panel Name="pnl_Right" Dock="Right" BorderStyle="Fixed3D" Size="200,828">
-      <SplitContainer Name="spt_Right" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="377">
+      <SplitContainer Name="spt_Right" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="405">
         <SplitterPanel Name="spt_Right_Panel1">
-          <PropertyGrid Name="PropertyGrid" Dock="Fill" Cursor="HSplit" ViewBackColor="Azure" />
+          <PropertyGrid Name="PropertyGrid" Dock="Fill" ViewBackColor="Azure" />
         </SplitterPanel>
         <SplitterPanel Name="spt_Right_Panel2" BackColor="Control">
           <TabControl Name="TabControl2" Dock="Fill">
-            <TabPage Name="Tab 1" Size="188,417" Text="Events">
-              <SplitContainer Name="SplitContainer3" Dock="Fill" Orientation="Horizontal" SplitterDistance="139">
+            <TabPage Name="Tab 1" Size="188,389" Text="Events">
+              <SplitContainer Name="SplitContainer3" Dock="Fill" Orientation="Horizontal" SplitterDistance="241">
                 <SplitterPanel Name="SplitContainer3_Panel1" AutoScroll="True">
                   <ListBox Name="lst_AvailableEvents" Dock="Fill" BackColor="Azure" />
                 </SplitterPanel>
@@ -43,13 +44,25 @@
                 </SplitterPanel>
               </SplitContainer>
             </TabPage>
-            <TabPage Name="TabPage3" Size="188,456" Text="Functions">
-              <SplitContainer Name="SplitContainer4" Dock="Fill" Orientation="Horizontal" SplitterDistance="205">
+            <TabPage Name="TabPage3" Size="188,466" Text="Functions">
+              <SplitContainer Name="SplitContainer4" Dock="Fill" Orientation="Horizontal" SplitterDistance="288">
                 <SplitterPanel Name="SplitContainer4_Panel1" AutoScroll="True">
                   <CheckedListBox Name="lst_Functions" Dock="Fill" BackColor="Azure" />
                 </SplitterPanel>
                 <SplitterPanel Name="SplitContainer4_Panel2" AutoScroll="True">
-                  <TextBox Name="lst_Params" Dock="Fill" BackColor="Azure" Multiline="True" ScrollBars="Both" Size="188,247" />
+                  <TextBox Name="lst_Params" Dock="Fill" BackColor="Azure" Multiline="True" ScrollBars="Both" Size="188,174" />
+                </SplitterPanel>
+              </SplitContainer>
+            </TabPage>
+            <TabPage Name="TabPage4" Size="188,466" Text="Finds">
+              <SplitContainer Name="SplitContainer5" Dock="Fill" Orientation="Horizontal" SplitterDistance="25">
+                <SplitterPanel Name="SplitContainer5_Panel1">
+                  <TextBox Name="txt_Find" BackColor="Azure" />
+                  <Button Name="btn_Find" Location="105,0" Size="23,23" Text="+" />
+                  <Button Name="btn_RemoveFind" Location="130,0" Size="23,23" Text="-" />
+                </SplitterPanel>
+                <SplitterPanel Name="SplitContainer5_Panel2">
+                  <ListBox Name="lst_Find" Dock="Fill" BackColor="Azure" />
                 </SplitterPanel>
               </SplitContainer>
             </TabPage>

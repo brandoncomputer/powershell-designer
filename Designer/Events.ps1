@@ -61,8 +61,8 @@ SOFTWARE.
         FileName:     Designer.ps1
         Modified:     Brandon Cunningham
         Created On:   1/15/2020
-        Last Updated: 5/2/2024
-        Version:      2.3.0rc 5/2/2024
+        Last Updated: 5/3/2024
+        Version:      2.3.1 5/3/2024
     ===========================================================================
 
     .DESCRIPTION
@@ -285,6 +285,16 @@ SOFTWARE.
         Fixed issue #11 regarding $PSScriptRoot by having the core powershell-designer.psm1 handle that standup.
         Designer.fbs and dependencies copied to Documents\PowerShell Designer
         
+    2.3.1 5/3/2024
+        Added Microsoft.PowerShell.Core to function list and dependencies.
+        Updated FastColoredText.dll. Please see that repository for diffs and details, but I added statements and the Core module as class words and got rid of maroon coloring for variable objects.
+        Changed location of Designer.ps1 and Events.ps1 and update core module to reflect.
+        If you are a regex expert and want to help me with something, kindly reply to the issue called "Regex expert needed"
+        In either this or the last revision added file switch to process a file argument to all scripts are are compiled with the software.
+        Fixed Assert-List LoadFile
+        Added 'Finds' Tab for navigating files.
+        Moved functions to functions subdirectory in module root.
+        
 BASIC MODIFICATIONS License
 Original available at https://www.pswinformscreator.com/ for deeper comparison.
         
@@ -312,9 +322,11 @@ SOFTWARE.
         
 #>
 
+
 import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\functions.psm1")
 
     $global:control_track = @{} 
+    
     function Convert-XmlToTreeView {
         param(
             [System.Xml.XmlLinkedNode]$Xml,
@@ -1183,6 +1195,7 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
                     }
                     $utf8 = [System.Text.Encoding]::UTF8
                     $FastText.SaveToFile("$generationPath\Events.ps1",$utf8)
+                    Assert-List $lst_Find SaveFile "$generationPath\Finds.txt"
                     if ( $Suppress -eq $false ) {$Script:refs['tsl_StatusLabel'].text = 'Successfully Saved!'}
                 }
             } 
@@ -1205,7 +1218,7 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
             throw 'SaveCancelled'
         }
     }
-    function bookMarkRefs{}
+ 
     function ChangeView {($e, $r)
         try {
             switch ($this.Text) {
@@ -1288,6 +1301,7 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
 #endregion
 
 "
+                assert-list $lst_Find Clear
                 try{$FastText.CollapseFoldingBlock(0)}catch{}
                 $refs['tpg_Form1'].Text = $projectName
                 $Script:refs['TreeView'].Nodes.ForEach({
@@ -1390,7 +1404,9 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
                 $projectName = $Script:refs['tpg_Form1'].Text
                 $generationPath = "$(Split-Path -Path $global:projectDirName)\$($projectName -replace "\..*$")"
                 if (Test-Path -path "$generationPath\Events.ps1") {
-                    $FastText.OpenFile("$generationPath\Events.ps1")    
+                    $FastText.OpenFile("$generationPath\Events.ps1")
+                    Assert-List $lst_Find Clear
+                    try{Assert-List $lst_Find LoadFile "$generationPath\Finds.txt"}catch{}
                     $fastArr = ($FastText.Text).split("
 ")
                     foreach ($arrItem in $fastArr){
@@ -1967,7 +1983,6 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
                     [void]$Script:refs['lst_AssignedEvents'].Items.Add($this.SelectedItem)
                     $Script:refs['lst_AssignedEvents'].Enabled = $true
                     $objRef.Events[$controlName] = @($Script:refs['lst_AssignedEvents'].Items)
-                    $FastText.GoEnd()
                     $FastText.SelectedText = "`$$ControlName.add_$($this.SelectedItem)({param(`$sender, `$e)
     
 })
@@ -2528,6 +2543,7 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
         $lst_Functions.add_SelectedIndexChanged({param($sender, $e)
             $lst_Params.text = "$(((Get-Help $lst_Functions.SelectedItem.ToString() -detailed) | Out-String))"
         })
+        
         function EmptyListString{
             foreach ($item in $lst_Functions.items){
                 if ($item.ToString() -eq ""){
@@ -2567,7 +2583,30 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
         $tsSavebtn.Add_MouseEnter{($tsl_StatusLabel.Text = "Save | Ctrl+S")}
         $tsOpenbtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Open | Ctrl+O"})
         $tsNewBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "New | Ctrl+N"})
-
+        
+        $btn_Find.add_Click({param($sender, $e)
+            if ($lst_Find.SelectedIndex -eq -1){
+                Assert-List $lst_Find Add $txt_Find.text
+            }
+            else{
+                Assert-List $lst_Find Insert $txt_Find.text
+            }
+                $txt_Find.text = ""
+        })
+        
+        $btn_RemoveFind.add_Click({param($sender, $e)
+            $lst_Find.Items.Remove($lst_Find.SelectedItem)
+        })
+        
+        $lst_Find.add_DoubleClick({
+            $FastText.ShowFindDialog($lst_Find.SelectedItem)
+            window-send (winexists 'Find') $(cr)
+        })
+        
+        $MainForm.WindowState = "Maximized"
+        
+        Assert-List $lst_Find Add ""
+        
         if ($null -ne $args[1]){
             if (($args[0].tolower() -eq "-file") -and (Test-File $args[1])){OpenProjectClick $args[1]}
         }
@@ -2575,3 +2614,5 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
     catch {
         Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered unexpectedly at ShowDialog."
     }
+
+
