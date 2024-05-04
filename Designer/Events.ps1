@@ -30,6 +30,7 @@ $tsNewBtn.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][Sy
 $MainForm.Icon = [System.Drawing.Icon]::FromHandle(([System.Drawing.Bitmap][System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAQAQAAAAAAAAAAAAAAAAAAAAAAACPWjAUj1owhI9aMKOPWjC2j1owyY9aMNqPWjDrj1ow+pRgOP+ZaED/Bnwi/wN6Hf96Xizej1owNAAAAAAAAAAAk14yaLePbP/WuaL/38Wy/+fUwv/u39P/9eri//v07//9+vb///79/wuGMf9CoF7/E34o/2dmKoUAAAAAAAAAAJhjNYnHo4T//////////////////////yGWUf8bkEn/FY5D/xCKO/85nl3/f8CV/0WiYf8Iex/0AHgYKgAAAACdaDhXnWg49rOEWP/ZpHr/2J1u/9eaaf8omlr/j8qo/4zIpP+JxaD/h8Sd/2m1hP+BwZb/R6Rl/wB8IOoAeBowo247FKNuO6vVrYv//fDl//fHof/3z6z/MJ5i/5PNrP9uuY3/areI/2W1hP9gsn//ZrSB/4LBl/87n1v/AH4k/AAAAACpdD8otoVV//7+/f/63sH/+ty+/zaiav+Vzq//k82s/5DLqf+Py6f/c7uP/4nHoP9FpGf/B4Y0/QGCLA8AAAAAsHpCHriFUf/+/Pn/+dy+//jbvv88pG7/OKJt/zSgZ/8wnWH/VK57/5DLqf9OqnP/F45E/xGKPAwAAAAAAAAAALaBRgm4hEr//vv3//ncwP/43L7/+Ny+//jbv//53b//+d2//zigZv9ZsoD/J5dW/7GCRvu2gUYBAAAAAAAAAAAAAAAAvIdK+fz28P/538f/+dy8//rcvv/628D/+t3C//rdwf8+pG3/MJ5k//j59f/AjFL/vIdKDwAAAAAAAAAAAAAAAMONTdr159j/+uXS//nau//527v/+tu+//rdwP/63cD/+d3D//vhyP///fv/yJNW/8ONTRIAAAAAAAAAAAAAAADKk1G78NnA//vt4f/52r//+dzB//nexP/64Mf/+uLK//rizf/65dD///79/8uOWf/Kk1HxypNRRQAAAAAAAAAA0JlUpO3Qsf//9vD/+uHK//vjzP/749D/++bT//vp1f/86dj//Orb/////f/SnHD/7tnA/9CZVOUAAAAAAAAAANWeV5LryqT///37//3p1f/969j//erb//3t3//98OL//fHk//zw5P//////4J9v///7+f/ft4b/AAAAAAAAAADao1qE68WZ///////87+L//fDn//3x6//99e7//fjx//369////Pr///////779//02r//2qNa6gAAAAAAAAAA3qdcbeq/i////////////////////////fn0//vz6v/469n/+ObT//Xfxf/py6X/3qdc7d6nXF0AAAAAAAAAAOKrXjbiq17G6ruA/+i2dv/msWz/5K9n/+KrXvDiq17j4qtez+KrXsziq1674qteqOKrXkviq14FAAMAAAADAAAAAQAAAAAAAAAAAACAAAAAgAEAAIABAADAAQAAwAEAAMAAAADAAAAAwAAAAMAAAADAAAAAwAAAAA=="))).GetHicon())
 
 #endregion
+#findMark
 
 <#
 
@@ -294,6 +295,11 @@ SOFTWARE.
         Fixed Assert-List LoadFile
         Added 'Finds' Tab for navigating files.
         Moved functions to functions subdirectory in module root.
+       
+    2.3.2 5/4/2024
+        'Find and Replace' and 'Find' window are now child windows (through API calls). Positioned windows.
+        Change to Find behavior, no longer notifies when last result is reached wontfix.
+        Find List DoubleClick searches for result twice, so the list should only be used for unique strings. Wontfix
         
 BASIC MODIFICATIONS License
 Original available at https://www.pswinformscreator.com/ for deeper comparison.
@@ -2297,6 +2303,13 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
             }
             Set-WindowText $PS "Windows PowerShell - PowerShell Designer Custom Functions Enabled"
         }
+        
+        function FindandUnfuse {
+            $FastText.ShowFindDialog()
+            # window-fuse $FindWindowHandle 0
+            # window-position $FindWindowHandle (winpos $FindWindowHandle).Left (winpos $FindWindowHandle).Height (winpos $FindWindowHandle).width (winpos $FindWindowHandle).Height
+        }
+        
         $functionsModule.Add_Click({
             LoadFunctionModule
         })
@@ -2319,7 +2332,7 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
             $FastText.SelectAll()
         })
         $Script:refs['Find'].Add_Click({
-            $FastText.ShowFindDialog()
+            FindAndUnfuse
         })
         $Script:refs['Replace'].Add_Click({
             $FastText.ShowReplaceDialog()
@@ -2375,7 +2388,7 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
         $tsCopyBtn.Add_Click({$FastText.Copy()})
         $tsPasteBtn.Add_Click({$FastText.Paste()})
         $tsSelectAllBtn.Add_Click({$FastText.SelectAll()})
-        $tsFindBtn.Add_Click({$FastText.ShowFindDialog()})
+        $tsFindBtn.Add_Click({FindAndUnfuse})
         $tsReplaceBtn.Add_Click({$FastText.ShowReplaceDialog()})
         $tsGoToLineBtn.Add_Click({$FastText.ShowGotoDialog()})
         $tsCollapseAllBtn.Add_Click({$FastText.CollapseAllFoldingBlocks()})
@@ -2426,12 +2439,14 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
         $eventForm.Text = "Events"
         try {
             if ((Get-Module -ListAvailable powershell-designer).count -gt 1){
-                [Reflection.Assembly]::LoadFile("$(split-path -path (Get-Module -ListAvailable powershell-designer)[0].path)\FastColoredTextBox.dll") | out-null
+            [Reflection.Assembly]::LoadFile("$(split-path -path (Get-Module -ListAvailable powershell-designer)[0].path)\FastColoredTextBox.dll") | out-null
             }
             else{
-                [Reflection.Assembly]::LoadFile("$(split-path -path (Get-Module -ListAvailable powershell-designer).path)\FastColoredTextBox.dll") | out-null
+            [Reflection.Assembly]::LoadFile("$(split-path -path (Get-Module -ListAvailable powershell-designer).path)\FastColoredTextBox.dll") | out-null
             }
         }
+        
+        
         catch {
             [Reflection.Assembly]::LoadFile("$BaseDir\FastColoredTextBox.dll") | out-null
         }
@@ -2442,7 +2457,7 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
         $functions = $ast.FindAll({ $args[0] -is [System.Management.Automation.Language.FunctionDefinitionAst] }, $true)
         for ( $i=0;$i -le $functions.count -1;$i++ ) {
             $lst_Functions.Items.Add("$($functions[$i].name)")
-        }
+            }
         $FastText = New-Object FastColoredTextBoxNS.FastColoredTextBox
         $FastText.Language = "DialogShell"
         $FastText.Dock = "Fill"
@@ -2595,18 +2610,28 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
         })
         
         $btn_RemoveFind.add_Click({param($sender, $e)
-            $lst_Find.Items.Remove($lst_Find.SelectedItem)
+        $lst_Find.Items.Remove($lst_Find.SelectedItem)
         })
         
         $lst_Find.add_DoubleClick({
-            $FastText.ShowFindDialog($lst_Find.SelectedItem)
-            window-send (winexists 'Find') $(cr)
+           $FastText.ShowFindDialog($lst_Find.SelectedItem)       
+           window-send $FindWindowHandle $(cr)
+           window-send $FindWindowHandle $(cr)
         })
         
         $MainForm.WindowState = "Maximized"
-        
         Assert-List $lst_Find Add ""
-        
+        $FastText.ShowFindDialog()
+        $FindWindowHandle = (winexists 'Find')
+        window-fuse $FindWindowHandle $MainForm.Handle
+        $FastText.ShowReplaceDialog()
+        $ReplaceWindowHandle = (winexists 'Find and replace')
+        window-fuse $ReplaceWindowHandle $MainForm.Handle
+        window-position $FindWindowHandle ($MainForm.Width - 625) 75 ((winpos $FindWindowHandle).Width) ((winpos $FindWindowHandle).Height)
+        window-position $ReplaceWindowHandle ($MainForm.Width - 625) 225 ((winpos $ReplaceWindowHandle).Width) ((winpos $ReplaceWindowHandle).Height)
+		window-hide $FindWindowHandle
+		window-hide $ReplaceWindowHandle
+	  
         if ($null -ne $args[1]){
             if (($args[0].tolower() -eq "-file") -and (Test-File $args[1])){OpenProjectClick $args[1]}
         }
