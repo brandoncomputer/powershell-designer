@@ -1003,6 +1003,9 @@ function Assert-List {
 <#
     .SYNOPSIS
 		Asserts a list operation
+		
+		ALIASES
+			List
 			 
 	.DESCRIPTION
 		This function asserts a list operation.
@@ -1119,6 +1122,7 @@ Butter"
 	.OUTPUTS
 		Assertion
 #>
+	[Alias("List")]
 	[CmdletBinding()]
     param (
 		[Parameter(ValueFromPipeline)]

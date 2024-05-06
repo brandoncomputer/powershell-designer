@@ -30,7 +30,6 @@ $tsNewBtn.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][Sy
 $MainForm.Icon = [System.Drawing.Icon]::FromHandle(([System.Drawing.Bitmap][System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAQAQAAAAAAAAAAAAAAAAAAAAAAACPWjAUj1owhI9aMKOPWjC2j1owyY9aMNqPWjDrj1ow+pRgOP+ZaED/Bnwi/wN6Hf96Xizej1owNAAAAAAAAAAAk14yaLePbP/WuaL/38Wy/+fUwv/u39P/9eri//v07//9+vb///79/wuGMf9CoF7/E34o/2dmKoUAAAAAAAAAAJhjNYnHo4T//////////////////////yGWUf8bkEn/FY5D/xCKO/85nl3/f8CV/0WiYf8Iex/0AHgYKgAAAACdaDhXnWg49rOEWP/ZpHr/2J1u/9eaaf8omlr/j8qo/4zIpP+JxaD/h8Sd/2m1hP+BwZb/R6Rl/wB8IOoAeBowo247FKNuO6vVrYv//fDl//fHof/3z6z/MJ5i/5PNrP9uuY3/areI/2W1hP9gsn//ZrSB/4LBl/87n1v/AH4k/AAAAACpdD8otoVV//7+/f/63sH/+ty+/zaiav+Vzq//k82s/5DLqf+Py6f/c7uP/4nHoP9FpGf/B4Y0/QGCLA8AAAAAsHpCHriFUf/+/Pn/+dy+//jbvv88pG7/OKJt/zSgZ/8wnWH/VK57/5DLqf9OqnP/F45E/xGKPAwAAAAAAAAAALaBRgm4hEr//vv3//ncwP/43L7/+Ny+//jbv//53b//+d2//zigZv9ZsoD/J5dW/7GCRvu2gUYBAAAAAAAAAAAAAAAAvIdK+fz28P/538f/+dy8//rcvv/628D/+t3C//rdwf8+pG3/MJ5k//j59f/AjFL/vIdKDwAAAAAAAAAAAAAAAMONTdr159j/+uXS//nau//527v/+tu+//rdwP/63cD/+d3D//vhyP///fv/yJNW/8ONTRIAAAAAAAAAAAAAAADKk1G78NnA//vt4f/52r//+dzB//nexP/64Mf/+uLK//rizf/65dD///79/8uOWf/Kk1HxypNRRQAAAAAAAAAA0JlUpO3Qsf//9vD/+uHK//vjzP/749D/++bT//vp1f/86dj//Orb/////f/SnHD/7tnA/9CZVOUAAAAAAAAAANWeV5LryqT///37//3p1f/969j//erb//3t3//98OL//fHk//zw5P//////4J9v///7+f/ft4b/AAAAAAAAAADao1qE68WZ///////87+L//fDn//3x6//99e7//fjx//369////Pr///////779//02r//2qNa6gAAAAAAAAAA3qdcbeq/i////////////////////////fn0//vz6v/469n/+ObT//Xfxf/py6X/3qdc7d6nXF0AAAAAAAAAAOKrXjbiq17G6ruA/+i2dv/msWz/5K9n/+KrXvDiq17j4qtez+KrXsziq1674qteqOKrXkviq14FAAMAAAADAAAAAQAAAAAAAAAAAACAAAAAgAEAAIABAADAAQAAwAEAAMAAAADAAAAAwAAAAMAAAADAAAAAwAAAAA=="))).GetHicon())
 
 #endregion
-#findMark
 
 <#
 
@@ -62,8 +61,8 @@ SOFTWARE.
         FileName:     Designer.ps1
         Modified:     Brandon Cunningham
         Created On:   1/15/2020
-        Last Updated: 5/3/2024
-        Version:      2.3.1 5/3/2024
+        Last Updated: 5/5/2024
+        Version:      2.3.3
     ===========================================================================
 
     .DESCRIPTION
@@ -295,11 +294,17 @@ SOFTWARE.
         Fixed Assert-List LoadFile
         Added 'Finds' Tab for navigating files.
         Moved functions to functions subdirectory in module root.
-       
+        
     2.3.2 5/4/2024
         'Find and Replace' and 'Find' window are now child windows (through API calls). Positioned windows.
         Change to Find behavior, no longer notifies when last result is reached wontfix.
         Find List DoubleClick searches for result twice, so the list should only be used for unique strings. Wontfix
+        
+    2.3.3 5/5/2024
+        Added vertical folding line marks. Minor code cleanup.
+        Changed FastText backcolor.
+        Got rid of common edit shortcuts, they are still there, but unlabled. If I label them, then they override those shortcuts for the find and replace windows and elsewhere.
+        Fixed regex for multiline comments    
         
 BASIC MODIFICATIONS License
 Original available at https://www.pswinformscreator.com/ for deeper comparison.
@@ -327,7 +332,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
         
 #>
-
 
 import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\functions.psm1")
 
@@ -864,7 +868,9 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
             if ($Object.GetType().Name -eq 'ToolStripProgressBar') {
                 return
             }
-        if (($Script:supportedControls.Where({$_.Type -eq 'Parentless'}).Name + @('Form','ToolStripMenuItem','ToolStripComboBox','ToolStripTextBox','ToolStripSeparator','ContextMenuStrip')) -notcontains $Object.GetType().Name ) {     
+        if (($Script:supportedControls.Where({
+            $_.Type -eq 'Parentless'
+        }).Name + @('Form','ToolStripMenuItem','ToolStripComboBox','ToolStripTextBox','ToolStripSeparator','ContextMenuStrip')) -notcontains $Object.GetType().Name ) {     
           $newSize = $Object.Size
             if ($Object.GetType().Name -ne 'HashTable') {
                 $refFID = $Script:refsFID.Form.Objects.Values.Where({$_.GetType().Name -eq 'Form'})
@@ -906,25 +912,37 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
                         if ( $Object.Size.Height -gt 28 ) {
                             $btn.Location = New-Object System.Drawing.Point($newLoc.X,($newLoc.Y + ($newSize.Height / 2) - 4))
                             $btn.Visible = $true
-                        } else {$btn.Visible = $false}
+                        } 
+                        else {
+                            $btn.Visible = $false
+                        }
                     }
                     btn_MRight {
                         if ( $Object.Size.Height -gt 28 ) {
                             $btn.Location = New-Object System.Drawing.Point(($newLoc.X + $newSize.Width - 8),($newLoc.Y + ($newSize.Height / 2) - 4))
                             $btn.Visible = $true
-                        } else {$btn.Visible = $false}
+                        } 
+                        else {
+                            $btn.Visible = $false
+                        }
                     }
                     btn_MTop {
                         if ( $Object.Size.Width -gt 40 ) {
                             $btn.Location = New-Object System.Drawing.Point(($newLoc.X + ($newSize.Width / 2) - 4),$newLoc.Y)
                             $btn.Visible = $true
-                        } else {$btn.Visible = $false}
+                        } 
+                        else {
+                            $btn.Visible = $false
+                        }
                     }
                     btn_MBottom {
                         if ( $Object.Size.Width -gt 40 ) {
                             $btn.Location = New-Object System.Drawing.Point(($newLoc.X + ($newSize.Width / 2) - 4),($newLoc.Y + $newSize.Height - 8))
                             $btn.Visible = $true
-                        } else {$btn.Visible = $false}
+                        } 
+                        else {
+                            $btn.Visible = $false
+                        }
                     }
                 }
                 $btn.BringToFront()
@@ -935,7 +953,9 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
             $Script:refs['PropertyGrid'].SelectedObject.Parent.Refresh()
         }
         else {
-            $Script:sButtons.GetEnumerator().ForEach({$_.Value.Visible = $false})
+            $Script:sButtons.GetEnumerator().ForEach({
+                $_.Value.Visible = $false
+            })
         }
     }
 
@@ -1307,7 +1327,7 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
 #endregion
 
 "
-                assert-list $lst_Find Clear
+                Assert-List $lst_Find Clear
                 try{$FastText.CollapseFoldingBlock(0)}catch{}
                 $refs['tpg_Form1'].Text = $projectName
                 $Script:refs['TreeView'].Nodes.ForEach({
@@ -1697,7 +1717,9 @@ $xmlText""@
 $($FastText.Text)
 Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShell.Invoke(); `$PowerShell.Dispose()"
 
-    if ( (Test-Path -Path "$($generationPath)" -PathType Container) -eq $false ) {New-Item -Path "$($generationPath)" -ItemType Directory | Out-Null}
+        if ( (Test-Path -Path "$($generationPath)" -PathType Container) -eq $false ) {
+            New-Item -Path "$($generationPath)" -ItemType Directory | Out-Null
+        }
         $utf8 = [System.Text.Encoding]::UTF8
         $FastText.SaveToFile("$generationPath\Events.ps1",$utf8)
         $outstring | Out-File "$($generationPath)\$($projectName -replace "fbs$","ps1")" -Encoding utf8 -Force
@@ -1761,7 +1783,9 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
                             if (( @('FlowLayoutPanel','TableLayoutPanel') -notcontains $objRef.Objects[$nodeName].Parent.GetType().Name ) -and
                                ( $objRef.Objects[$nodeName].Dock -eq 'None' ) -and
                                ( @('SplitterPanel','ToolStripMenuItem','ToolStripComboBox','ToolStripTextBox','ToolStripSeparator','ContextMenuStrip') -notcontains $nodeType ) -and
-                               ( $Script:supportedControls.Where({$_.Type -eq 'Parentless'}).Name -notcontains $nodeType )) {
+                               ( $Script:supportedControls.Where({
+                                    $_.Type -eq 'Parentless'
+                                }).Name -notcontains $nodeType )) {
                                 $objRef.Objects[$nodeName].BringToFront()
                             }
                             Move-SButtons -Object $objRef.Objects[$nodeName]
@@ -1829,6 +1853,7 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
                     $controlName = $Script:refs['TreeView'].SelectedNode.Name
                     $objRef = Get-RootNodeObjRef -TreeNode $Script:refs['TreeView'].SelectedNode
                     if ( $changedProperty.PropertyDescriptor.ShouldSerializeValue($changedProperty.Component) ) {
+                        
                         switch ($changedProperty.PropertyType) {
                             'System.Drawing.Image' {
                                 $MemoryStream = New-Object System.IO.MemoryStream
@@ -1837,14 +1862,17 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
                                 $MemoryStream.Flush()
                                 $MemoryStream.Dispose()
                                 $decodedimage = [convert]::ToBase64String($Bytes)
-                                if ($FastText.GetLineText(0) -eq "#region Images") {
+                                
+                                if ($FastText.GetLineText(0) -eq "#region Images") 
+                                {
                                     $FastText.ExpandFoldedBlock(0)
                                     $FastText.SelectionStart = 16
                                 }
                                 $string = "`$$controlName.$($changedProperty.PropertyName) = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String(`"$decodedimage`"))
 "
                                 $FastText.SelectedText = $string
-                                if ($FastText.GetLineText(0) -eq "#region Images"){
+                                if ($FastText.GetLineText(0) -eq "#region Images") 
+                                {
                                     $FastText.CollapseFoldingBlock(0)
                                 }
                             }
@@ -1855,14 +1883,16 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
                                 $MemoryStream.Flush()
                                 $MemoryStream.Dispose()
                                 $decodedimage = [convert]::ToBase64String($Bytes)
-                                if ($FastText.GetLineText(0) -eq "#region Images") {
+                                if ($FastText.GetLineText(0) -eq "#region Images") 
+                                {
                                     $FastText.ExpandFoldedBlock(0)
                                     $FastText.SelectionStart = 16
                                 }                       
                                 $string = "`$$controlName.Icon = [System.Drawing.Icon]::FromHandle(([System.Drawing.Bitmap][System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String(`"$decodedimage`"))).GetHicon())
 "
                                 $FastText.SelectedText = $string
-                                if ($FastText.GetLineText(0) -eq "#region Images"){
+                                if ($FastText.GetLineText(0) -eq "#region Images")
+                                {
                                     $FastText.CollapseFoldingBlock(0)
                                 }
                             }
@@ -1944,14 +1974,16 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
                             }
                         }
                         else {
-                            if ( $Script:supportedControls.Where({$_.Name -eq $($refs['TreeView'].SelectedNode.Text -replace " - .*$")}).ChildTypes -contains $controlObjectType ) {
+                            if ( $Script:supportedControls.Where({
+                                $_.Name -eq $($refs['TreeView'].SelectedNode.Text -replace " - .*$")}).ChildTypes -contains $controlObjectType ) {
                                 if ($control_track.$controlName -eq $null){
                                     $control_track[$controlName] = 1
                                 }
                                 else {
                                     $control_track.$controlName = $control_track.$controlName + 1
                                 }
-                                if ($Script:refs['TreeView'].Nodes.Nodes | Where-Object { $_.Text -eq "$($controlName) - $controlName$($control_track.$controlName)" }) {
+                                if ($Script:refs['TreeView'].Nodes.Nodes | Where-Object { 
+                                $_.Text -eq "$($controlName) - $controlName$($control_track.$controlName)" }) {
                                     [void][System.Windows.Forms.MessageBox]::Show("A $($controlName) with the Name '$controlName$($control_track.$controlName)' already exists. Try again to create '$controlName$($control_track.$controlName + 1)'",'Error')
                                 }
                                 else {
@@ -1965,7 +1997,8 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
                                 else {
                                     $control_track.$controlName = $control_track.$controlName + 1
                                 }
-                                if ($Script:refs['TreeView'].Nodes.Nodes | Where-Object { $_.Text -eq "$($controlName) - $controlName$($control_track.$controlName)" }) {
+                                if ($Script:refs['TreeView'].Nodes.Nodes | Where-Object { 
+                                    $_.Text -eq "$($controlName) - $controlName$($control_track.$controlName)" }) {
                                     [void][System.Windows.Forms.MessageBox]::Show("A $($controlName) with the Name '$controlName$($control_track.$controlName)' already exists. Try again to create '$controlName$($control_track.$controlName + 1)'",'Error')
                                 }
                                 else {
@@ -2288,7 +2321,7 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
                 New-Item -ItemType directory -Path $generationPath
                 }
                 $file = "`"$($generationPath)\$($projectName -replace "fbs$","ps1")`""
-                start-process -filepath powershell.exe -argumentlist '-ep bypass','-sta',"-file $file"
+                start-process -filepath powershell.exe -argumentlist '-ep bypass','-sta','-noexit',"-file $file"
             }
         }
         $Script:refs['RunLast'].Add_Click({
@@ -2303,13 +2336,7 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
             }
             Set-WindowText $PS "Windows PowerShell - PowerShell Designer Custom Functions Enabled"
         }
-        
-        function FindandUnfuse {
-            $FastText.ShowFindDialog()
-            # window-fuse $FindWindowHandle 0
-            # window-position $FindWindowHandle (winpos $FindWindowHandle).Left (winpos $FindWindowHandle).Height (winpos $FindWindowHandle).width (winpos $FindWindowHandle).Height
-        }
-        
+
         $functionsModule.Add_Click({
             LoadFunctionModule
         })
@@ -2332,7 +2359,7 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
             $FastText.SelectAll()
         })
         $Script:refs['Find'].Add_Click({
-            FindAndUnfuse
+            $FastText.ShowFindDialog()
         })
         $Script:refs['Replace'].Add_Click({
             $FastText.ShowReplaceDialog()
@@ -2388,7 +2415,7 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
         $tsCopyBtn.Add_Click({$FastText.Copy()})
         $tsPasteBtn.Add_Click({$FastText.Paste()})
         $tsSelectAllBtn.Add_Click({$FastText.SelectAll()})
-        $tsFindBtn.Add_Click({FindAndUnfuse})
+        $tsFindBtn.Add_Click({$FastText.ShowFindDialog()})
         $tsReplaceBtn.Add_Click({$FastText.ShowReplaceDialog()})
         $tsGoToLineBtn.Add_Click({$FastText.ShowGotoDialog()})
         $tsCollapseAllBtn.Add_Click({$FastText.CollapseAllFoldingBlocks()})
@@ -2460,6 +2487,8 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
             }
         $FastText = New-Object FastColoredTextBoxNS.FastColoredTextBox
         $FastText.Language = "DialogShell"
+        $FastText.ShowFoldingLines = $True
+        $FastText.BackColor = "Azure"
         $FastText.Dock = "Fill"
         $FastText.Zoom = 100
         $eventForm.Controls.Add($FastText)
@@ -2601,10 +2630,10 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
         
         $btn_Find.add_Click({param($sender, $e)
             if ($lst_Find.SelectedIndex -eq -1){
-                Assert-List $lst_Find Add $txt_Find.text
+            Assert-List $lst_Find Add $txt_Find.text
             }
             else{
-                Assert-List $lst_Find Insert $txt_Find.text
+            Assert-List $lst_Find Insert $txt_Find.text
             }
                 $txt_Find.text = ""
         })
@@ -2615,23 +2644,27 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
         
         $lst_Find.add_DoubleClick({
            $FastText.ShowFindDialog($lst_Find.SelectedItem)       
-           window-send $FindWindowHandle $(cr)
-           window-send $FindWindowHandle $(cr)
+           Send-Window $FindWindowHandle $(Get-CarriageReturn)
+           Send-Window $FindWindowHandle $(Get-CarriageReturn)
         })
         
         $MainForm.WindowState = "Maximized"
         Assert-List $lst_Find Add ""
         $FastText.ShowFindDialog()
         $FindWindowHandle = (winexists 'Find')
-        window-fuse $FindWindowHandle $MainForm.Handle
+        Set-WindowParent $FindWindowHandle $MainForm.Handle
         $FastText.ShowReplaceDialog()
         $ReplaceWindowHandle = (winexists 'Find and replace')
-        window-fuse $ReplaceWindowHandle $MainForm.Handle
-        window-position $FindWindowHandle ($MainForm.Width - 625) 75 ((winpos $FindWindowHandle).Width) ((winpos $FindWindowHandle).Height)
-        window-position $ReplaceWindowHandle ($MainForm.Width - 625) 225 ((winpos $ReplaceWindowHandle).Width) ((winpos $ReplaceWindowHandle).Height)
-		window-hide $FindWindowHandle
-		window-hide $ReplaceWindowHandle
-	  
+        Set-WindowParent $ReplaceWindowHandle $MainForm.Handle
+        Move-Window $FindWindowHandle ($MainForm.Width - 625) 75 ((winpos $FindWindowHandle).Width) ((winpos $FindWindowHandle).Height)
+        Move-Window $ReplaceWindowHandle ($MainForm.Width - 625) 225 ((winpos $ReplaceWindowHandle).Width) ((winpos $ReplaceWindowHandle).Height)
+        Hide-Window $FindWindowHandle
+        Hide-Window $ReplaceWindowHandle
+     
+        $FastText.Add_Click({param($sender, $e)
+            $FastText.OnTextChanged()
+        })   
+        
         if ($null -ne $args[1]){
             if (($args[0].tolower() -eq "-file") -and (Test-File $args[1])){OpenProjectClick $args[1]}
         }
@@ -2639,5 +2672,7 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
     catch {
         Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered unexpectedly at ShowDialog."
     }
+
+
 
 
