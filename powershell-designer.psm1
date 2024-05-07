@@ -28,7 +28,8 @@ function powershell-designer($a) {
 		New-Item -ItemType directory -Path ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\Designer")
 		Copy-Item -Path "$PSScriptRoot\Designer.fbs" -destination ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer")
 		Copy-Item -Path "$PSScriptRoot\Designer\Designer.ps1" -destination ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\Designer")
-		Copy-Item -Path "$PSScriptRoot\Designer\Events.ps1" -destination ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\Designer") -recurse
+		Copy-Item -Path "$PSScriptRoot\Designer\Events.ps1" -destination ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\Designer")
+		Copy-Item -Path "$PSScriptRoot\Designer\finds.txt" -destination ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\Designer")
 	}
 	
 	if ($a) {

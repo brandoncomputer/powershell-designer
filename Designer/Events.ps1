@@ -61,8 +61,8 @@ SOFTWARE.
         FileName:     Designer.ps1
         Modified:     Brandon Cunningham
         Created On:   1/15/2020
-        Last Updated: 5/5/2024
-        Version:      2.3.3
+        Last Updated: 5/6/2024
+        Version:      2.3.4
     ===========================================================================
 
     .DESCRIPTION
@@ -304,7 +304,16 @@ SOFTWARE.
         Added vertical folding line marks. Minor code cleanup.
         Changed FastText backcolor.
         Got rid of common edit shortcuts, they are still there, but unlabled. If I label them, then they override those shortcuts for the find and replace windows and elsewhere.
-        Fixed regex for multiline comments    
+        Fixed regex for multiline comments
+        Changes to FastColoredTextBox.dll, https://github.com/brandoncomputer/FastColoredTextBox
+        
+    2.3.4 5/6/2024
+        Highlight syntax refresh no longer happens on click for multiline comments, added check for typing timer.
+        Added references to Designer.fbs project (checked boxes in functions and event references) - this wasn't 100% needed for this software, but it is a best practice regardless - your software might not work if you don't 
+            check the boxes and make the selections to include the needed references, and I want this to be a good example.
+        Now copies finds.txt to designer project directory.
+        Upgraded Selenium Functions from Selenium 3 to Selenium 4 syntax
+        
         
 BASIC MODIFICATIONS License
 Original available at https://www.pswinformscreator.com/ for deeper comparison.
@@ -366,7 +375,7 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
                         else {
                             $controlName = $controlName + '_1'
                         }
-                    } 
+                    }
                     else {
                         $controlName = $controlName + '_1' 
                     }
@@ -2283,7 +2292,7 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
             $noIssues = $false
         }
     }
-
+    
     try {
         $Script:refs['MainForm'].Add_Load($eventSB['MainForm'].Load)
         $Script:refs['ms_Toolbox'].Add_Click($eventSB.ChangeView)
@@ -2656,14 +2665,22 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
         $FastText.ShowReplaceDialog()
         $ReplaceWindowHandle = (winexists 'Find and replace')
         Set-WindowParent $ReplaceWindowHandle $MainForm.Handle
-        Move-Window $FindWindowHandle ($MainForm.Width - 625) 75 ((winpos $FindWindowHandle).Width) ((winpos $FindWindowHandle).Height)
-        Move-Window $ReplaceWindowHandle ($MainForm.Width - 625) 225 ((winpos $ReplaceWindowHandle).Width) ((winpos $ReplaceWindowHandle).Height)
+        Move-Window $FindWindowHandle ($MainForm.Width - 625) 75 ((Get-WindowPosition $FindWindowHandle).Width) ((winpos $FindWindowHandle).Height)
+        Move-Window $ReplaceWindowHandle ($MainForm.Width - 625) 225 ((Get-WindowPosition $ReplaceWindowHandle).Width) ((Get-WindowPosition $ReplaceWindowHandle).Height)
         Hide-Window $FindWindowHandle
         Hide-Window $ReplaceWindowHandle
-     
-        $FastText.Add_Click({param($sender, $e)
+        
+
+        $CheckForTypingTimer = new-timer 2000
+        $CheckForTypingTimer.Add_Tick({
             $FastText.OnTextChanged()
-        })   
+            $CheckForTypingTimer.Enabled = $false
+        })
+        
+        $FastText.Add_KeyUp({param($sender, $e)
+            $CheckForTypingTimer.Enabled = $false      
+            $CheckForTypingTimer.Enabled = $true
+        })  
         
         if ($null -ne $args[1]){
             if (($args[0].tolower() -eq "-file") -and (Test-File $args[1])){OpenProjectClick $args[1]}
@@ -2672,7 +2689,6 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
     catch {
         Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered unexpectedly at ShowDialog."
     }
-
 
 
 

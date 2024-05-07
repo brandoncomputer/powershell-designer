@@ -1,6 +1,261 @@
 ﻿#region VDS
 $RunSpace = [RunspaceFactory]::CreateRunspacePool(); $RunSpace.ApartmentState = "STA"; $RunSpace.Open(); $PowerShell = [powershell]::Create();$PowerShell.RunspacePool = $RunSpace; [void]$PowerShell.AddScript({
 
+function Assert-List {
+<#
+    .SYNOPSIS
+		Asserts a list operation
+		
+		ALIASES
+			List
+			 
+	.DESCRIPTION
+		This function asserts a list operation.
+
+	.PARAMETER List
+		The list to assert the operation.
+	
+	.PARAMETER Assertion
+		The assertion for the list.
+		Add, Append, Assign, Clear, Create, Copy,
+		Delete, Insert, Paste, Put, Reverse, Seek, Sort, 
+		Dropfiles, Filelist, Folderlist, Fontlist, Loadfile, 
+		Loadtext, Modules, Regkeys, Regvals, Savefile, Tasklist,
+		Winlist
+
+	.PARAMETER Parameter
+		The Parameter to the assertion.
+		Add=Text, Append=LineFeedItems, Assign=List, Insert=Text, Put=Text,
+		Seek=Text, DropFiles=$_, Filelist=Path, Folderlist=Path,
+		Loadfile=Path, Loadtext=LineFeedItems, Modules=Process, Regkeys=Path,
+		Regvals=Path, Savefile=Path
+	
+	.EXAMPLE
+		Assert-List $list1 Add "item"
+		
+	.EXAMPLE
+		Assert-List -list $list1 -assertion Add -parameter "item"
+	
+	.EXAMPLE
+		$list1 | Assert-List -assertion Add -parameter "item"
+	
+	.EXAMPLE
+		Assert-List $list1 append "Banana
+apple
+pear"
+	
+	.EXAMPLE
+		Assert-List $list1 assign $list2
+	
+	.EXAMPLE
+		Assert-List $list1 clear
+	
+	.EXAMPLE
+		$list1 = Assert-List -assertion Create
+		
+	.EXAMPLE
+		Assert-List $list1 copy
+	
+	.EXAMPLE
+		Assert-List $list1 delete
+	
+	.EXAMPLE
+		Assert-List $list1 insert $item
+	
+	.EXAMPLE
+		Assert-List $list1 paste
+	
+	.EXAMPLE
+		Assert-List $list1 put $item
+	
+	.EXAMPLE
+		Assert-List $list1 reverse
+	
+	.EXAMPLE
+		Assert-List $list1 seek 5
+
+	.EXAMPLE
+		Assert-List $list1 sort
+
+	.EXAMPLE
+		$list1.AllowDrop = $true
+		$list1.add_DragEnter({
+			Assert-List $list1 dropfiles $_
+		})
+		
+	.EXAMPLE
+		Assert-List $list1 filelist "c:\temp\"
+	
+	.EXAMPLE
+		Assert-List $list1 folderlist "c:\temp\"
+
+	.EXAMPLE
+		Assert-List $ComboBox1 Fontlist
+		
+	.EXAMPLE
+		Assert-List $list1 Loadfile 'c:\temp\temp.txt'
+
+	.EXAMPLE
+		Assert-List $list1 loadtext "Rice
+Beans
+Butter"
+
+	.EXAMPLE
+		Assert-List $list1 modules "c:\windows\explorer.exe"
+	
+	.EXAMPLE
+		Assert-List $list1 regkeys hkcu:\software\dialogshell
+		
+	.EXAMPLE
+		Assert-List $list1 regvals hkcu:\software\dialogshell
+		
+	.EXAMPLE
+		Assert-List $list1 savefile "c:\temp\temp-modifled.txt"
+	
+	.EXAMPLE
+		Assert-List $list1 tasklist
+		
+	.EXAMPLE
+		Assert-List $list1 winlist
+		
+	.INPUTS
+		List as Object, Assertion as String, Parameter as String
+	
+	.OUTPUTS
+		Assertion
+#>
+	[Alias("List")]
+	[CmdletBinding()]
+    param (
+		[Parameter(ValueFromPipeline)]
+		[object]$List,
+        [Parameter(Mandatory)]
+		[ValidateSet('Add', 'Append', 'Assign', 'Clear', 'Create', 'Copy',
+		'Delete', 'Insert', 'Paste', 'Put', 'Reverse', 'Seek', 'Sort', 
+		'Dropfiles', 'Filelist', 'Folderlist', 'Fontlist', 'Loadfile', 
+		'Loadtext', 'Modules', 'Regkeys', 'Regvals', 'Savefile', 'Tasklist',
+		'Winlist')]
+        [string[]]$Assertion,
+		[string]$Parameter
+	)
+    switch ($Assertion) {
+	    add {
+            $List.Items.Add($Parameter) | Out-Null
+		}
+        append {
+            $List.Items.AddRange($Parameter.Split([char][byte]10))
+        }
+        assign {
+            $List.Items.AddRange($Parameter.Items)
+        }
+        clear {
+            $List.Items.Clear()
+        }
+		create{
+		return New-Object System.Windows.Forms.listbox
+		}
+        copy {
+            Set-Clipboard $List.items
+        } 
+        delete {
+            $List.Items.RemoveAt($List.SelectedIndex)
+        }
+        insert {
+            $List.items.Insert($List.SelectedIndex,$Parameter)
+        }
+        paste {     
+                $clip = Get-Clipboard
+                $List.Items.AddRange($clip.Split())
+            }
+        put {
+                $sel = $List.selectedIndex
+                $List.Items.RemoveAt($List.SelectedIndex)
+                $List.items.Insert($sel,$Parameter)
+            }
+        reverse {
+            $rev = [array]$List.items
+            [array]::Reverse($rev)
+            $List.items.clear()
+            $List.items.AddRange($rev)
+        }
+        seek {
+            $List.selectedIndex = $Parameter
+        }
+        sort {
+            $List.sorted = $true
+        }
+        dropfiles {
+            if ($Parameter.Data.GetDataPresent([Windows.Forms.DataFormats]::FileDrop)) {
+                foreach ($filename in $Parameter.Data.GetData([Windows.Forms.DataFormats]::FileDrop)) {
+                    list add $List $filename
+                }
+            }
+        }#  list dropfiles $List1 $_
+         # declare: $List1.AllowDrop = $true
+         # Use $List1.add_DragEnter
+        filelist {
+			$items = Get-ChildItem -Path $Parameter
+			foreach ($item in $items) {
+				if ($item.Attributes -ne "Directory") {
+					list add $List $item
+				}
+			}
+		}
+		folderlist {
+			$items = Get-ChildItem -Path $Parameter
+			foreach ($item in $items) {
+				if ($item.Attributes -eq "Directory") {
+					list add $List $item
+				}
+			}
+		}
+        fontlist {  
+            [System.Reflection.Assembly]::LoadWithPartialName("System.Drawing")
+            $r = (New-Object System.Drawing.Text.InstalledFontCollection).Families
+            foreach ($s in $r){
+                $List.items.AddRange($s.name)
+            }
+        }
+        loadfile {
+            $content = (get-content $Parameter).Split([char][byte]10)
+            $List.items.addrange($content)
+        }
+        loadtext {
+			$List.Items.Clear()
+            $List.items.addrange($Parameter.Split([char][byte]10))
+        }
+        modules {
+            $process = Get-Process $Parameter -module
+            foreach ($module in $process) {
+                $List.items.Add($module) | Out-Null
+            }
+        }
+        regkeys {
+            $keys = Get-ChildItem -Path $Parameter
+            foreach ($key in $keys) {
+                $List.items.add($key) | Out-Null
+            }
+        }
+        
+        regvals {
+            #$name = Get-Item -Path $Parameter | Select-Object -ExpandProperty Property | Out-String
+            $name = $(out-string -inputobject $(select-object -inputobject $(get-item -path $Parameter) -expandproperty property))
+            $List.items.addrange($name.Split([char][byte]13))
+        } 
+        savefile {
+        $List.items | Out-File $Parameter
+        }
+        tasklist {
+            $proc = Get-Process | Select-Object -ExpandProperty ProcessName | Out-String
+            $List.items.addrange($proc.Split([char][byte]13))
+        }
+        winlist {
+            $win = Get-Process | Where-Object {$_.MainWindowTitle -ne ""} | Select-Object -ExpandProperty MainWindowTitle | Out-String
+            $List.items.addrange($win.Split([char][byte]13))
+        }
+    }
+}
+
 function ConvertFrom-WinFormsXML {
 <#
     .SYNOPSIS
@@ -529,6 +784,119 @@ function ConvertFrom-WinFormsXML {
 	}
 }
 
+function Get-Answer {
+<#
+	.SYNOPSIS
+		Opens a dialog window to ask the user a yes or no question.
+
+		ALIASES
+			Ask
+     
+    .DESCRIPTION
+		This function will call upon Windows Forms to display a Information
+		dialog asking the user a Yes or No quesiton.
+	
+	.PARAMETER QuestionText
+		The question to ask the end user.
+		
+	.PARAMETER TitleText
+	
+	.EXAMPLE
+		Get-Answer "Are the birds singing?"
+	
+	.EXAMPLE
+		Get-Answer "Are the birds singing?" "About the birds" 
+	
+	.EXAMPLE
+		Get-Answer -TitleText "About the birds" -QuestionText "Are the birds singing?"
+	
+	.EXAMPLE
+		"Are the birds singing?" | Get-Answer
+	
+	.INPUTS
+		QuestionText as String, TitleText as String
+	
+	.OUTPUTS
+		Yes or No as String
+#>
+	[Alias("Ask")]
+	[CmdletBinding()]
+    param (
+		[Parameter(Mandatory,
+			ValueFromPipeline)]
+        [string]$QuestionText,
+		[string]$TitleText
+	)
+    $GetAnswer = [System.Windows.Forms.MessageBox]::Show($QuestionText,$TitleText,'YesNo','Info')
+    return $GetAnswer
+}
+
+function Get-CarriageReturn {
+<#
+	.SYNOPSIS
+		Returns a carriage return character.
+
+		ALIASES
+			Cr
+		     
+    .DESCRIPTION
+		This function returns a carriage return character and does not include a line feed.
+		
+	.EXAMPLE
+		$Label1.Text = "Item 1$(Get-CarriageReturn)$(Get-LineFeed)Item 2$(Get-CarriageReturn)$(Get-LineFeed)Item 3"
+	
+	.OUTPUTS
+		string
+#>
+	[Alias("Cr")]
+	param()
+    return Get-Character(13)
+}
+
+function Get-Character {
+<#
+	.SYNOPSIS
+		Returns the text character related to the ascii code specified 
+		in the string parameter.
+
+		ALIASES
+			Chr
+     
+    .DESCRIPTION
+		This function will return the text character or 'character byte'
+		related to the ascii code specified in the string parameter.
+	
+	.PARAMETER AsciiCode
+		The character being passed to the function.
+	
+	.EXAMPLE
+		Get-Character 34
+	
+	.EXAMPLE
+		Get-Character -AsciiCode 34
+	
+	.EXAMPLE
+		34 | Get-Character
+	
+	.EXAMPLE
+		Write-Host Get-Character -AsciiCode 34
+	
+	.INPUTS
+		AsciiCode as String
+		
+	.OUTPUTS
+		String
+#>
+	[Alias("Chr")]
+	[CmdletBinding()]
+    param (
+        [Parameter(Mandatory,
+			ValueFromPipeline)]
+        [string]$AsciiCode
+    )
+	return [char][byte]$AsciiCode
+}
+
 function Get-CurrentDirectory {
 <#
 	.SYNOPSIS
@@ -549,6 +917,194 @@ function Get-CurrentDirectory {
 	[Alias("Curdir")]
 	param()
     return (Get-Location | Select-Object -expandproperty Path | Out-String).Trim()
+}
+
+function Get-WindowExists {
+<#
+    .SYNOPSIS
+		Returns the handle of a window, or null if it doesn't exists
+
+		ALIASES
+			Winexists
+			 
+	.DESCRIPTION
+		This function returns the handle of a window, or null if it doesn't exists
+
+	.PARAMETER Window
+		The title of a window, the class of a window, or the window as a powershell object
+
+	.EXAMPLE
+		Set-WindowText (Get-WindowExists "Untitled - Notepad") "Hello World"
+
+	.EXAMPLE
+		Set-WindowText -handle (Get-WindowExists -window "Untitled - Notepad") -text "Hello World"
+		
+	.EXAMPLE
+		("Untitled - Notepad" | Get-WindowExists) | Set-WindowText -text "Hello World"
+		
+	.INPUTS
+		Window as String
+#>
+	[Alias("Winexists")]
+	[CmdletBinding()]
+    param (
+        [Parameter(Mandatory,
+			ValueFromPipeline)]
+        [string]$Window
+	)
+    $class = [vds]::FindWindowByClass($Window)
+    if ($class) {
+        return $class/1
+    }
+    else {
+        $title = [vds]::FindWindowByTitle($Window)
+        if ($title){
+            return $title/1
+        }
+        else {
+            if ($Window.handle) {
+                return $Window.handle
+            }
+        }   
+    }
+}
+
+function Get-WindowPosition {
+<#
+    .SYNOPSIS
+		Returns an object with Left, Top, Width and Height properties of a windows position
+
+		ALIASES
+			Winpos
+			 
+	.DESCRIPTION
+		This function returns an object with Left, Top, Width and Height properties of a windows position according to a handle specified
+
+	.PARAMETER Handle
+		The handle of the window to return the postion of
+
+	.EXAMPLE
+		$winpos = Get-WindowPosition (Get-WindowExists "Untitled - Notepad")
+
+	.EXAMPLE
+		$winpos = Get-WindowPosition -handle (Get-WindowExists "Untitled - Notepad")
+		
+	.EXAMPLE
+		$winexists = (Get-ChildWindow "Libraries") | Get-WindowParent
+		
+	.INPUTS
+		Handle as Integer
+	
+	.OUTPUTS
+		Integer
+#>
+	[Alias("Winpos")]
+	[CmdletBinding()]
+    param (
+        [Parameter(Mandatory,
+			ValueFromPipeline)]
+        [int]$Handle
+	)
+	$return = [PSCustomObject] | Select-Object -Property Top, Left, Width, Height
+    $Rect = New-Object RECT
+    [vds]::GetWindowRect($Handle,[ref]$Rect) | Out-Null
+	$return.Top = $Rect.Top
+	$return.Left = $Rect.Left
+	$return.Width = $Rect.Right - $Rect.Left
+	$return.Height = $Rect.Bottom - $Rect.Top
+	return $return
+}
+
+function Hide-Window {
+<#
+    .SYNOPSIS
+		Hides a window
+		
+		ALIASES
+			Window-Hide
+			 
+	.DESCRIPTION
+		This function hides a window
+
+	.PARAMETER Handle
+		The handle of the window
+
+	.EXAMPLE
+		Hide-Window (Get-WindowExists "Untitled - Notepad")
+
+	.EXAMPLE
+		Hide-Window -handle (Get-WindowExists "Untitled - Notepad")
+		
+	.EXAMPLE
+		(Get-WindowExists "Untitled - Notepad") | Hide-Window
+		
+	.INPUTS
+		Handle as Handle
+#>
+	[Alias("Window-Hide")]
+	[CmdletBinding()]
+    param (
+        [Parameter(Mandatory,
+			ValueFromPipeline)]
+        [int]$Handle
+	)
+	[vds]::ShowWindow($Handle, "SW_HIDE")
+}
+
+function Move-Window {
+<#
+    .SYNOPSIS
+		Moves a window
+		
+		ALIASES
+			Window-Position
+			 
+	.DESCRIPTION
+		This function moves a window per left, top, width and height parameters
+
+	.PARAMETER Handle
+		The handle of the window
+	
+	.PARAMETER Left
+		The left position of the window
+		
+	.PARAMETER Top
+		The top position of the window
+	
+	.PARAMETER Width
+		The width of the window
+	
+	.PARAMETER Height
+		The height of the window
+
+	.EXAMPLE
+		Move-Window -handle (Get-WindowExists "Untitled - Notepad") 10 100 1000 100
+
+	.EXAMPLE
+		Move-Window -handle (Get-WindowExists "Untitled - Notepad") -left 10 -height 100 -width 1000 -height 100
+		
+	.EXAMPLE
+		(Get-WindowExists "Untitled - Notepad") | Move-Window -left 10 -height 100 -width 1000 -height 100
+		
+	.INPUTS
+		Handle as Handle
+#>
+	[Alias("Window-Position")]
+	[CmdletBinding()]
+    param (
+        [Parameter(Mandatory,
+			ValueFromPipeline)]
+        [int]$Handle,
+		[Parameter(Mandatory)]
+		[int]$Left,
+		[Parameter(Mandatory)]
+		[int]$Top,
+		[Parameter(Mandatory)]
+		[int]$Width,
+		[Parameter(Mandatory)]
+		[int]$Height
+	)
+	[vds]::MoveWindow($Handle,$Left,$Top,$Width,$Height,$true)
 }
 
 function Set-DPIAware {
@@ -913,6 +1469,87 @@ public class Window
 $global:ctscale = 1
 }
 
+function Set-WindowParent {
+<#
+    .SYNOPSIS
+		This function fuses a window into another window
+		
+		ALIAS
+			Window-Fuse
+			 
+	.DESCRIPTION
+		This function fuses a child window into a parent window
+
+	.PARAMETER Child
+		The child window
+		
+	.PARAMETER Parent
+		The parent window
+
+	.EXAMPLE
+		Set-WindowParent (Get-WindowExists "Untitled - Notepad") (Get-WindowExists "Libraries") 
+
+	.EXAMPLE
+		Set-WindowParent -child (Get-WindowExists "Untitled - Notepad") -parent (Get-WindowExists "Libraries")
+		
+	.EXAMPLE
+		(Get-WindowExists "Untitled - Notepad") | Set-WindowParent -parent (Get-WindowExists "Libraries")
+		
+	.INPUTS
+		Child as Handle,Parent as Handle
+#>
+	[Alias("Window-Fuse")]
+	[CmdletBinding()]
+    param (
+        [Parameter(Mandatory,
+			ValueFromPipeline)]
+        [int]$Child,
+        [Parameter(Mandatory)]
+		[int]$Parent
+	)
+	[vds]::SetParent($Child,$Parent)
+}
+
+function Set-WindowText {
+<#
+    .SYNOPSIS
+		Sets the text of a window
+		
+		ALIAS
+			Window-Settext
+			 
+	.DESCRIPTION
+		This function sets the text of a window
+
+	.PARAMETER Handle
+		The handle of the window
+		
+	.PARAMETER Text
+		The text to set the window to
+
+	.EXAMPLE
+		Set-WindowText (Get-WindowExists "Untitled - Notepad") "Hello World"
+
+	.EXAMPLE
+		Set-WindowText -handle (Get-WindowExists "Untitled - Notepad") -text "Hello World"
+		
+	.EXAMPLE
+		(Get-WindowExists "Untitled - Notepad") | Set-WindowText -text "Hello World"
+		
+	.INPUTS
+		Handle as Handle, String as String
+#>
+	[Alias("Window-Settext")]
+	[CmdletBinding()]
+    param (
+        [Parameter(Mandatory,
+			ValueFromPipeline)]
+        [int]$Handle,
+		[string]$Text
+	)
+	[vds]::SetWindowText($Handle,$Text)
+}
+
 function Show-Form {
 <#
 	.SYNOPSIS
@@ -963,6 +1600,50 @@ function Show-Form {
 			$global:apprunning = $true
 			[System.Windows.Forms.Application]::Run($Form) | Out-Null
 		}
+	}
+}
+
+function Test-File {
+<#
+	.SYNOPSIS
+		Test for the existance of a file
+		
+		ALIAS
+			File
+		
+    .DESCRIPTION
+		This function test for the existance of a file
+	
+	.PARAMETER Path
+		The path to the file.
+	
+	.EXAMPLE	
+		$fileExists = Test-File 'c:\temp\temp.txt'
+
+	.EXAMPLE	
+		$fileExists = Test-File -Path 'c:\temp\temp.txt'
+		
+	.EXAMPLE	
+		$fileExists = 'c:\temp\temp.txt' | Test-File
+	
+	.INPUTS
+		Path as String
+	
+	.OUTPUTS
+		Boolean
+#>
+	[Alias("File")]
+	[CmdletBinding()]
+    param (
+		[Parameter(Mandatory,
+			ValueFromPipeline)]
+		[string]$Path
+	)
+	if (Test-Path -path $Path) {
+		return $true
+	}
+	else {
+		return $false
 	}
 }
 
@@ -1017,7 +1698,7 @@ function Update-ErrorLog {
 }
 Set-Types
 ConvertFrom-WinFormsXML -Reference refs -Suppress -Xml @"
-<Form Name="MainForm" Size="800,600" Tag="IsMDIContainer, DPIAware, VisualStyle" Text="PowerShell Designer" IsMDIContainer="True"><TabControl Name="tcl_Top" Dock="Top" Size="332,20"><TabPage Name="tpg_Form1" Size="324,0" Text="NewProject.fbs" /></TabControl><Label Name="lbl_Left" Dock="Left" BackColor="35, 35, 35" Cursor="VSplit" Size="3,489" /><Label Name="lbl_Right" Dock="Right" BackColor="35, 35, 35" Cursor="VSplit" Size="3,489" /><Panel Name="pnl_Left" Dock="Left" BorderStyle="Fixed3D" Size="200,489"><SplitContainer Name="spt_Left" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="284"><SplitterPanel Name="spt_Left_Panel1"><TreeView Name="trv_Controls" Dock="Fill" BackColor="Azure" /></SplitterPanel><SplitterPanel Name="spt_Left_Panel2" BackColor="ControlLight"><TreeView Name="TreeView" Dock="Fill" BackColor="Azure" DrawMode="OwnerDrawText" HideSelection="False" /></SplitterPanel></SplitContainer></Panel><Panel Name="pnl_Right" Dock="Right" BorderStyle="Fixed3D" Size="200,489"><SplitContainer Name="spt_Right" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="282"><SplitterPanel Name="spt_Right_Panel1"><PropertyGrid Name="PropertyGrid" Dock="Fill" Cursor="HSplit" ViewBackColor="Azure" /></SplitterPanel><SplitterPanel Name="spt_Right_Panel2" BackColor="Control"><TabControl Name="TabControl2" Dock="Fill"><TabPage Name="Tab 1" Size="188,173" Text="Events"><SplitContainer Name="SplitContainer3" Dock="Fill" Orientation="Horizontal" SplitterDistance="119"><SplitterPanel Name="SplitContainer3_Panel1" AutoScroll="True"><ListBox Name="lst_AvailableEvents" Dock="Fill" BackColor="Azure" /></SplitterPanel><SplitterPanel Name="SplitContainer3_Panel2" AutoScroll="True"><ListBox Name="lst_AssignedEvents" Dock="Fill" BackColor="Azure" /></SplitterPanel></SplitContainer></TabPage><TabPage Name="TabPage3" Size="188,314" Text="Functions"><SplitContainer Name="SplitContainer4" Dock="Fill" Orientation="Horizontal" SplitterDistance="229"><SplitterPanel Name="SplitContainer4_Panel1" AutoScroll="True"><CheckedListBox Name="lst_Functions" Dock="Fill" BackColor="Azure" /></SplitterPanel><SplitterPanel Name="SplitContainer4_Panel2" AutoScroll="True"><TextBox Name="lst_Params" Dock="Fill" BackColor="Azure" Multiline="True" ScrollBars="Both" Size="188,81" /></SplitterPanel></SplitContainer></TabPage><TabPage Name="TabPage4" Size="188,428" Text="Finds"><SplitContainer Name="SplitContainer5" Dock="Fill" Orientation="Horizontal" SplitterDistance="25"><SplitterPanel Name="SplitContainer5_Panel1"><TextBox Name="txt_Find" BackColor="Azure" /><Button Name="btn_Find" Location="105,0" Size="23,23" Text="+" /><Button Name="btn_RemoveFind" Location="130,0" Size="23,23" Text="-" /></SplitterPanel><SplitterPanel Name="SplitContainer5_Panel2"><ListBox Name="lst_Find" Dock="Fill" BackColor="Azure" /></SplitterPanel></SplitContainer></TabPage></TabControl></SplitterPanel></SplitContainer></Panel><MenuStrip Name="ms_Left" Dock="Left" AutoSize="False" BackColor="ControlDarkDark" Font="Verdana, 9pt" LayoutStyle="VerticalStackWithOverflow" Size="23,489" TextDirection="Vertical90"><ToolStripMenuItem Name="ms_Toolbox" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" Size="23,100" Text="Toolbox" /><ToolStripMenuItem Name="ms_FormTree" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" Size="23,100" TextAlign="MiddleLeft" TextDirection="Vertical90" Text="Form Tree" /></MenuStrip><MenuStrip Name="ms_Right" Dock="Right" AutoSize="False" BackColor="ControlDarkDark" Font="Verdana, 9pt" LayoutStyle="VerticalStackWithOverflow" Size="23,489" TextDirection="Vertical90"><ToolStripMenuItem Name="ms_Properties" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" Size="23,100" TextAlign="MiddleLeft" TextDirection="Vertical270" Text="Properties" /><ToolStripMenuItem Name="ms_Events" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" ImageTransparentColor="White" Size="23,100" TextDirection="Vertical270" Text="Events" /></MenuStrip><MenuStrip Name="ToolStrip" Text="ToolStrip1"><ToolStripButton Name="tsNewBtn" BackColor="Control" DisplayStyle="Image" ImageTransparentColor="Control" Text="New" /><ToolStripButton Name="tsOpenbtn" DisplayStyle="Image" Text="ToolStripButton2" /><ToolStripButton Name="tsSavebtn" DisplayStyle="Image" Text="ToolStripButton4" /><ToolStripButton Name="tsSaveAsbtn" DisplayStyle="Image" Text="ToolStripButton5" /><ToolStripSeparator Name="ToolStripSeparator7" Margin="10, 0, 10, 0" /><ToolStripButton Name="tsUndoBtn" DisplayStyle="Image" Text="ToolStripButton6" /><ToolStripButton Name="tsRedoBtn" DisplayStyle="Image" Text="ToolStripButton7" /><ToolStripButton Name="tsCutBtn" DisplayStyle="Image" Text="ToolStripButton8" /><ToolStripButton Name="tsCopyBtn" DisplayStyle="Image" Text="ToolStripButton9" /><ToolStripButton Name="tsPasteBtn" DisplayStyle="Image" Text="ToolStripButton10" /><ToolStripButton Name="tsSelectAllBtn" DisplayStyle="Image" Text="ToolStripButton12" /><ToolStripButton Name="tsFindBtn" DisplayStyle="Image" Text="ToolStripButton13" /><ToolStripButton Name="tsReplaceBtn" DisplayStyle="Image" Text="ToolStripButton14" /><ToolStripButton Name="tsGoToLineBtn" DisplayStyle="Image" Text="ToolStripButton15" /><ToolStripButton Name="tsCollapseAllBtn" DisplayStyle="Image" Text="ToolStripButton16" /><ToolStripButton Name="tsExpandAllBtn" DisplayStyle="Image" Text="ToolStripButton17" /><ToolStripSeparator Name="ToolStripSeparator9" Margin="10, 0, 10, 0" /><ToolStripButton Name="tsRenameBtn" DisplayStyle="Image" Text="ToolStripButton16" /><ToolStripButton Name="tsDeleteBtn" DisplayStyle="Image" Text="ToolStripButton17" /><ToolStripButton Name="tsControlCopyBtn" DisplayStyle="Image" Text="ToolStripButton18" /><ToolStripButton Name="tsControlPasteBtn" DisplayStyle="Image" Text="ToolStripButton20" /><ToolStripButton Name="tsMoveUpBtn" DisplayStyle="Image" Text="ToolStripButton21" /><ToolStripButton Name="tsMoveDownBtn" DisplayStyle="Image" Text="ToolStripButton22" /><ToolStripSeparator Name="ToolStripSeparator10" Margin="10, 0, 10, 0" /><ToolStripButton Name="tsToolBoxBtn" Checked="True" CheckState="Checked" DisplayStyle="Image" Text="Toolbox" /><ToolStripButton Name="tsFormTreeBtn" Checked="True" CheckState="Checked" DisplayStyle="Image" Text="Form Tree" /><ToolStripButton Name="tsPropertiesBtn" Checked="True" CheckState="Checked" DisplayStyle="Image" Text="Properties" /><ToolStripButton Name="tsEventsBtn" Checked="True" CheckState="Checked" DisplayStyle="Image" Text="Events" /><ToolStripSeparator Name="ToolStripSeparator11" Margin="10, 0, 10, 0" /><ToolStripButton Name="tsTermBtn" DisplayStyle="Image" ImageTransparentColor="White" Text="ToolStripButton28" /><ToolStripButton Name="tsGenerateBtn" DisplayStyle="Image" Text="ToolStripButton29" /><ToolStripButton Name="tsRunBtn" DisplayStyle="Image" Text="ToolStripButton30" /></MenuStrip><MenuStrip Name="MenuStrip" RenderMode="System"><ToolStripMenuItem Name="ts_File" DisplayStyle="Text" Text="File"><ToolStripMenuItem Name="New" BackgroundImageLayout="None" DisplayStyle="Text" ImageTransparentColor="White" ShortcutKeyDisplayString="Ctrl+N" ShortcutKeys="Ctrl+N" Text="New" /><ToolStripMenuItem Name="Open" BackgroundImageLayout="None" DisplayStyle="Text" ShortcutKeyDisplayString="Ctrl+O" ShortcutKeys="Ctrl+O" Text="Open" /><ToolStripMenuItem Name="Save" BackgroundImageLayout="None" DisplayStyle="Text" ShortcutKeyDisplayString="Ctrl+S" ShortcutKeys="Ctrl+S" Text="Save" /><ToolStripMenuItem Name="Save As" DisplayStyle="Text" ShortcutKeyDisplayString="Ctrl+Alt+S" ShortcutKeys="Ctrl+Alt+S" Text="Save As" /><ToolStripSeparator Name="FileSep" /><ToolStripMenuItem Name="Exit" DisplayStyle="Text" ShortcutKeyDisplayString="Ctrl+Alt+X" ShortcutKeys="Ctrl+Alt+X" Text="Exit" /></ToolStripMenuItem><ToolStripMenuItem Name="ts_Edit" Text="Edit"><ToolStripMenuItem Name="Undo" BackgroundImageLayout="None" ShortcutKeyDisplayString="" Text="Undo" /><ToolStripMenuItem Name="Redo" ShortcutKeyDisplayString="Ctrl+Y" ShortcutKeys="Ctrl+Y" Text="Redo" /><ToolStripSeparator Name="EditSep4" /><ToolStripMenuItem Name="Cut" BackgroundImageLayout="None" ShortcutKeyDisplayString="" Text="Cut" /><ToolStripMenuItem Name="Copy" BackgroundImageLayout="None" ShortcutKeyDisplayString="" Text="Copy" /><ToolStripMenuItem Name="Paste" BackgroundImageLayout="None" ShortcutKeyDisplayString="" Text="Paste" /><ToolStripMenuItem Name="Select All" ShortcutKeyDisplayString="" Text="Select All" /><ToolStripSeparator Name="EditSep5" /><ToolStripMenuItem Name="Find" BackgroundImageLayout="None" ShortcutKeyDisplayString="Ctrl+F" ShortcutKeys="Ctrl+F" Text="Find" /><ToolStripMenuItem Name="Replace" ShortcutKeyDisplayString="Ctrl+H" ShortcutKeys="Ctrl+H" Text="Replace" /><ToolStripMenuItem Name="Goto" ShortcutKeyDisplayString="Ctrl+G" ShortcutKeys="Ctrl+G" Text="Go To Line..." /><ToolStripSeparator Name="EditSep6" /><ToolStripMenuItem Name="Collapse All" ShortcutKeyDisplayString="F10" ShortcutKeys="F10" Text="Collapse All" /><ToolStripMenuItem Name="Expand All" ShortcutKeyDisplayString="F11" ShortcutKeys="F11" Text="Expand All" /></ToolStripMenuItem><ToolStripMenuItem Name="ts_Controls" Text="Controls"><ToolStripMenuItem Name="Rename" ShortcutKeyDisplayString="Ctrl+R" ShortcutKeys="Ctrl+R" Text="Rename" /><ToolStripMenuItem Name="Delete" ShortcutKeyDisplayString="Ctrl+D" ShortcutKeys="Ctrl+D" Text="Delete" /><ToolStripSeparator Name="EditSep1" /><ToolStripMenuItem Name="CopyNode" ShortcutKeyDisplayString="Ctrl+Alt+C" ShortcutKeys="Ctrl+Alt+C" Text="Copy Control" /><ToolStripMenuItem Name="PasteNode" ShortcutKeyDisplayString="Ctrl+Alt+V" ShortcutKeys="Ctrl+Alt+V" Text="Paste Control" /><ToolStripSeparator Name="EditSep2" /><ToolStripMenuItem Name="Move Up" ShortcutKeyDisplayString="F5" ShortcutKeys="F5" Text="Move Up" /><ToolStripMenuItem Name="Move Down" ShortcutKeyDisplayString="F6" ShortcutKeys="F6" Text="Move Down" /></ToolStripMenuItem><ToolStripMenuItem Name="ts_View" Text="View"><ToolStripMenuItem Name="Toolbox" Checked="True" CheckState="Checked" ShortcutKeyDisplayString="F1" ShortcutKeys="F1" Text="Toolbox" /><ToolStripMenuItem Name="FormTree" Checked="True" CheckState="Checked" DisplayStyle="Text" ShortcutKeyDisplayString="F2" ShortcutKeys="F2" Text="Form Tree" /><ToolStripMenuItem Name="Properties" Checked="True" CheckState="Checked" DisplayStyle="Text" ShortcutKeyDisplayString="F3" ShortcutKeys="F3" Text="Properties" /><ToolStripMenuItem Name="Events" Checked="True" CheckState="Checked" ShortcutKeyDisplayString="F4" ShortcutKeys="F4" Text="Events" /></ToolStripMenuItem><ToolStripMenuItem Name="ts_Tools" DisplayStyle="Text" Text="Tools"><ToolStripMenuItem Name="functionsModule" BackgroundImageLayout="None" DisplayStyle="Text" ShortcutKeys="F7" Text="Load Functions Module in PowerShell" /><ToolStripMenuItem Name="Generate" BackgroundImageLayout="None" DisplayStyle="Text" ShortcutKeys="F8" Text="Generate Script File" /><ToolStripMenuItem Name="RunLast" BackgroundImageLayout="None" DisplayStyle="Text" ShortcutKeys="F9" Text="Run Script File" /></ToolStripMenuItem></MenuStrip><StatusStrip Name="sta_Status"><ToolStripStatusLabel Name="tsl_StatusLabel" /></StatusStrip></Form>
+<Form Name="MainForm" Size="1526,939" Tag="IsMDIContainer, DPIAware, VisualStyle" WindowState="Maximized" Text="PowerShell Designer" IsMDIContainer="True"><TabControl Name="tcl_Top" Dock="Top" Size="1104,20"><TabPage Name="tpg_Form1" Size="1096,0" Text="NewProject.fbs" /></TabControl><Label Name="lbl_Left" Dock="Left" BackColor="35, 35, 35" Cursor="VSplit" Size="3,828" /><Label Name="lbl_Right" Dock="Right" BackColor="35, 35, 35" Cursor="VSplit" Size="3,828" /><Panel Name="pnl_Left" Dock="Left" BorderStyle="Fixed3D" Size="200,828"><SplitContainer Name="spt_Left" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="415"><SplitterPanel Name="spt_Left_Panel1"><TreeView Name="trv_Controls" Dock="Fill" BackColor="Azure" /></SplitterPanel><SplitterPanel Name="spt_Left_Panel2" BackColor="ControlLight"><TreeView Name="TreeView" Dock="Fill" BackColor="Azure" DrawMode="OwnerDrawText" HideSelection="False" /></SplitterPanel></SplitContainer></Panel><Panel Name="pnl_Right" Dock="Right" BorderStyle="Fixed3D" Size="200,828"><SplitContainer Name="spt_Right" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="405"><SplitterPanel Name="spt_Right_Panel1"><PropertyGrid Name="PropertyGrid" Dock="Fill" Cursor="HSplit" ViewBackColor="Azure" /></SplitterPanel><SplitterPanel Name="spt_Right_Panel2" BackColor="Control"><TabControl Name="TabControl2" Dock="Fill"><TabPage Name="Tab 1" Size="188,389" Text="Events"><SplitContainer Name="SplitContainer3" Dock="Fill" Orientation="Horizontal" SplitterDistance="246"><SplitterPanel Name="SplitContainer3_Panel1" AutoScroll="True"><ListBox Name="lst_AvailableEvents" Dock="Fill" BackColor="Azure" /></SplitterPanel><SplitterPanel Name="SplitContainer3_Panel2" AutoScroll="True"><ListBox Name="lst_AssignedEvents" Dock="Fill" BackColor="Azure" /></SplitterPanel></SplitContainer></TabPage><TabPage Name="TabPage3" Size="188,345" Text="Functions"><SplitContainer Name="SplitContainer4" Dock="Fill" Orientation="Horizontal" SplitterDistance="233"><SplitterPanel Name="SplitContainer4_Panel1" AutoScroll="True"><CheckedListBox Name="lst_Functions" Dock="Fill" BackColor="Azure" /></SplitterPanel><SplitterPanel Name="SplitContainer4_Panel2" AutoScroll="True"><TextBox Name="lst_Params" Dock="Fill" BackColor="Azure" Multiline="True" ScrollBars="Both" Size="188,108" /></SplitterPanel></SplitContainer></TabPage><TabPage Name="TabPage4" Size="188,345" Text="Finds"><SplitContainer Name="SplitContainer5" Dock="Fill" Orientation="Horizontal" SplitterDistance="25"><SplitterPanel Name="SplitContainer5_Panel1"><TextBox Name="txt_Find" BackColor="Azure" /><Button Name="btn_Find" Location="105,0" Size="23,23" Text="+" /><Button Name="btn_RemoveFind" Location="130,0" Size="23,23" Text="-" /></SplitterPanel><SplitterPanel Name="SplitContainer5_Panel2"><ListBox Name="lst_Find" Dock="Fill" BackColor="Azure" /></SplitterPanel></SplitContainer></TabPage></TabControl></SplitterPanel></SplitContainer></Panel><MenuStrip Name="ms_Left" Dock="Left" AutoSize="False" BackColor="ControlDarkDark" Font="Verdana, 9pt" LayoutStyle="VerticalStackWithOverflow" Size="23,828" TextDirection="Vertical90" Visible="False"><ToolStripMenuItem Name="ms_Toolbox" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" Size="23,100" Visible="False" Text="Toolbox" /><ToolStripMenuItem Name="ms_FormTree" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" Size="23,100" TextAlign="MiddleLeft" TextDirection="Vertical90" Visible="False" Text="Form Tree" /></MenuStrip><MenuStrip Name="ms_Right" Dock="Right" AutoSize="False" BackColor="ControlDarkDark" Font="Verdana, 9pt" LayoutStyle="VerticalStackWithOverflow" Size="23,828" TextDirection="Vertical90" Visible="False"><ToolStripMenuItem Name="ms_Properties" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" Size="23,100" TextAlign="MiddleLeft" TextDirection="Vertical270" Visible="False" Text="Properties" /><ToolStripMenuItem Name="ms_Events" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" ImageTransparentColor="White" Size="23,100" TextDirection="Vertical270" Visible="False" Text="Events" /></MenuStrip><MenuStrip Name="ToolStrip" Text="ToolStrip1"><ToolStripButton Name="tsNewBtn" BackColor="Control" DisplayStyle="Image" ImageTransparentColor="Control" Text="New" /><ToolStripButton Name="tsOpenbtn" DisplayStyle="Image" Text="ToolStripButton2" /><ToolStripButton Name="tsSavebtn" DisplayStyle="Image" Text="ToolStripButton4" /><ToolStripButton Name="tsSaveAsbtn" DisplayStyle="Image" Text="ToolStripButton5" /><ToolStripSeparator Name="ToolStripSeparator7" Margin="10, 0, 10, 0" /><ToolStripButton Name="tsUndoBtn" DisplayStyle="Image" Text="ToolStripButton6" /><ToolStripButton Name="tsRedoBtn" DisplayStyle="Image" Text="ToolStripButton7" /><ToolStripButton Name="tsCutBtn" DisplayStyle="Image" Text="ToolStripButton8" /><ToolStripButton Name="tsCopyBtn" DisplayStyle="Image" Text="ToolStripButton9" /><ToolStripButton Name="tsPasteBtn" DisplayStyle="Image" Text="ToolStripButton10" /><ToolStripButton Name="tsSelectAllBtn" DisplayStyle="Image" Text="ToolStripButton12" /><ToolStripButton Name="tsFindBtn" DisplayStyle="Image" Text="ToolStripButton13" /><ToolStripButton Name="tsReplaceBtn" DisplayStyle="Image" Text="ToolStripButton14" /><ToolStripButton Name="tsGoToLineBtn" DisplayStyle="Image" Text="ToolStripButton15" /><ToolStripButton Name="tsCollapseAllBtn" DisplayStyle="Image" Text="ToolStripButton16" /><ToolStripButton Name="tsExpandAllBtn" DisplayStyle="Image" Text="ToolStripButton17" /><ToolStripSeparator Name="ToolStripSeparator9" Margin="10, 0, 10, 0" /><ToolStripButton Name="tsRenameBtn" DisplayStyle="Image" Text="ToolStripButton16" /><ToolStripButton Name="tsDeleteBtn" DisplayStyle="Image" Text="ToolStripButton17" /><ToolStripButton Name="tsControlCopyBtn" DisplayStyle="Image" Text="ToolStripButton18" /><ToolStripButton Name="tsControlPasteBtn" DisplayStyle="Image" Text="ToolStripButton20" /><ToolStripButton Name="tsMoveUpBtn" DisplayStyle="Image" Text="ToolStripButton21" /><ToolStripButton Name="tsMoveDownBtn" DisplayStyle="Image" Text="ToolStripButton22" /><ToolStripSeparator Name="ToolStripSeparator10" Margin="10, 0, 10, 0" /><ToolStripButton Name="tsToolBoxBtn" Checked="True" CheckState="Checked" DisplayStyle="Image" Text="Toolbox" /><ToolStripButton Name="tsFormTreeBtn" Checked="True" CheckState="Checked" DisplayStyle="Image" Text="Form Tree" /><ToolStripButton Name="tsPropertiesBtn" Checked="True" CheckState="Checked" DisplayStyle="Image" Text="Properties" /><ToolStripButton Name="tsEventsBtn" Checked="True" CheckState="Checked" DisplayStyle="Image" Text="Events" /><ToolStripSeparator Name="ToolStripSeparator11" Margin="10, 0, 10, 0" /><ToolStripButton Name="tsTermBtn" DisplayStyle="Image" ImageTransparentColor="White" Text="ToolStripButton28" /><ToolStripButton Name="tsGenerateBtn" DisplayStyle="Image" Text="ToolStripButton29" /><ToolStripButton Name="tsRunBtn" DisplayStyle="Image" Text="ToolStripButton30" /></MenuStrip><MenuStrip Name="MenuStrip" RenderMode="System"><ToolStripMenuItem Name="ts_File" DisplayStyle="Text" Text="File"><ToolStripMenuItem Name="New" BackgroundImageLayout="None" DisplayStyle="Text" ImageTransparentColor="White" ShortcutKeyDisplayString="Ctrl+N" ShortcutKeys="Ctrl+N" Text="New" /><ToolStripMenuItem Name="Open" BackgroundImageLayout="None" DisplayStyle="Text" ShortcutKeyDisplayString="Ctrl+O" ShortcutKeys="Ctrl+O" Text="Open" /><ToolStripMenuItem Name="Save" BackgroundImageLayout="None" DisplayStyle="Text" ShortcutKeyDisplayString="Ctrl+S" ShortcutKeys="Ctrl+S" Text="Save" /><ToolStripMenuItem Name="Save As" DisplayStyle="Text" ShortcutKeyDisplayString="Ctrl+Alt+S" ShortcutKeys="Ctrl+Alt+S" Text="Save As" /><ToolStripSeparator Name="FileSep" /><ToolStripMenuItem Name="Exit" DisplayStyle="Text" ShortcutKeyDisplayString="Ctrl+Alt+X" ShortcutKeys="Ctrl+Alt+X" Text="Exit" /></ToolStripMenuItem><ToolStripMenuItem Name="ts_Edit" Text="Edit"><ToolStripMenuItem Name="Undo" BackgroundImageLayout="None" ShortcutKeyDisplayString="" Text="Undo" /><ToolStripMenuItem Name="Redo" ShortcutKeyDisplayString="Ctrl+Y" ShortcutKeys="Ctrl+Y" Text="Redo" /><ToolStripSeparator Name="EditSep4" /><ToolStripMenuItem Name="Cut" BackgroundImageLayout="None" ShortcutKeyDisplayString="" Text="Cut" /><ToolStripMenuItem Name="Copy" BackgroundImageLayout="None" ShortcutKeyDisplayString="" Text="Copy" /><ToolStripMenuItem Name="Paste" BackgroundImageLayout="None" ShortcutKeyDisplayString="" Text="Paste" /><ToolStripMenuItem Name="Select All" ShortcutKeyDisplayString="" Text="Select All" /><ToolStripSeparator Name="EditSep5" /><ToolStripMenuItem Name="Find" BackgroundImageLayout="None" ShortcutKeyDisplayString="Ctrl+F" ShortcutKeys="Ctrl+F" Text="Find" /><ToolStripMenuItem Name="Replace" ShortcutKeyDisplayString="Ctrl+H" ShortcutKeys="Ctrl+H" Text="Replace" /><ToolStripMenuItem Name="Goto" ShortcutKeyDisplayString="Ctrl+G" ShortcutKeys="Ctrl+G" Text="Go To Line..." /><ToolStripSeparator Name="EditSep6" /><ToolStripMenuItem Name="Collapse All" ShortcutKeyDisplayString="F10" ShortcutKeys="F10" Text="Collapse All" /><ToolStripMenuItem Name="Expand All" ShortcutKeyDisplayString="F11" ShortcutKeys="F11" Text="Expand All" /></ToolStripMenuItem><ToolStripMenuItem Name="ts_Controls" Text="Controls"><ToolStripMenuItem Name="Rename" ShortcutKeyDisplayString="Ctrl+R" ShortcutKeys="Ctrl+R" Text="Rename" /><ToolStripMenuItem Name="Delete" ShortcutKeyDisplayString="Ctrl+D" ShortcutKeys="Ctrl+D" Text="Delete" /><ToolStripSeparator Name="EditSep1" /><ToolStripMenuItem Name="CopyNode" ShortcutKeyDisplayString="Ctrl+Alt+C" ShortcutKeys="Ctrl+Alt+C" Text="Copy Control" /><ToolStripMenuItem Name="PasteNode" ShortcutKeyDisplayString="Ctrl+Alt+V" ShortcutKeys="Ctrl+Alt+V" Text="Paste Control" /><ToolStripSeparator Name="EditSep2" /><ToolStripMenuItem Name="Move Up" ShortcutKeyDisplayString="F5" ShortcutKeys="F5" Text="Move Up" /><ToolStripMenuItem Name="Move Down" ShortcutKeyDisplayString="F6" ShortcutKeys="F6" Text="Move Down" /></ToolStripMenuItem><ToolStripMenuItem Name="ts_View" Text="View"><ToolStripMenuItem Name="Toolbox" Checked="True" CheckState="Checked" ShortcutKeyDisplayString="F1" ShortcutKeys="F1" Text="Toolbox" /><ToolStripMenuItem Name="FormTree" Checked="True" CheckState="Checked" DisplayStyle="Text" ShortcutKeyDisplayString="F2" ShortcutKeys="F2" Text="Form Tree" /><ToolStripMenuItem Name="Properties" Checked="True" CheckState="Checked" DisplayStyle="Text" ShortcutKeyDisplayString="F3" ShortcutKeys="F3" Text="Properties" /><ToolStripMenuItem Name="Events" Checked="True" CheckState="Checked" ShortcutKeyDisplayString="F4" ShortcutKeys="F4" Text="Events" /></ToolStripMenuItem><ToolStripMenuItem Name="ts_Tools" DisplayStyle="Text" Text="Tools"><ToolStripMenuItem Name="functionsModule" BackgroundImageLayout="None" DisplayStyle="Text" ShortcutKeys="F7" Text="Load Functions Module in PowerShell" /><ToolStripMenuItem Name="Generate" BackgroundImageLayout="None" DisplayStyle="Text" ShortcutKeys="F8" Text="Generate Script File" /><ToolStripMenuItem Name="RunLast" BackgroundImageLayout="None" DisplayStyle="Text" ShortcutKeys="F9" Text="Run Script File" /></ToolStripMenuItem></MenuStrip><StatusStrip Name="sta_Status"><ToolStripStatusLabel Name="tsl_StatusLabel" /></StatusStrip></Form>
 "@
 #endregion VDS
 #region Images
@@ -1326,7 +2007,15 @@ SOFTWARE.
         Added vertical folding line marks. Minor code cleanup.
         Changed FastText backcolor.
         Got rid of common edit shortcuts, they are still there, but unlabled. If I label them, then they override those shortcuts for the find and replace windows and elsewhere.
-        Fixed regex for multiline comments    
+        Fixed regex for multiline comments
+        Changes to FastColoredTextBox.dll, https://github.com/brandoncomputer/FastColoredTextBox
+        
+    2.3.4 5/6/2024
+        Highlight syntax refresh no longer happens on click for multiline comments, added check for typing timer.
+        Added references (checked boxes in functions and event references) - this wasn't 100% needed for this software, but it is a best practice regardless - your software might not work if you don't 
+            check the boxes and make the selections to include the needed references.
+        Now copies finds.txt to designer project directory.
+        
         
 BASIC MODIFICATIONS License
 Original available at https://www.pswinformscreator.com/ for deeper comparison.
@@ -1388,7 +2077,7 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
                         else {
                             $controlName = $controlName + '_1'
                         }
-                    } 
+                    }
                     else {
                         $controlName = $controlName + '_1' 
                     }
@@ -3305,7 +3994,7 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
             $noIssues = $false
         }
     }
-
+    
     try {
         $Script:refs['MainForm'].Add_Load($eventSB['MainForm'].Load)
         $Script:refs['ms_Toolbox'].Add_Click($eventSB.ChangeView)
@@ -3678,14 +4367,22 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
         $FastText.ShowReplaceDialog()
         $ReplaceWindowHandle = (winexists 'Find and replace')
         Set-WindowParent $ReplaceWindowHandle $MainForm.Handle
-        Move-Window $FindWindowHandle ($MainForm.Width - 625) 75 ((winpos $FindWindowHandle).Width) ((winpos $FindWindowHandle).Height)
-        Move-Window $ReplaceWindowHandle ($MainForm.Width - 625) 225 ((winpos $ReplaceWindowHandle).Width) ((winpos $ReplaceWindowHandle).Height)
+        Move-Window $FindWindowHandle ($MainForm.Width - 625) 75 ((Get-WindowPosition $FindWindowHandle).Width) ((winpos $FindWindowHandle).Height)
+        Move-Window $ReplaceWindowHandle ($MainForm.Width - 625) 225 ((Get-WindowPosition $ReplaceWindowHandle).Width) ((Get-WindowPosition $ReplaceWindowHandle).Height)
         Hide-Window $FindWindowHandle
         Hide-Window $ReplaceWindowHandle
-     
-        $FastText.Add_Click({param($sender, $e)
+        
+
+        $CheckForTypingTimer = new-timer 2000
+        $CheckForTypingTimer.Add_Tick({
             $FastText.OnTextChanged()
-        })   
+            $CheckForTypingTimer.Enabled = $false
+        })
+        
+        $FastText.Add_KeyUp({param($sender, $e)
+            $CheckForTypingTimer.Enabled = $false      
+            $CheckForTypingTimer.Enabled = $true
+        })  
         
         if ($null -ne $args[1]){
             if (($args[0].tolower() -eq "-file") -and (Test-File $args[1])){OpenProjectClick $args[1]}
@@ -3694,7 +4391,6 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
     catch {
         Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered unexpectedly at ShowDialog."
     }
-
 
 
 
