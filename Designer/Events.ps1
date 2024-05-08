@@ -313,6 +313,11 @@ SOFTWARE.
             check the boxes and make the selections to include the needed references, and I want this to be a good example.
         Now copies finds.txt to designer project directory.
         Upgraded Selenium Functions from Selenium 3 to Selenium 4 syntax
+ 
+    2.3.5 5/7/2024
+        Implemented drag and drop from the control selection
+        Tweaking of position buttons for controls
+        Added Move-Cursor
         
         
 BASIC MODIFICATIONS License
@@ -343,7 +348,7 @@ SOFTWARE.
 #>
 
 import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\functions.psm1")
-
+    $global:ControlBeingSelected = $false
     $global:control_track = @{} 
     
     function Convert-XmlToTreeView {
@@ -583,7 +588,112 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
                         $e.Cancel = $true
                     })
                     
-                    $form.Add_MouseEnter({$Script:refs['tsl_StatusLabel'].text ="Current DPIScale: $ctscale"})
+                    $form.Add_MouseEnter({
+                        $Script:refs['tsl_StatusLabel'].text ="Current DPIScale: $ctscale"
+                        if ($ControlBeingSelected -eq $true){
+                            $global:ControlBeingSelected = $false
+                            $MainForm.Cursor = 'Default'
+                        
+                            $controlName = $trv_Controls.SelectedNode.Name
+                            switch ($controlName) {
+                                'MenuStrip' {
+                                    $Script:refs['tsl_StatusLabel'].text = "Please do not use item collections in the property grid. Build onto controls by stacking controls from the selection on the left."
+                                }
+                                'ContextMenuStrip' {
+                                    $Script:refs['tsl_StatusLabel'].text = "Please do not use item collections in the property grid. Build onto controls by stacking controls from the selection on the left."
+                                }
+                                'StatusStrip' {
+                                    $Script:refs['tsl_StatusLabel'].text = "Please do not use item collections in the property grid. Build onto controls by stacking controls from the selection on the left."
+                                }
+                                'ToolStrip' {
+                                    $Script:refs['tsl_StatusLabel'].text = "Please do not use item collections in the property grid. Build onto controls by stacking controls from the selection on the left."
+                                }
+                                'ToolStripDropDownButton' {
+                                    $Script:refs['tsl_StatusLabel'].text = "Please do not use item collections in the property grid. Build onto controls by stacking controls from the selection on the left."
+                                }
+                                'ToolStripSplitButton' {
+                                    $Script:refs['tsl_StatusLabel'].text = "Please do not use item collections in the property grid. Build onto controls by stacking controls from the selection on the left."
+                                }
+                                'ToolStripMenuItem' {
+                                    $Script:refs['tsl_StatusLabel'].text = "Please do not use item collections in the property grid. Build onto controls by stacking controls from the selection on the left."
+                                }
+                                default{}
+                            }
+                            if ( $controlName -eq 'ContextMenuStrip' ){
+                                $context = 1
+                            } 
+                            else {
+                                $context = 2
+                            }
+                            if ( @('All Controls','Common','Containers', 'Menus and ToolStrips','Miscellaneous') -notcontains $controlName ) {
+                                $controlObjectType = $Script:supportedControls.Where({$_.Name -eq $controlName}).Type
+                                try {
+                                    if (( $controlObjectType -eq 'Parentless' ) -or ( $context -eq 0 )) {
+                                        $controlType = $controlName
+                                        $Script:newNameCheck = $false
+                                        $Script:newNameCheck = $true
+                                        if ( $Script:refs['TreeView'].Nodes.Text -match "$($controlType) - $($userInput.NewName)" ) {
+                                            [void][System.Windows.Forms.MessageBox]::Show("A $($controlType) with the Name '$($userInput.NewName)' already exists.",'Error')
+                                        } 
+                                        else {
+                                            if ($control_track.$controlName -eq $null){
+                                                $control_track[$controlName] = 1
+                                            }
+                                            else {
+                                                $control_track.$controlName = $control_track.$controlName + 1
+                                            }
+                                            if ( $Script:refs['TreeView'].Nodes.Text -match "$($controlType) - $controlName$($control_track.$controlName)" ) {
+                                                [void][System.Windows.Forms.MessageBox]::Show("A $($controlType) with the Name '$controlName$($control_track.$controlName)' already exists.",'Error')
+                                            }
+                                            else {
+                                                Add-TreeNode -TreeObject $Script:refs['TreeView'] -ControlType $controlName "$controlName$($control_track.$controlName)" "$controlName$($control_track.$controlName)"
+                                            }
+                                        }
+                                    }
+                                    else {
+                                        if ( $Script:supportedControls.Where({
+                                            $_.Name -eq $($refs['TreeView'].SelectedNode.Text -replace " - .*$")}).ChildTypes -contains $controlObjectType ) {
+                                            if ($control_track.$controlName -eq $null){
+                                                $control_track[$controlName] = 1
+                                            }
+                                            else {
+                                                $control_track.$controlName = $control_track.$controlName + 1
+                                            }
+                                            if ($Script:refs['TreeView'].Nodes.Nodes | Where-Object { 
+                                            $_.Text -eq "$($controlName) - $controlName$($control_track.$controlName)" }) {
+                                                [void][System.Windows.Forms.MessageBox]::Show("A $($controlName) with the Name '$controlName$($control_track.$controlName)' already exists. Try again to create '$controlName$($control_track.$controlName + 1)'",'Error')
+                                            }
+                                            else {
+                                                Add-TreeNode -TreeObject $Script:refs['TreeView'].SelectedNode -ControlType $controlName "$controlName$($control_track.$controlName)" "$controlName$($control_track.$controlName)"
+                                            }
+                                        } 
+                                        else {
+                                            if ($control_track.$controlName -eq $null) {
+                                                $control_track[$controlName] = 1
+                                            }
+                                            else {
+                                                $control_track.$controlName = $control_track.$controlName + 1
+                                            }
+                                            if ($Script:refs['TreeView'].Nodes.Nodes | Where-Object { 
+                                                $_.Text -eq "$($controlName) - $controlName$($control_track.$controlName)" }) {
+                                                [void][System.Windows.Forms.MessageBox]::Show("A $($controlName) with the Name '$controlName$($control_track.$controlName)' already exists. Try again to create '$controlName$($control_track.$controlName + 1)'",'Error')
+                                            }
+                                            else {
+                                                Add-TreeNode -TreeObject $Script:refs['TreeView'].TopNode -ControlType $controlName "$controlName$($control_track.$controlName)" "$controlName$($control_track.$controlName)"
+                                            }
+                                        }
+                                    }
+                                }
+                                catch {
+                                    Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered while adding '$($controlName)'."
+                                }
+                            }
+                            $Script:oldMousePos = [System.Windows.Forms.Cursor]::Position
+                            $Script:oldMousePos.Y = 125 + $MainForm.Top + ($btn_SizeAll.Parent).Top
+                            $Script.OldMousePos.X = $MainForm.Left + ($btn_SizeAll.Parent).Left
+                            New-SendMessage -hWnd $btn_SizeAll.handle -Msg 0x0201 -wParam 0 -lParam 0
+                        }
+                    })
                     $form.Add_Click({
                         if (($Script:refs['PropertyGrid'].SelectedObject -ne $this ) -and ( $args[1].Button -eq 'Left')) {
                             $Script:refs['TreeView'].SelectedNode = $Script:refsFID.Form.TreeNodes[$this.Name]
@@ -607,6 +717,7 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
                         $this.ParentForm.Refresh()
                     })
                     $Script:sButtons = $null
+                    Remove-Variable -Name btn_SizeAll -Scope global
                     Remove-Variable -Name sButtons -Scope Script -ErrorAction SilentlyContinue
                     ConvertFrom-WinFormsXML -ParentControl $form -Reference sButtons -Suppress -Xml '<Button Name="btn_SizeAll" Cursor="SizeAll" BackColor="White" Size="8,8" Visible="False" />'
                     ConvertFrom-WinFormsXML -ParentControl $form -Reference sButtons -Suppress -Xml '<Button Name="btn_TLeft" Cursor="SizeNWSE" BackColor="White" Size="8,8" Visible="False" />'
@@ -617,6 +728,7 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
                     ConvertFrom-WinFormsXML -ParentControl $form -Reference sButtons -Suppress -Xml '<Button Name="btn_MRight" Cursor="SizeWE" BackColor="White" Size="8,8" Visible="False" />'
                     ConvertFrom-WinFormsXML -ParentControl $form -Reference sButtons -Suppress -Xml '<Button Name="btn_MTop" Cursor="SizeNS" BackColor="White" Size="8,8" Visible="False" />'
                     ConvertFrom-WinFormsXML -ParentControl $form -Reference sButtons -Suppress -Xml '<Button Name="btn_MBottom" Cursor="SizeNS" BackColor="White" Size="8,8" Visible="False" />'
+                   
                     $sButtons.GetEnumerator().ForEach({
                         $_.Value.Add_MouseMove({
                             param($Sender, $e)
@@ -691,7 +803,7 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
                             }
                         })
                         $_.Value.Add_MouseUp({
-                           #do not uncomment # Move-SButtons -Object $Script:refs['PropertyGrid'].SelectedObject
+                        #do not uncomment # Move-SButtons -Object $Script:refs['PropertyGrid'].SelectedObject
                         })
                     })
                     $form.MDIParent = $refs['MainForm']
@@ -735,6 +847,7 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
                         if ($newControl.width){
                             $newControl.width = $newControl.width * $ctscale
                         }
+
                         if ($newControl.ImageScalingSize) {
                             $newControl.imagescalingsize = new-object System.Drawing.Size([int]($ctscale * $newControl.imagescalingsize.width),[int]($ctscale * $newControl.imagescalingsize.Height))
                         } 
@@ -874,9 +987,9 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
 
     function Move-SButtons {
         param($Object)
-            if ($Object.GetType().Name -eq 'ToolStripProgressBar') {
-                return
-            }
+        if ($Object.GetType().Name -eq 'ToolStripProgressBar') {
+            return
+        }
         if (($Script:supportedControls.Where({
             $_.Type -eq 'Parentless'
         }).Name + @('Form','ToolStripMenuItem','ToolStripComboBox','ToolStripTextBox','ToolStripSeparator','ContextMenuStrip')) -notcontains $Object.GetType().Name ) {     
@@ -885,30 +998,16 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
                 $refFID = $Script:refsFID.Form.Objects.Values.Where({$_.GetType().Name -eq 'Form'})
                 $Script:sButtons.GetEnumerator().ForEach({$_.Value.Visible = $true})
                 $newLoc = $Object.PointToClient([System.Drawing.Point]::Empty)
-                if ( $Script:MouseMoving -eq $true ) {
-                    $clientParent = $Object.Parent.PointToClient([System.Drawing.Point]::Empty)
-                    $clientForm = $refFID.PointToClient([System.Drawing.Point]::Empty)
-                    $clientOffset = New-Object System.Drawing.Point((($clientParent.X - $clientForm.X) * -1),(($clientParent.Y - $clientForm.Y) * -1))
-                } 
-                else {
-                    $clientOffset = New-Object System.Drawing.Point((($clientParent.X - $clientForm.X) * -1),(($clientParent.Y - $clientForm.Y) * -1))
-                }
-                if ($Object.Parent.WindowState -eq "Maximized"){
-                    $newLoc.X = ($newLoc.X * -1) - $refFID.Location.X - $refs['MainForm'].Location.X - $clientOffset.X - $Script:refs['ms_Left'].Size.Width - [math]::Round((15 * $ctscale))
-                    $newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - (20 * $ctscale) - ($clientOffset.Y * $ctscale) - [math]::Round(((148 * $ctscale) - (($ctscale * 16)*$ctscale)) + (2 - ($ctscale)))
-                }
-                else{
-                    $newLoc.X = ($newLoc.X * -1) - $refFID.Location.X - $refs['MainForm'].Location.X - $clientOffset.X - $Script:refs['ms_Left'].Size.Width - [math]::Round((15 * $ctscale))
-                    $newLoc.Y = ($newLoc.Y * -1) - $refFID.Location.Y - $refs['MainForm'].Location.Y - ($clientOffset.Y * $ctscale) - [math]::Round((148 * $ctscale) - (($ctscale * 16)*$ctscale) + (2 - ($ctscale)))
-                }
-                if ($Script:refs['pnl_Left'].Visible -eq $true) {
-                    $newLoc.X = $newLoc.X - $Script:refs['pnl_Left'].Size.Width - $Script:refs['lbl_Left'].Size.Width
-                }
+                $clientParent = $Object.Parent.PointToClient([System.Drawing.Point]::Empty)
+                $clientForm = $refFID.PointToClient([System.Drawing.Point]::Empty)
+                $clientOffset = New-Object System.Drawing.Point((($clientParent.X - $clientForm.X) * -1),(($clientParent.Y - $clientForm.Y) * -1))
+                $newLoc = New-Object System.Drawing.Point(($Object.Location.X + $Object.LocOffset.X),($Object.Location.Y + $Object.LocOffset.Y))
             } 
             else {
                 $newLoc = New-Object System.Drawing.Point(($Script:sButtons['btn_TLeft'].Location.X + $Object.LocOffset.X),($Script:sButtons['btn_TLeft'].Location.Y + $Object.LocOffset.Y))
             }
             $Script:sRect = New-Object System.Drawing.Rectangle($newLoc,$newSize)
+            
             $Script:sButtons.GetEnumerator().ForEach({
                 $btn = $_.Value
                 switch ($btn.Name) {
@@ -1001,7 +1100,6 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
                 } 
                 finally {
                     $saveDialog.Dispose()
-#brandoncomputer_SaveDialogFix
                     $global:projectDirName = $saveDialog.FileName
                     Remove-Variable -Name saveDialog
                 }
@@ -1351,7 +1449,6 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
                 })
                 $Script:refs['TreeView'].Nodes.Clear()
                 Add-TreeNode -TreeObject $Script:refs['TreeView'] -ControlType Form -ControlName MainForm
-                #brandoncomputer_newResize
                 $Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].height = $Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].height * $ctscale
                 $Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].width = $Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].width * $ctscale
                 $Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].tag = "VisualStyle,DPIAware"
@@ -2064,7 +2161,7 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
         'ChangePanelSize' = @{
             'MouseMove' = {
                 param($Sender, $e)
-                if (( $e.Button -eq 'Left' ) -and ( $e.Location.X -ne 0 )) {
+                if (( $e.Button -eq 'Left' ) -and ( $e.Location.X -ne 0 ) -and ($ControlBeingSelected -eq $False)) {
                     $side = $Sender.Name -replace "^lbl_"
                     if ( $side -eq 'Right' ) {$newX = $refs["pnl_$($side)"].Size.Width - $e.Location.X} else {$newX = $refs["pnl_$($side)"].Size.Width + $e.Location.X}
                     if ( $newX -ge 100 ) {$refs["pnl_$($side)"].Size = New-Object System.Drawing.Size($newX,$refs["pnl_$($side)"].Size.Y)}
@@ -2682,6 +2779,25 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
             $CheckForTypingTimer.Enabled = $true
         })  
         
+        $trv_Controls.add_MouseDown({param($sender, $e)
+        $global:ControlBeingSelected = $true
+        $MainForm.Cursor = 'PanEast'
+})
+
+$trv_Controls.add_MouseUp({param($sender, $e)
+    $global:ControlBeingSelected = $false
+    $MainForm.Cursor = 'Default'
+})
+
+
+$MainForm.add_MouseUp({param($sender, $e)
+    $global:ControlBeingSelected = $false
+    $MainForm.Cursor = 'Default' 
+})
+
+
+
+
         if ($null -ne $args[1]){
             if (($args[0].tolower() -eq "-file") -and (Test-File $args[1])){OpenProjectClick $args[1]}
         }

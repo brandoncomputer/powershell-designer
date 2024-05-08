@@ -4470,7 +4470,7 @@ function Get-SeleniumElementByAttribute {
 		[Parameter(Mandatory)]
 		[string]$Value
 	)
-	return $Selenium.FindElement([OpenQA.Selenium.By]::XPath("//*[contains(@$Attribute, '$Value')]"))
+	return $Selenium.FindElementsByXPath("//*[contains(@$Attribute, '$Value')]")
 }
 
 function Get-SeleniumElementByXPath {
@@ -4510,7 +4510,7 @@ function Get-SeleniumElementByXPath {
 		[Parameter(Mandatory)]
 		[string]$XPath
 	)
-	return $Selenium.FindElement([OpenQA.Selenium.By]::XPath("$XPath"))
+	return $Selenium.FindElementsByXPath($XPath)
 }
 
 function Get-Sine {
@@ -5693,6 +5693,40 @@ function Initialize-Selenium {
     Add-Type -Path ($Path + 'WebDriver.dll')
     $ChromeOptions = New-Object OpenQA.Selenium.Chrome.ChromeOptions
     return New-Object OpenQA.Selenium.Chrome.ChromeDriver($ChromeOptions)
+}
+
+function Move-Cursor {
+<#
+	.SYNOPSIS
+		Sets the mouse cursor to a position without clicking
+		
+    .DESCRIPTION
+		This function sets the position of the cursor to the x and y specified
+	
+	.PARAMETER x
+		The x position to set the cursor to
+
+	.PARAMETER y
+		The y position to set the cursor to
+	
+	.EXAMPLE
+		Move-Cursor 23 45
+	
+	.EXAMPLE
+		Move-Cursor -x 23 -y 45
+
+	.INPUTS
+		x as Integer, y as Integer
+#>
+
+	[CmdletBinding()]
+    param (
+        [Parameter(Mandatory)]
+        [int]$x,
+        [Parameter(Mandatory)]
+		[int]$y
+	)
+	[vds]::SetCursorPos($x, $y)
 }
 
 function Move-File {
@@ -7361,7 +7395,7 @@ function Send-ClickToSeleniumElementByAttribute {
 		[Parameter(Mandatory)]
 		[string]$Value
 	)
-	$Selenium.FindElement([OpenQA.Selenium.By]::XPath("//*[contains(@$Attribute, '$Value')]")).Click()
+	$Selenium.FindElementsByXPath("//*[contains(@$Attribute, '$Value')]").Click()
 }
 
 function Send-ClickToSeleniumElementByXPath {
@@ -7401,7 +7435,7 @@ function Send-ClickToSeleniumElementByXPath {
 		[Parameter(Mandatory)]
 		[string]$XPath
 	)
-	$Selenium.FindElement([OpenQA.Selenium.By]::XPath($XPath)).Click()
+	$Selenium.FindElementsByXPath($XPath).Click()
 }
 
 function Send-ClickToWindow {
@@ -7581,7 +7615,7 @@ function Send-SeleniumElementByAttribute {
 		[Parameter(Mandatory)]
 		[string]$Send
 	)
-	$Selenium.FindElement([OpenQA.Selenium.By]::XPath("//*[contains(@$Attribute, '$Value')]")).SendKeys($Send)
+	$Selenium.FindElementsByXPath("//*[contains(@$Attribute, '$Value')]").SendKeys($Send)
 }
 
 function Send-SeleniumElementByXPath {
@@ -7623,7 +7657,7 @@ function Send-SeleniumElementByXPath {
 		[Parameter(Mandatory)]
 		[string]$Send
 	)
-	$Selenium.FindElement([OpenQA.Selenium.By]::XPath($XPath)).SendKeys($Send)
+	$Selenium.FindElementsByXPath($XPath).SendKeys($Send)
 }
 
 function Send-Window {
@@ -8251,6 +8285,9 @@ public enum WindowState
         SW_SHOW_DEFAULT       = 10,
         SW_FORCE_MINIMIZE     = 11
     }
+	
+[DllImport("user32.dll")]
+private static extern bool SetCursorPos(int x, int y);
     
 [DllImport("User32.dll")]
 public static extern bool MoveWindow(int hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
