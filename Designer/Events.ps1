@@ -66,8 +66,8 @@ SOFTWARE.
         FileName:     Designer.ps1
         Modified:     Brandon Cunningham
         Created On:   1/15/2020
-        Last Updated: 5/8/2024
-        Version:      2.3.6
+        Last Updated: 5/9/2024
+        Version:      2.3.7
     ===========================================================================
 
     .DESCRIPTION
@@ -334,6 +334,9 @@ SOFTWARE.
         Updated FastColoredTextBox to include Move-Cursor
         Added resize notifiers to status bar
         
+    2.3.7 5/9/2024
+        Changed menu RenderMode to professional.
+        Added Alt &'s to menu items.
         
 BASIC MODIFICATIONS License
 Original available at https://www.pswinformscreator.com/ for deeper comparison.
@@ -2592,17 +2595,23 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
             $Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].width = $Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].width * $ctscale
             $Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].tag = "VisualStyle,DPIAware"
             Remove-Variable -Name eventSB, reuseContextInfo
+            #($Script:refs['trv_Controls'].Nodes | Where-Object { $_.Name -match "^Button"}).ImageIndex = 0
+           # $Script:refs['trv_Controls'].Nodes.Where({$_.Name -eq 'Button'}).Remove()
         } 
         catch {
             Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered before ShowDialog."
             $noIssues = $false
         }
     }
+    
+    
     try {
         $eventForm = New-Object System.Windows.Forms.Form
         $eventForm.Text = "Events"
         try {
             if ((Get-Module -ListAvailable powershell-designer).count -gt 1){
+            # or? [Reflection.Assembly]::LoadFile("$(split-path -path ((Get-Module PowerShell-Designer)[((Get-Module PowerShell-Designer).Count -1)]).Path)\FastColoredTextBox.dll") | out-null
+            
             [Reflection.Assembly]::LoadFile("$(split-path -path (Get-Module -ListAvailable powershell-designer)[0].path)\FastColoredTextBox.dll") | out-null
             }
             else{
@@ -2861,6 +2870,7 @@ $tsPlayBtn.add_Click({param($sender, $e)
     PlayMacro
 })
 
+
         if ($null -ne $args[1]){
             if (($args[0].tolower() -eq "-file") -and (Test-File $args[1])){OpenProjectClick $args[1]}
         }
@@ -2868,6 +2878,3 @@ $tsPlayBtn.add_Click({param($sender, $e)
     catch {
         Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered unexpectedly at ShowDialog."
     }
-
-
-
