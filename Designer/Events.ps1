@@ -1,4 +1,9 @@
 ﻿#region Images
+$tsl_StatusLabel.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBsRXhpZgAATU0AKgAAAAgABQExAAIAAAARAAAASgMBAAUAAAABAAAAXFEQAAEAAAABAQAAAFERAAQAAAABAAAAAFESAAQAAAABAAAAAAAAAABBZG9iZSBJbWFnZVJlYWR5AAAAAYagAACvyP/bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/APQNU1m9vdbMAuJreJZ2t4YoJGXdhtpdivJyRwB0x+dfTtc1DTvECQ/aJrmF7lLWeGeRm27nCB0LcggkZB65/KLWtM1TS/ELSiylvIXne5t5oYHkVctuKSKnzDBPB75+oEWk6Rq2seJhcNZy2cKXMd3czTW7xq21w4SNX+YksuSeg/IH0bw5PKxwqM+bzuf/2Q=="))
+$tsHeightWidth.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBsRXhpZgAATU0AKgAAAAgABQExAAIAAAARAAAASgMBAAUAAAABAAAAXFEQAAEAAAABAQAAAFERAAQAAAABAAAAAFESAAQAAAABAAAAAAAAAABBZG9iZSBJbWFnZVJlYWR5AAAAAYagAACvyP/bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/APS9T1K4trhgrO255DzPIMYkZQAFYDGAKh0rVrq7v1R2dQrRkbZ5TnMiAghmIxgmrGoadNc3DnZIuJJBzBIc5kYgghSOhFM03S5rW8RykjbnjHEEgxiRSSSVAxgGu9ez9n5nL7/Mf//Z"))
+$tsLeftTop.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBsRXhpZgAATU0AKgAAAAgABQExAAIAAAARAAAASgMBAAUAAAABAAAAXFEQAAEAAAABAQAAAFERAAQAAAABAAAAAFESAAQAAAABAAAAAAAAAABBZG9iZSBJbWFnZVJlYWR5AAAAAYagAACvyP/bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/APbtauZLexYRJNvYZ8yMHCAEEkkdOKj0G8lurLZNHcB0582VSFkBJIKk9eMfpXP6ufEUEt2Ehme0nd48Aeb8jbgCFXLLgH0HbNZ1ivi+7v8ATgIbmPT7WeKNufIAjXbuJViGfIHcEdQPSgD/2Q=="))
+$tsRecordBtn.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAQABADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD17WtasdL0yXU9TlK24O2OJTy57ADuTj+ZOAKj0jXbHUdNh1PTZibZmCSRMeUJwMEdiCR+YIOKbr+k2l/psum6nbu9qx3RSxrkxnsRjkEZ689SCMGodE0a1tLGDTdMtnjs0YSSzSrhpCPrySSASTjoABjpXv8AP/dN/wDZfqvX2t/K1rffe5//2Q=="))
+$tsPlayBtn.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBsRXhpZgAATU0AKgAAAAgABQExAAIAAAARAAAASgMBAAUAAAABAAAAXFEQAAEAAAABAQAAAFERAAQAAAABAAAAAFESAAQAAAABAAAAAAAAAABBZG9iZSBJbWFnZVJlYWR5AAAAAYagAACvyP/bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/APUFigu9Mm1zVUa63I88cDtlYkxnao6dABnHOMmopWtLSwj13RGMUaMryxRttWVc4II9eSORxmmm6i06wl0TWBNBGFeGK4CfLKmMZHXnBB74zg1A80Oq20Wh6HA5tiyrNMsZ2RJnPf6E8nJI9TXpe9zdbX+XKcPu8vn+Nz//2Q=="))
 $tsRunBtn.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBsRXhpZgAATU0AKgAAAAgABQExAAIAAAARAAAASgMBAAUAAAABAAAAXFEQAAEAAAABAQAAAFERAAQAAAABAAAAAFESAAQAAAABAAAAAAAAAABBZG9iZSBJbWFnZVJlYWR5AAAAAYagAACvyP/bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/APVbTRr+4sLef+27oCSJXxuckZAPXfz9aia0ntbmNhrlxM8NzbiWHzG6NIowRvOMg9xzVmb+1T4bgsYNMvY7pI4ULpNEv3Su7BEmeQCPxriLhdTudeGl2STJriyK7GR93lAbXDyNlgUHycHPIAAzxRXxk6c1G10/T+rnLK0bafmf/9k="))
 $tsGenerateBtn.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBsRXhpZgAATU0AKgAAAAgABQExAAIAAAARAAAASgMBAAUAAAABAAAAXFEQAAEAAAABAQAAAFERAAQAAAABAAAAAFESAAQAAAABAAAAAAAAAABBZG9iZSBJbWFnZVJlYWR5AAAAAYagAACvyP/bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/APVbTRr+4sLef+27oCSJXxuckZAPXfz9abLpt7ZSQTtq93Iq3MAKFnAYNKqkffPr6Vga54oudKNrorrJaXcOmrKsTyKPOk+4o3K4+XKt/EDx0PAPPXXiue9tZ4rm+uI4I4TiYSBHWVcFANspzzk7sE5C89x0OtK9unyMVTVr/wCZ/9k="))
 $tsTermBtn.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAQABADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwBuszaVYXl8IvBuhvbW1x5BcWsOQe2RtJGcHnocGq2kaho2p61ZWTeEtDjSaZUYiyiPB6/wVV17ydQ1e+eDxDoxs5blpkRtWhAyeN23d1xUegwWmn69Y3c+uaGIYZlZyNUgJAz/AL1fXRpZb9Wbk489tNXvb13uYpLlv1+Z/9k="))
@@ -61,8 +66,8 @@ SOFTWARE.
         FileName:     Designer.ps1
         Modified:     Brandon Cunningham
         Created On:   1/15/2020
-        Last Updated: 5/6/2024
-        Version:      2.3.4
+        Last Updated: 5/8/2024
+        Version:      2.3.6
     ===========================================================================
 
     .DESCRIPTION
@@ -200,7 +205,7 @@ SOFTWARE.
     2.1.7 4/29/2022
         Changed several message box dialogs to status bar label updates with timer instances.
     
-    3.0.0 4/19/2024 - 4/20/2024
+    2.1.9 #3.0.0# 4/19/2024 - 4/20/2024
         In a bit of a mad dash, I've refactored script output and I've added abstract syntax tree parsing and a function reference.
         Outputted scripts have the same functionality as before but are using a different system.
         The console window is no longer hidden when running your script.
@@ -319,6 +324,16 @@ SOFTWARE.
         Tweaking of position buttons for controls
         Added Move-Cursor
         
+    2.3.6rc 5/8/2024
+        Exposed macro functions
+        Readded shortcut labels w/o setting keys
+        Set-Types now autoloads in the load module to console command
+        "Poor mans tooltips"
+        Got rid of notifications on common error popups adding controls so the user may try again without a nag screen.
+        Made debugger ontop and labeled it, because I kept forgetting to close them.
+        Updated FastColoredTextBox to include Move-Cursor
+        Added resize notifiers to status bar
+        
         
 BASIC MODIFICATIONS License
 Original available at https://www.pswinformscreator.com/ for deeper comparison.
@@ -347,9 +362,10 @@ SOFTWARE.
         
 #>
 
+
 import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\functions.psm1")
     $global:ControlBeingSelected = $false
-    $global:control_track = @{} 
+    $global:control_track = @{}
     
     function Convert-XmlToTreeView {
         param(
@@ -589,7 +605,7 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
                     })
                     
                     $form.Add_MouseEnter({
-                        $Script:refs['tsl_StatusLabel'].text ="Current DPIScale: $ctscale"
+                    $Script:refs['tsl_StatusLabel'].text ="Current DPIScale: $ctscale $(Add-Tab)"
                         if ($ControlBeingSelected -eq $true){
                             $global:ControlBeingSelected = $false
                             $MainForm.Cursor = 'Default'
@@ -685,11 +701,11 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
                                     }
                                 }
                                 catch {
-                                    Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered while adding '$($controlName)'."
+                                    #Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered while adding '$($controlName)'."
                                 }
                             }
                             $Script:oldMousePos = [System.Windows.Forms.Cursor]::Position
-                            $Script:oldMousePos.Y = 125 + $MainForm.Top + ($btn_SizeAll.Parent).Top
+                            $Script:OldMousePos.Y = 125 + $MainForm.Top + ($btn_SizeAll.Parent).Top
                             $Script.OldMousePos.X = $MainForm.Left + ($btn_SizeAll.Parent).Left
                             New-SendMessage -hWnd $btn_SizeAll.handle -Msg 0x0201 -wParam 0 -lParam 0
                         }
@@ -728,11 +744,13 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
                     ConvertFrom-WinFormsXML -ParentControl $form -Reference sButtons -Suppress -Xml '<Button Name="btn_MRight" Cursor="SizeWE" BackColor="White" Size="8,8" Visible="False" />'
                     ConvertFrom-WinFormsXML -ParentControl $form -Reference sButtons -Suppress -Xml '<Button Name="btn_MTop" Cursor="SizeNS" BackColor="White" Size="8,8" Visible="False" />'
                     ConvertFrom-WinFormsXML -ParentControl $form -Reference sButtons -Suppress -Xml '<Button Name="btn_MBottom" Cursor="SizeNS" BackColor="White" Size="8,8" Visible="False" />'
-                   
+                    
+                    
                     $sButtons.GetEnumerator().ForEach({
                         $_.Value.Add_MouseMove({
                             param($Sender, $e)
                             try {
+                            
                                 $currentMousePOS = [System.Windows.Forms.Cursor]::Position
                                 if (($e.Button -eq 'Left') -and (($currentMousePOS.X -ne $Script:oldMousePOS.X) -or ($currentMousePOS.Y -ne $Script:oldMousePOS.Y))) {
                                     if (@('SplitterPanel','TabPage') -notcontains $Script:refs['PropertyGrid'].SelectedObject.GetType().Name) {
@@ -744,7 +762,7 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
                                                         $msObj.LocOffset = New-Object System.Drawing.Point(0,0)
                                                     } else {
                                                         $msObj.LocOffset = New-Object System.Drawing.Point(($currentMousePOS.X - $Script:oldMousePOS.X),($currentMousePOS.Y - $Script:oldMousePOS.Y))
-                                                    }
+                                                        }
                                                     $newSize = $Script:sRect.Size
                                                 }
                                                 btn_TLeft {
@@ -799,7 +817,7 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
                                 }
                             }
                             catch {
-                                Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered while moving mouse over selected control."
+                            #  Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered while moving mouse over selected control."
                             }
                         })
                         $_.Value.Add_MouseUp({
@@ -1004,10 +1022,10 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
                 $newLoc = New-Object System.Drawing.Point(($Object.Location.X + $Object.LocOffset.X),($Object.Location.Y + $Object.LocOffset.Y))
             } 
             else {
-                $newLoc = New-Object System.Drawing.Point(($Script:sButtons['btn_TLeft'].Location.X + $Object.LocOffset.X),($Script:sButtons['btn_TLeft'].Location.Y + $Object.LocOffset.Y))
+            $newLoc = New-Object System.Drawing.Point(($Script:sButtons['btn_TLeft'].Location.X + $Object.LocOffset.X),($Script:sButtons['btn_TLeft'].Location.Y + $Object.LocOffset.Y))
             }
-            $Script:sRect = New-Object System.Drawing.Rectangle($newLoc,$newSize)
             
+            $Script:sRect = New-Object System.Drawing.Rectangle($newLoc,$newSize)
             $Script:sButtons.GetEnumerator().ForEach({
                 $btn = $_.Value
                 switch ($btn.Name) {
@@ -1018,7 +1036,7 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
                     btn_BRight {$btn.Location = New-Object System.Drawing.Point(($newLoc.X + $newSize.Width - 8),($newLoc.Y + $newSize.Height - 8))}
                     btn_MLeft {
                         if ( $Object.Size.Height -gt 28 ) {
-                            $btn.Location = New-Object System.Drawing.Point($newLoc.X,($newLoc.Y + ($newSize.Height / 2) - 4))
+                            $btn.Location = New-Object System.Drawing.Point($newLoc.X ,($newLoc.Y + ($newSize.Height / 2) - 4))
                             $btn.Visible = $true
                         } 
                         else {
@@ -1066,6 +1084,12 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
             })
         }
     }
+    
+                $stlTimer = new-timer 100
+            $stlTimer.Add_Tick({
+            $tsLeftTop.Text = "$($Script:refs['PropertyGrid'].SelectedObject.Location.Y),$($Script:refs['PropertyGrid'].SelectedObject.Location.X)"
+            $tsHeightWidth.Text = "$($Script:refs['PropertyGrid'].SelectedObject.Size.Width),$($Script:refs['PropertyGrid'].SelectedObject.Size.Height)"
+            })
 
     function Save-Project {
         param(
@@ -2428,19 +2452,26 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
                 }
                 $file = "`"$($generationPath)\$($projectName -replace "fbs$","ps1")`""
                 start-process -filepath powershell.exe -argumentlist '-ep bypass','-sta','-noexit',"-file $file"
+                start-sleep -s 1
+            $PS = Get-WindowExists "Windows PowerShell"
+            if ($PS -eq $Null){
+                $PS = Get-WindowExists "Administrator: Windows PowerShell"
+            }
+            Set-WindowText $PS "Windows PowerShell - PowerShell Designer Debug Window"
+            Set-WindowOnTop -Handle $PS
             }
         }
         $Script:refs['RunLast'].Add_Click({
             RunLast
         })
         function LoadFunctionModule {
-            start-process -filepath powershell.exe -argumentlist '-noexit', "-command import-module '$([Environment]::GetFolderPath('MyDocuments'))\PowerShell Designer\functions\functions.psm1'" #-workingdirectory "$($global:projectDirName)"
+        start-process -filepath powershell.exe -argumentlist '-noexit', "-command import-module '$([Environment]::GetFolderPath('MyDocuments'))\PowerShell Designer\functions\functions.psm1'; Set-Types" #-workingdirectory "$($global:projectDirName)"
             start-sleep -s 1
             $PS = Get-WindowExists "Windows PowerShell"
             if ($PS -eq $Null){
                 $PS = Get-WindowExists "Administrator: Windows PowerShell"
             }
-            Set-WindowText $PS "Windows PowerShell - PowerShell Designer Custom Functions Enabled"
+            Set-WindowText $PS "Windows PowerShell - PowerShell Designer Custom Functions Enabled | Set-Types"
         }
 
         $functionsModule.Add_Click({
@@ -2705,34 +2736,43 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
         }
         EmptyListString
         
-        $tsRunBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Run Script File | F9"})
-        $tsGenerateBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Generate Script File | F8"})
-        $tsTermBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Load Functions Module in PowerShell | F7"})
-        $tsFormTreeBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Form Tree | F2"})
-        $tsEventsBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Events | F4"})
-        $tsPropertiesBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Properties | F3"})
-        $tsToolBoxBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "ToolBox | F1"})
-        $tsMoveDownBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Move Down | F5"})
-        $tsMoveUpBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Move Up | F6"})
-        $tsControlPasteBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Paste Control | Ctrl+Alt+V"})
-        $tsControlCopyBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Copy Control | Ctrl+Alt+C"})
-        $tsDeleteBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Delete Control | Ctrl+D"})
-        $tsRenameBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Rename Control | Ctrl+R"})
-        $tsExpandAllBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Expand All | F11"})
-        $tsCollapseAllBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Collapse All | F10"})
-        $tsGoToLineBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Go To Line... | Ctrl+G"})
-        $tsReplaceBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Replace | Ctrl+H"})
-        $tsFindBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Find | Ctrl+F"})
-        $tsSelectAllBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Select All | Ctrl+A"})
-        $tsPasteBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Paste | Ctrl+V"})
-        $tsCopyBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Copy | Ctrl+C"})
-        $tsCutBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Cut | Ctrl+X"})
-        $tsRedoBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Redo | Ctrl+Z"})
-        $tsUndoBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Undo | Ctrl+Y"})
-        $tsSaveAsbtn.Add_MouseEnter{($tsl_StatusLabel.Text = "Save As | Ctrl+Alt+S")}
-        $tsSavebtn.Add_MouseEnter{($tsl_StatusLabel.Text = "Save | Ctrl+S")}
-        $tsOpenbtn.Add_MouseEnter({$tsl_StatusLabel.Text = "Open | Ctrl+O"})
-        $tsNewBtn.Add_MouseEnter({$tsl_StatusLabel.Text = "New | Ctrl+N"})
+        $ToolStrip.add_MouseLeave({$tcl_Top.TabPages.RemoveAt(1)})
+        
+        $ToolStrip.add_MouseEnter({
+            $ToolTip = New-Object System.Windows.Forms.TabPage
+            $tcl_Top.Controls.Add($ToolTip)
+        })
+
+        $tsRunBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Run Script File | F9"})
+        $tsGenerateBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Generate Script File | F8"})
+        $tsTermBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Load Functions Module in PowerShell | F7"})
+        $tsFormTreeBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Form Tree | F2"})
+        $tsEventsBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Events | F4"})
+        $tsPropertiesBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Properties | F3"})
+        $tsToolBoxBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "ToolBox | F1"})
+        $tsMoveDownBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Move Down | F6"})
+        $tsMoveUpBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Move Up | F5"})
+        $tsControlPasteBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Paste Control | Ctrl+Alt+V"})
+        $tsControlCopyBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Copy Control | Ctrl+Alt+C"})
+        $tsDeleteBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Delete Control | Ctrl+D"})
+        $tsRenameBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Rename Control | Ctrl+R"})
+        $tsExpandAllBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Expand All | F11"})
+        $tsCollapseAllBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Collapse All | F10"})
+        $tsRecordBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Record Macro | Ctrl+M"})
+        $tsPlayBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Play Macro | Ctrl+E"})
+        $tsGoToLineBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Go To Line... | Ctrl+G"})
+        $tsReplaceBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Replace | Ctrl+H"})
+        $tsFindBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Find | Ctrl+F"})
+        $tsSelectAllBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Select All | Ctrl+A"})
+        $tsPasteBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Paste | Ctrl+V"})
+        $tsCopyBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Copy | Ctrl+C"})
+        $tsCutBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Cut | Ctrl+X"})
+        $tsRedoBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Redo | Ctrl+Z"})
+        $tsUndoBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Undo | Ctrl+Y"})
+        $tsSaveAsbtn.Add_MouseEnter{($tcl_Top.Controls[1].Text = "Save As | Ctrl+Alt+S")}
+        $tsSavebtn.Add_MouseEnter{($tcl_Top.Controls[1].Text = "Save | Ctrl+S")}
+        $tsOpenbtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Open | Ctrl+O"})
+        $tsNewBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "New | Ctrl+N"})
         
         $btn_Find.add_Click({param($sender, $e)
             if ($lst_Find.SelectedIndex -eq -1){
@@ -2795,8 +2835,31 @@ $MainForm.add_MouseUp({param($sender, $e)
     $MainForm.Cursor = 'Default' 
 })
 
+function RecordMacro {
+    Send-Window -Handle $FastText.Handle -String (Add-CTRL -TextValue 'm')
+}
+
+function PlayMacro {
+    Send-Window -Handle $FastText.Handle -String (Add-CTRL -TextValue 'e')
+}
+
+$mnuRecord.add_Click({param($sender, $e)
+    RecordMacro
+})
 
 
+$mnuPlay.add_Click({param($sender, $e)
+    PlayMacro
+})
+
+
+$tsRecordBtn.add_Click({param($sender, $e)
+    RecordMacro
+})
+
+$tsPlayBtn.add_Click({param($sender, $e)
+    PlayMacro
+})
 
         if ($null -ne $args[1]){
             if (($args[0].tolower() -eq "-file") -and (Test-File $args[1])){OpenProjectClick $args[1]}
