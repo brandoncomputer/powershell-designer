@@ -353,6 +353,10 @@ SOFTWARE.
     2.4.2 5/10/2024
         Fixed typo preventing some tooltip changes.
         
+    2.4.3 5/10/2024
+        Further fixes to ChangeView. Several false commits/releases today. Apologies.
+        Trying to make this the last day on this.
+        
 BASIC MODIFICATIONS License
 Original available at https://www.pswinformscreator.com/ for deeper comparison.
         
@@ -1397,6 +1401,16 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
     function ChangeView {($e, $r)
         try {
             switch ($this.Name) {
+                'tsToolBoxBtn' {
+                    $pnlChanged = $refs['pnl_Left']
+                    $sptChanged = $refs['spt_Left']
+                    $tsViewItem = $refs['Toolbox']
+                    $tsMenuItem = $refs['ms_Toolbox']
+                    $tsBtn = $tsToolBoxBtn
+                    $thisNum = '1'
+                    $otherNum = '2'
+                    $side = 'Left'
+                }
                 'Toolbox' {
                     $pnlChanged = $refs['pnl_Left']
                     $sptChanged = $refs['spt_Left']
@@ -1405,6 +1419,16 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
                     $tsBtn = $tsToolBoxBtn
                     $thisNum = '1'
                     $otherNum = '2'
+                    $side = 'Left'
+                }
+                'tsFormTreeBtn' {
+                    $pnlChanged = $refs['pnl_Left']
+                    $sptChanged = $refs['spt_Left']
+                    $tsViewItem = $refs['FormTree']
+                    $tsMenuItem = $refs['ms_FormTree']
+                    $tsBtn = $tsFormTreeBtn
+                    $thisNum = '2'
+                    $otherNum = '1'
                     $side = 'Left'
                 }
                 'FormTree' {
@@ -1417,6 +1441,16 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
                     $otherNum = '1'
                     $side = 'Left'
                 }
+                'tsPropertiesBtn' {
+                    $pnlChanged = $refs['pnl_Right']
+                    $sptChanged = $refs['spt_Right']
+                    $tsViewItem = $refs['Properties']
+                    $tsMenuItem = $refs['ms_Properties']
+                    $tsBtn = $tsPropertiesBtn
+                    $thisNum = '1'
+                    $otherNum = '2'
+                    $side = 'Right'
+                }
                 'Properties' {
                     $pnlChanged = $refs['pnl_Right']
                     $sptChanged = $refs['spt_Right']
@@ -1425,6 +1459,16 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
                     $tsBtn = $tsPropertiesBtn
                     $thisNum = '1'
                     $otherNum = '2'
+                    $side = 'Right'
+                }
+                'tsEventsBtn' {
+                    $pnlChanged = $refs['pnl_Right']
+                    $sptChanged = $refs['spt_Right']
+                    $tsViewItem = $refs['Events']
+                    $tsMenuItem = $refs['ms_Events']
+                    $tsBtn = $tsEventsBtn
+                    $thisNum = '2'
+                    $otherNum = '1'
                     $side = 'Right'
                 }
                 'Events' {

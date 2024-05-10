@@ -4113,7 +4113,7 @@ function Get-PowerShellDesignerVersion {
 	.EXAMPLE
 		$PSDVersion = Get-PowerShellDesignerVersion
 #>
-	return '2.4.2'
+	return '2.4.3'
 }
 
 function Get-PowerShellVersion {
