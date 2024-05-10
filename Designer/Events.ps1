@@ -67,7 +67,7 @@ SOFTWARE.
         Modified:     Brandon Cunningham
         Created On:   1/15/2020
         Last Updated: 5/10/2024
-        Version:      2.4.4
+        Version:      2.4.5
     ===========================================================================
 
     .DESCRIPTION
@@ -362,6 +362,9 @@ SOFTWARE.
         Changes to New Project and Open Project #14
         Changes to Load Functions in PowerShell and to Run Script File #15
         
+    2.4.5 5/10/2024
+     Set-ActiveWindow #16
+        
 BASIC MODIFICATIONS License
 Original available at https://www.pswinformscreator.com/ for deeper comparison.
         
@@ -388,8 +391,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
         
 #>
-
-    Hide-Window -Handle (get-windowexists "ConsoleWindowClass")
 
     import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\functions.psm1")
     $global:ControlBeingSelected = $false
@@ -2945,3 +2946,7 @@ $tsPlayBtn.add_Click({param($sender, $e)
     catch {
         Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered unexpectedly at ShowDialog."
     }
+    
+    Set-ActiveWindow $MainForm.Handle
+    
+    Hide-Window -Handle (get-windowexists "ConsoleWindowClass")
