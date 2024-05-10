@@ -67,7 +67,7 @@ SOFTWARE.
         Modified:     Brandon Cunningham
         Created On:   1/15/2020
         Last Updated: 5/10/2024
-        Version:      2.4.0
+        Version:      2.4.1
     ===========================================================================
 
     .DESCRIPTION
@@ -346,6 +346,9 @@ SOFTWARE.
         
     2.4.0 5/10/2024
         Button3 test button removal.
+        
+    2.4.1 5/10/2024
+        ShowItemToolTips. Got ToolTips working properly. Removed "Poor mans tooltips"
         
 BASIC MODIFICATIONS License
 Original available at https://www.pswinformscreator.com/ for deeper comparison.
@@ -2754,43 +2757,36 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
         }
         EmptyListString
         
-        $ToolStrip.add_MouseLeave({$tcl_Top.TabPages.RemoveAt(1)})
-        
-        $ToolStrip.add_MouseEnter({
-            $ToolTip = New-Object System.Windows.Forms.TabPage
-            $tcl_Top.Controls.Add($ToolTip)
-        })
-
-        $tsRunBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Run Script File | F9"})
-        $tsGenerateBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Generate Script File | F8"})
-        $tsTermBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Load Functions Module in PowerShell | F7"})
-        $tsFormTreeBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Form Tree | F2"})
-        $tsEventsBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Events | F4"})
-        $tsPropertiesBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Properties | F3"})
-        $tsToolBoxBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "ToolBox | F1"})
-        $tsMoveDownBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Move Down | F6"})
-        $tsMoveUpBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Move Up | F5"})
-        $tsControlPasteBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Paste Control | Ctrl+Alt+V"})
-        $tsControlCopyBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Copy Control | Ctrl+Alt+C"})
-        $tsDeleteBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Delete Control | Ctrl+D"})
-        $tsRenameBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Rename Control | Ctrl+R"})
-        $tsExpandAllBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Expand All | F11"})
-        $tsCollapseAllBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Collapse All | F10"})
-        $tsRecordBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Record Macro | Ctrl+M"})
-        $tsPlayBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Play Macro | Ctrl+E"})
-        $tsGoToLineBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Go To Line... | Ctrl+G"})
-        $tsReplaceBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Replace | Ctrl+H"})
-        $tsFindBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Find | Ctrl+F"})
-        $tsSelectAllBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Select All | Ctrl+A"})
-        $tsPasteBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Paste | Ctrl+V"})
-        $tsCopyBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Copy | Ctrl+C"})
-        $tsCutBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Cut | Ctrl+X"})
-        $tsRedoBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Redo | Ctrl+Z"})
-        $tsUndoBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Undo | Ctrl+Y"})
-        $tsSaveAsbtn.Add_MouseEnter{($tcl_Top.Controls[1].Text = "Save As | Ctrl+Alt+S")}
-        $tsSavebtn.Add_MouseEnter{($tcl_Top.Controls[1].Text = "Save | Ctrl+S")}
-        $tsOpenbtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "Open | Ctrl+O"})
-        $tsNewBtn.Add_MouseEnter({$tcl_Top.Controls[1].Text = "New | Ctrl+N"})
+        $tsRunBtn.ToolTipText = "Run Script File | F9"
+        $tsGenerateBtn.ToolTipText = "Generate Script File | F8"
+        $tsTermBtn.ToolTipText = "Load Functions Module in PowerShell | F7"
+        $tsFormTreeBtn.ToolTipText = "Form Tree | F2"
+        $tsEventsBtn.ToolTipText = "Events | F4"
+        $tsPropertiesBtn.ToolTipText = "Properties | F3"
+        $tsToolBoxBtn.ToolTipText = "ToolBox | F1"
+        $tsMoveDownBtn.ToolTipText = "Move Down | F6"
+        $tsMoveUpBtn.ToolTipText = "Move Up | F5"
+        $tsControlPasteBtn.ToolTipText = "Paste Control | Ctrl+Alt+V"
+        $tsControlCopyBtn.ToolTipText = "Copy Control | Ctrl+Alt+C"
+        $tsDeleteBtn.ToolTipText = "Delete Control | Ctrl+D"
+        $tsRenameBtn.ToolTipText = "Rename Control | Ctrl+R"
+        $tsExpandAllBtn.ToolTipText = "Expand All | F11"
+        $tsCollapseAllBtn.ToolTipText = "Collapse All | F10"
+        $tsRecordBtn.ToolTipText = "Record Macro | Ctrl+M"
+        $tsPlayBtn.ToolTipText = "Play Macro | Ctrl+E"
+        $tsGoToLineBtn.ToolTipText = "Go To Line... | Ctrl+G"
+        $tsReplaceBtn.ToolTipText = "Replace | Ctrl+H"
+        $tsFindBtn.ToolTipText = "Find | Ctrl+F"
+        $tsSelectAllBtn.ToolTipText = "Select All | Ctrl+A"
+        $tsPasteBtn.ToolTipText = "Paste | Ctrl+V"
+        $tsCopyBtn.ToolTipText = "Copy | Ctrl+C"
+        $tsCutBtn.ToolTipText = "Cut | Ctrl+X"
+        $tsRedoBtn.ToolTipText = "Redo | Ctrl+Z"
+        $tsUndoBtn.ToolTipText = "Undo | Ctrl+Y"
+        $tsSaveAsbtnToolTipText = "Save As | Ctrl+Alt+S"
+        $tsSavebtnToolTipText = "Save | Ctrl+S"
+        $tsOpenbtn.ToolTipText = "Open | Ctrl+O"
+        $tsNewBtn.ToolTipText = "New | Ctrl+N"
         
         $btn_Find.add_Click({param($sender, $e)
             if ($lst_Find.SelectedIndex -eq -1){
