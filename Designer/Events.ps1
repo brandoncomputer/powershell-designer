@@ -66,8 +66,8 @@ SOFTWARE.
         FileName:     Designer.ps1
         Modified:     Brandon Cunningham
         Created On:   1/15/2020
-        Last Updated: 5/9/2024
-        Version:      2.3.7
+        Last Updated: 5/10/2024
+        Version:      2.4.0
     ===========================================================================
 
     .DESCRIPTION
@@ -343,6 +343,9 @@ SOFTWARE.
         
     2.3.9 5/10/2024
         Fixed breaking change &'s to view change function. #13
+        
+    2.4.0 5/10/2024
+        Button3 test button removal.
         
 BASIC MODIFICATIONS License
 Original available at https://www.pswinformscreator.com/ for deeper comparison.

@@ -282,6 +282,5 @@
       <ToolStripStatusLabel Name="tsLeftTop" ImageTransparentColor="White" Text="tsLeftTop" />
       <ToolStripStatusLabel Name="tsHeightWidth" Text="tsHeightWidth" />
     </StatusStrip>
-    <Button Name="Button3" Location="1211,157" Text="Button3" />
   </Form>
 </Data>

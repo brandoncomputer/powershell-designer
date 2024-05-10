@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>powershell-designer</id>
+    <version>2.4.0</version>
+    <authors>Brandon Cunningham</authors>
+    <owners>Brandon Cunningham</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://github.com/brandoncomputer/powershell-designer/blob/main/license.md</licenseUrl>
+    <projectUrl>https://github.com/brandoncomputer/powershell-designer</projectUrl>
+    <description>The best free form designer for powershell.</description>
+    <releaseNotes>The best free form designer for powershell.</releaseNotes>
+    <copyright>(c) Brandon Cunningham. Portions (c) Benjamin Turmo &amp; Pavel Torgashov</copyright>
+    <tags>PSModule PSIncludes_Function PSFunction_powershell-designer PSCommand_powershell-designer</tags>
+  </metadata>
+</package>
