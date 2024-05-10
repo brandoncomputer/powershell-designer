@@ -67,7 +67,7 @@ SOFTWARE.
         Modified:     Brandon Cunningham
         Created On:   1/15/2020
         Last Updated: 5/10/2024
-        Version:      2.4.1
+        Version:      2.4.2
     ===========================================================================
 
     .DESCRIPTION
@@ -349,6 +349,9 @@ SOFTWARE.
         
     2.4.1 5/10/2024
         ShowItemToolTips. Got ToolTips working properly. Removed "Poor mans tooltips"
+    
+    2.4.2 5/10/2024
+        Fixed typo preventing some tooltip changes.
         
 BASIC MODIFICATIONS License
 Original available at https://www.pswinformscreator.com/ for deeper comparison.
@@ -2783,8 +2786,8 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
         $tsCutBtn.ToolTipText = "Cut | Ctrl+X"
         $tsRedoBtn.ToolTipText = "Redo | Ctrl+Z"
         $tsUndoBtn.ToolTipText = "Undo | Ctrl+Y"
-        $tsSaveAsbtnToolTipText = "Save As | Ctrl+Alt+S"
-        $tsSavebtnToolTipText = "Save | Ctrl+S"
+        $tsSaveAsbtn.ToolTipText = "Save As | Ctrl+Alt+S"
+        $tsSavebtn.ToolTipText = "Save | Ctrl+S"
         $tsOpenbtn.ToolTipText = "Open | Ctrl+O"
         $tsNewBtn.ToolTipText = "New | Ctrl+N"
         
