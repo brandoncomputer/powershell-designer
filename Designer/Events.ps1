@@ -338,6 +338,12 @@ SOFTWARE.
         Changed menu RenderMode to professional.
         Added Alt &'s to menu items.
         
+    2.3.8 5/9/2024
+        Fixed mistake during release
+        
+    2.3.9 5/10/2024
+        Fixed breaking change &'s to view change function. #13
+        
 BASIC MODIFICATIONS License
 Original available at https://www.pswinformscreator.com/ for deeper comparison.
         
@@ -1381,7 +1387,7 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
  
     function ChangeView {($e, $r)
         try {
-            switch ($this.Text) {
+            switch ($this.Name) {
                 'Toolbox' {
                     $pnlChanged = $refs['pnl_Left']
                     $sptChanged = $refs['spt_Left']
@@ -1392,7 +1398,7 @@ import-module ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer
                     $otherNum = '2'
                     $side = 'Left'
                 }
-                'Form Tree' {
+                'FormTree' {
                     $pnlChanged = $refs['pnl_Left']
                     $sptChanged = $refs['spt_Left']
                     $tsViewItem = $refs['FormTree']
