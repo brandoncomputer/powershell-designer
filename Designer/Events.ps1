@@ -67,7 +67,7 @@ SOFTWARE.
         Modified:     Brandon Cunningham
         Created On:   1/15/2020
         Last Updated: 5/10/2024
-        Version:      2.4.5
+        Version:      2.4.6
     ===========================================================================
 
     .DESCRIPTION
@@ -364,6 +364,10 @@ SOFTWARE.
         
     2.4.5 5/10/2024
      Set-ActiveWindow #16
+        
+    2.4.6 5/10/2024
+        Undid MDI Style changes, they didn't flow well/invalid
+        Checks for debug mode before hiding console window.
         
 BASIC MODIFICATIONS License
 Original available at https://www.pswinformscreator.com/ for deeper comparison.
@@ -1517,9 +1521,6 @@ SOFTWARE.
     }
     
     function NewProjectClick {
-        powershell-designer
-        return
-#Legacy code. Not trimming yet.
         try {               
             if ( [System.Windows.Forms.MessageBox]::Show("Unsaved changes to the current project will be lost.  Are you sure you want to start a new project?", 'Confirm', 4) -eq 'Yes' ) {
                 $global:control_track = @{}
@@ -1558,9 +1559,9 @@ SOFTWARE.
     
     function OpenProjectClick ([string]$fileName){
         if ($fileName -eq ''){
-        <#if ( [System.Windows.Forms.MessageBox]::Show("You will lose all changes to the current project.  Are you sure?", 'Confirm', 4) -eq 'No' ) {
+            if ( [System.Windows.Forms.MessageBox]::Show("You will lose all changes to the current project.  Are you sure?", 'Confirm', 4) -eq 'No' ) {
                 return
-                }   #>
+            }   
             $openDialog = ConvertFrom-WinFormsXML -Xml @"
 <OpenFileDialog InitialDirectory="$($Script:projectsDir)" AddExtension="True" DefaultExt="fbs" Filter="fbs files (*.fbs)|*.fbs" FilterIndex="1" ValidateNames="True" CheckFileExists="True" RestoreDirectory="True" />
 "@
@@ -1571,10 +1572,6 @@ SOFTWARE.
                 if ( $openDialog.ShowDialog() -ne 'OK' ) {return}
                 $fileName = $openDialog.FileName
                 $projectName = $refs['tpg_Form1'].Text
-                if ($projectName -ne "NewProject.fbs") {
-                    powershell-designer "$(get-character 34)$fileName$(get-character 34)"
-                    return
-                }
             }
             if ($fileName) {
                 for($i=0; $i -lt $lst_Functions.Items.Count; $i++){
@@ -2534,8 +2531,9 @@ Show-Form `$$FormName}); `$PowerShell.AddParameter('File',`$args[0]);`$PowerShel
                 else {
                     start-process -filepath powershell.exe -argumentlist '-ep bypass','-sta','-noexit',"-file $file"
                 }
-                start-sleep -s 1
+            start-sleep -s 1
             Set-WindowOnTop -Handle (get-windowexists "ConsoleWindowClass")
+            Set-WindowText (get-windowexists "ConsoleWindowClass") "Windows PowerShell - PowerShell Designer Debug Window"
             }
         }
         $Script:refs['RunLast'].Add_Click({
@@ -2949,4 +2947,7 @@ $tsPlayBtn.add_Click({param($sender, $e)
     
     Set-ActiveWindow $MainForm.Handle
     
-    Hide-Window -Handle (get-windowexists "ConsoleWindowClass")
+    if ((get-windowexists "Windows PowerShell - PowerShell Designer Debug Window") -eq $null){
+        Hide-Window -Handle (get-windowexists "ConsoleWindowClass")
+     }
+        
