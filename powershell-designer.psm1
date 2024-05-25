@@ -34,38 +34,18 @@ function powershell-designer($a) {
 	
 	if ($a) {
 		if ((get-host).version.major -eq 7) {
-			if ((Get-Module -ListAvailable powershell-designer).count -gt 1){
-				start-process -filepath pwsh.exe -argumentlist '-ep bypass',"-file $(chr 34)$(path $(Get-Module PowerShell-Designer)[0].path)\Designer\Designer.ps1$(chr 34)","$($a)"
-			}
-			else {
-				start-process -filepath pwsh.exe -argumentlist '-ep bypass',"-file $(chr 34)$(path $(Get-Module PowerShell-Designer).path)\Designer\Designer.ps1$(chr 34)","$($a)"
-			}
+				start-process -filepath pwsh.exe -argumentlist '-WindowStyle hidden','-ep bypass',"-file $(chr 34)$([Environment]::GetFolderPath('MyDocuments'))\PowerShell Designer\designer\designer.ps1$(chr 34)","$($a)"
 		}
 		else {
-			if ((Get-Module -ListAvailable powershell-designer).count -gt 1){
-				start-process -filepath powershell.exe -argumentlist '-ep bypass',"-file $(chr 34)$(path $(Get-Module PowerShell-Designer)[0].path)\Designer\Designer.ps1$(chr 34)","$($a)"
-			}
-			else {
-				start-process -filepath powershell.exe -argumentlist '-ep bypass',"-file $(chr 34)$(path $(Get-Module PowerShell-Designer).path)\Designer\Designer.ps1$(chr 34)","$($a)"
-			}
+				start-process -filepath powershell.exe -argumentlist '-WindowStyle hidden','-ep bypass',"-file $(chr 34)$([Environment]::GetFolderPath('MyDocuments'))\PowerShell Designer\designer\designer.ps1$(chr 34)","$($a)"
 		}
 	}
-	else{	
+	else {	
 		if ((get-host).version.major -eq 7) {
-			if ((Get-Module -ListAvailable powershell-designer).count -gt 1){
-				start-process -filepath pwsh.exe -argumentlist '-ep bypass',"-file $(chr 34)$(path $(Get-Module PowerShell-Designer)[0].path)\Designer\Designer.ps1$(chr 34)"
-			}
-			else {
-				start-process -filepath pwsh.exe -argumentlist '-ep bypass',"-file $(chr 34)$(path $(Get-Module PowerShell-Designer).path)\Designer\Designer.ps1$(chr 34)"
-			}
+				start-process -filepath pwsh.exe -argumentlist '-WindowStyle hidden','-ep bypass',"-file $(chr 34)$([Environment]::GetFolderPath('MyDocuments'))\PowerShell Designer\designer\designer.ps1$(chr 34)"
 		}
 		else {
-			if ((Get-Module -ListAvailable powershell-designer).count -gt 1){
-				start-process -filepath powershell.exe -argumentlist '-ep bypass',"-file $(chr 34)$(path $(Get-Module PowerShell-Designer)[0].path)\Designer\Designer.ps1$(chr 34)"
-			}
-			else {
-				start-process -filepath powershell.exe -argumentlist '-ep bypass',"-file $(chr 34)$(path $(Get-Module PowerShell-Designer).path)\Designer\Designer.ps1$(chr 34)"
-			}
+				start-process -filepath powershell.exe -argumentlist '-WindowStyle hidden','-ep bypass',"-file $(chr 34)$([Environment]::GetFolderPath('MyDocuments'))\PowerShell Designer\designer\designer.ps1$(chr 34)"
 		}
 	}
 }

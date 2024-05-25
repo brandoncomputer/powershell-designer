@@ -1,13 +1,15 @@
 <Data>
   <Events Desc="Events associated with controls">
-    <Form Name="MainForm" Root="Form|MainForm" Events="Load MouseEnter MouseUp" />
+    <Form Name="MainForm" Root="Form|MainForm" Events="Load MouseEnter MouseUp ChangeUICues Click" />
     <Label Name="lbl_Left" Root="Form|MainForm" Events="MouseMove" />
     <Label Name="lbl_Right" Root="Form|MainForm" Events="MouseMove" />
-    <TreeView Name="trv_Controls" Root="Form|MainForm" Events="DoubleClick MouseDown MouseLeave MouseUp" />
-    <TreeView Name="TreeView" Root="Form|MainForm" Events="AfterSelect" />
-    <PropertyGrid Name="PropertyGrid" Root="Form|MainForm" Events="PropertyValueChanged" />
-    <ListBox Name="lst_AvailableEvents" Root="Form|MainForm" Events="DoubleClick" />
+    <TreeView Name="trv_Controls" Root="Form|MainForm" Events="MouseDown MouseLeave MouseUp DoubleClick" />
+    <TreeView Name="TreeView" Root="Form|MainForm" Events="AfterSelect DoubleClick" />
+    <Button Name="btnInject" Root="Form|MainForm" Events="Click" />
+    <PropertyGrid Name="PropertyGrid" Root="Form|MainForm" Events="SelectedGridItemChanged MouseDoubleClick" />
+    <ListView Name="lst_AvailableEvents" Root="Form|MainForm" Events="DoubleClick KeyPress" />
     <ListBox Name="lst_AssignedEvents" Root="Form|MainForm" Events="DoubleClick" />
+    <ListView Name="lst_Methods" Root="Form|MainForm" Events="DoubleClick" />
     <CheckedListBox Name="lst_Functions" Root="Form|MainForm" Events="DoubleClick Click" />
     <Button Name="btn_Find" Root="Form|MainForm" Events="Click" />
     <Button Name="btn_RemoveFind" Root="Form|MainForm" Events="Click" />
@@ -34,6 +36,10 @@
     <ToolStripButton Name="tsExpandAllBtn" Root="Form|MainForm" Events="Click" />
     <ToolStripButton Name="tsRecordBtn" Root="Form|MainForm" Events="Click" />
     <ToolStripButton Name="tsPlayBtn" Root="Form|MainForm" Events="Click" />
+    <ToolStripButton Name="tsBookmark" Root="Form|MainForm" Events="Click" />
+    <ToolStripButton Name="tsUnbookmark" Root="Form|MainForm" Events="Click" />
+    <ToolStripButton Name="tsNextBookmark" Root="Form|MainForm" Events="Click" />
+    <ToolStripButton Name="tsZoomNormal" Root="Form|MainForm" Events="Click" />
     <ToolStripButton Name="tsRenameBtn" Root="Form|MainForm" Events="Click" />
     <ToolStripButton Name="tsDeleteBtn" Root="Form|MainForm" Events="Click" />
     <ToolStripButton Name="tsControlCopyBtn" Root="Form|MainForm" Events="Click" />
@@ -44,6 +50,7 @@
     <ToolStripButton Name="tsFormTreeBtn" Root="Form|MainForm" Events="Click" />
     <ToolStripButton Name="tsPropertiesBtn" Root="Form|MainForm" Events="Click" />
     <ToolStripButton Name="tsEventsBtn" Root="Form|MainForm" Events="Click" />
+    <ToolStripButton Name="tsImportForm" Root="Form|MainForm" Events="Click" />
     <ToolStripButton Name="tsTermBtn" Root="Form|MainForm" Events="Click" />
     <ToolStripButton Name="tsGenerateBtn" Root="Form|MainForm" Events="Click" />
     <ToolStripButton Name="tsRunBtn" Root="Form|MainForm" Events="Click" />
@@ -65,6 +72,9 @@
     <ToolStripMenuItem Name="Expand All" Root="Form|MainForm" Events="Click" />
     <ToolStripMenuItem Name="mnuRecord" Root="Form|MainForm" Events="Click" />
     <ToolStripMenuItem Name="mnuPlay" Root="Form|MainForm" Events="Click" />
+    <ToolStripMenuItem Name="ZoomIn" Root="Form|MainForm" Events="Click" />
+    <ToolStripMenuItem Name="ZoomNormal" Root="Form|MainForm" Events="Click" />
+    <ToolStripMenuItem Name="ZoomOut" Root="Form|MainForm" Events="Click" />
     <ToolStripMenuItem Name="Rename" Root="Form|MainForm" Events="Click" />
     <ToolStripMenuItem Name="Delete" Root="Form|MainForm" Events="Click" />
     <ToolStripMenuItem Name="CopyNode" Root="Form|MainForm" Events="Click" />
@@ -81,7 +91,6 @@
   </Events>
   <Functions Desc="Functions associated with project">
     <Function Name="Add-CTRL" />
-    <Function Name="Add-Tab" />
     <Function Name="Assert-List" />
     <Function Name="ConvertFrom-WinFormsXML" />
     <Function Name="Get-ActiveWindow" />
@@ -89,13 +98,17 @@
     <Function Name="Get-CarriageReturn" />
     <Function Name="Get-Character" />
     <Function Name="Get-CurrentDirectory" />
+    <Function Name="Get-FileExtension" />
+    <Function Name="Get-FileName" />
+    <Function Name="Get-InputBox" />
     <Function Name="Get-WindowExists" />
     <Function Name="Get-WindowPosition" />
     <Function Name="Get-WindowText" />
     <Function Name="Hide-Window" />
+    <Function Name="Initialize-FastColoredTextBox" />
+    <Function Name="Invoke-Form" />
     <Function Name="Move-Window" />
     <Function Name="New-SendMessage" />
-    <Function Name="Send-ClickToWindow" />
     <Function Name="Send-Window" />
     <Function Name="Set-ActiveWindow" />
     <Function Name="Set-DPIAware" />
@@ -104,11 +117,12 @@
     <Function Name="Set-WindowOnTop" />
     <Function Name="Set-WindowParent" />
     <Function Name="Set-WindowText" />
-    <Function Name="Show-Form" />
+    <Function Name="Show-OpenFileDialog" />
     <Function Name="Show-Window" />
     <Function Name="Test-File" />
     <Function Name="Update-ErrorLog" />
     <Function Name="Add-Type" />
+    <Function Name="Export-Clixml" />
     <Function Name="Get-Date" />
     <Function Name="Get-Member" />
     <Function Name="Get-Variable" />
@@ -118,22 +132,24 @@
     <Function Name="Remove-Variable" />
     <Function Name="Select-Xml" />
     <Function Name="Start-Sleep" />
+    <Function Name="Add-Content" />
     <Function Name="Get-Content" />
     <Function Name="Split-Path" />
     <Function Name="Start-Process" />
+    <Function Name="Test-Path" />
     <Function Name="ForEach-Object" />
     <Function Name="Get-Module" />
     <Function Name="Out-Null" />
     <Function Name="Where-Object" />
   </Functions>
-  <Form Name="MainForm" Size="800,600" Tag="IsMDIContainer, DPIAware, VisualStyle" Text="PowerShell Designer">
-    <TabControl Name="tcl_Top" Dock="Top" ShowToolTips="True" Size="378,20">
-      <TabPage Name="tpg_Form1" Size="370,0" Text="NewProject.fbs" />
+  <Form Name="MainForm" MinimumSize="800,600" Size="972,627" Tag="IsMDIContainer, DPIAware, VisualStyle" Text="PowerShell Designer">
+    <TabControl Name="tcl_Top" Dock="Top" ShowToolTips="True" Size="550,20">
+      <TabPage Name="tpg_Form1" Size="542,0" Text="NewProject.fbs" />
     </TabControl>
-    <Label Name="lbl_Left" Dock="Left" BackColor="35, 35, 35" Cursor="VSplit" Size="3,489" />
-    <Label Name="lbl_Right" Dock="Right" BackColor="35, 35, 35" Cursor="VSplit" Size="3,489" />
-    <Panel Name="pnl_Left" Dock="Left" BorderStyle="Fixed3D" Size="200,489">
-      <SplitContainer Name="spt_Left" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="238">
+    <Label Name="lbl_Left" Dock="Left" BackColor="35, 35, 35" Cursor="VSplit" Size="3,493" />
+    <Label Name="lbl_Right" Dock="Right" BackColor="35, 35, 35" Cursor="VSplit" Size="3,493" />
+    <Panel Name="pnl_Left" Dock="Left" BorderStyle="Fixed3D" Size="200,493">
+      <SplitContainer Name="spt_Left" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="240">
         <SplitterPanel Name="spt_Left_Panel1">
           <TreeView Name="trv_Controls" Dock="Fill" BackColor="Azure" />
         </SplitterPanel>
@@ -142,39 +158,53 @@
         </SplitterPanel>
       </SplitContainer>
     </Panel>
-    <Panel Name="pnl_Right" Dock="Right" BorderStyle="Fixed3D" Size="200,489">
-      <SplitContainer Name="spt_Right" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="257">
+    <Panel Name="pnl_Right" Dock="Right" BorderStyle="Fixed3D" Size="200,493">
+      <SplitContainer Name="spt_Right" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="253">
         <SplitterPanel Name="spt_Right_Panel1">
-          <PropertyGrid Name="PropertyGrid" Dock="Fill" ViewBackColor="Azure" />
-        </SplitterPanel>
-        <SplitterPanel Name="spt_Right_Panel2" BackColor="Control">
-          <TabControl Name="TabControl2" Dock="Fill">
-            <TabPage Name="Tab 1" Size="188,357" Text="Events">
-              <SplitContainer Name="SplitContainer3" Dock="Fill" Orientation="Horizontal" SplitterDistance="222">
+          <TabControl Name="TabControl5" Dock="Fill">
+            <TabPage Name="Tab 116" Size="188,227" Text="Properties">
+              <Button Name="btnInject" BackColor="ControlLight" Location="55,0" Size="24,24" UseVisualStyleBackColor="False" />
+              <PropertyGrid Name="PropertyGrid" Dock="Fill" ViewBackColor="Azure" />
+            </TabPage>
+            <TabPage Name="Tab 1" Size="188,402" Text="Events">
+              <SplitContainer Name="SplitContainer3" Dock="Fill" Orientation="Horizontal" SplitterDistance="323">
                 <SplitterPanel Name="SplitContainer3_Panel1" AutoScroll="True">
-                  <ListBox Name="lst_AvailableEvents" Dock="Fill" BackColor="Azure" />
+                  <ListView Name="lst_AvailableEvents" Dock="Fill" BackColor="Azure" GridLines="True" TileSize="160, 18" View="List" />
                 </SplitterPanel>
                 <SplitterPanel Name="SplitContainer3_Panel2" AutoScroll="True">
                   <ListBox Name="lst_AssignedEvents" Dock="Fill" BackColor="Azure" />
                 </SplitterPanel>
               </SplitContainer>
             </TabPage>
-            <TabPage Name="TabPage3" Size="188,198" Text="Functions">
-              <SplitContainer Name="SplitContainer4" Dock="Fill" Orientation="Horizontal" SplitterDistance="109">
+            <TabPage Name="TabPage8" Size="188,402" Text="Methods">
+              <ListView Name="lst_Methods" Dock="Fill" BackColor="Azure" GridLines="True" TileSize="160, 18" View="List" />
+            </TabPage>
+          </TabControl>
+        </SplitterPanel>
+        <SplitterPanel Name="spt_Right_Panel2" BackColor="Control">
+          <TabControl Name="TabControl2" Dock="Fill">
+            <TabPage Name="TabPage3" Size="188,206" Text="Functions">
+              <SplitContainer Name="SplitContainer4" Dock="Fill" Orientation="Horizontal" SplitterDistance="172">
                 <SplitterPanel Name="SplitContainer4_Panel1" AutoScroll="True">
-                  <CheckedListBox Name="lst_Functions" Dock="Fill" BackColor="Azure" />
+                  <CheckedListBox Name="lst_Functions" Dock="Fill" BackColor="Azure" ColumnWidth="175" MultiColumn="True" />
                 </SplitterPanel>
                 <SplitterPanel Name="SplitContainer4_Panel2" AutoScroll="True">
-                  <TextBox Name="lst_Params" Dock="Fill" BackColor="Azure" Multiline="True" ScrollBars="Both" Size="188,85" />
+                  <TextBox Name="lst_Params" Dock="Fill" BackColor="Azure" Multiline="True" ScrollBars="Both" Size="188,30" />
                 </SplitterPanel>
               </SplitContainer>
             </TabPage>
-            <TabPage Name="TabPage4" Size="188,332" Text="Finds">
+            <TabPage Name="TabPage4" Size="188,325" Text="Finds">
               <SplitContainer Name="SplitContainer5" Dock="Fill" Orientation="Horizontal" SplitterDistance="25">
                 <SplitterPanel Name="SplitContainer5_Panel1">
-                  <TextBox Name="txt_Find" BackColor="Azure" />
-                  <Button Name="btn_Find" Location="105,0" Size="23,23" Text="+" />
-                  <Button Name="btn_RemoveFind" Location="130,0" Size="23,23" Text="-" />
+                  <SplitContainer Name="SplitContainer6" Dock="Fill" SplitterDistance="128">
+                    <SplitterPanel Name="SplitContainer6_Panel1">
+                      <TextBox Name="txt_Find" Dock="Bottom" BackColor="Azure" Size="128,20" />
+                    </SplitterPanel>
+                    <SplitterPanel Name="SplitContainer6_Panel2">
+                      <Button Name="btn_Find" Location="5,0" Size="24,24" />
+                      <Button Name="btn_RemoveFind" Location="30,0" Size="24,24" />
+                    </SplitterPanel>
+                  </SplitContainer>
                 </SplitterPanel>
                 <SplitterPanel Name="SplitContainer5_Panel2">
                   <ListBox Name="lst_Find" Dock="Fill" BackColor="Azure" />
@@ -185,46 +215,63 @@
         </SplitterPanel>
       </SplitContainer>
     </Panel>
-    <MenuStrip Name="ms_Left" Dock="Left" AutoSize="False" BackColor="ControlDarkDark" Font="Verdana, 9pt" LayoutStyle="VerticalStackWithOverflow" Size="23,562" TextDirection="Vertical90" Visible="False">
+    <MenuStrip Name="ms_Left" Dock="Left" AutoSize="False" BackColor="ControlDarkDark" Font="Verdana, 9pt" LayoutStyle="VerticalStackWithOverflow" Size="23,589" TextDirection="Vertical90" Visible="False">
       <ToolStripMenuItem Name="ms_Toolbox" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" Size="23,100" Visible="False" Text="Toolbox" />
       <ToolStripMenuItem Name="ms_FormTree" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" Size="23,100" TextAlign="MiddleLeft" TextDirection="Vertical90" Visible="False" Text="Form Tree" />
     </MenuStrip>
-    <MenuStrip Name="ms_Right" Dock="Right" AutoSize="False" BackColor="ControlDarkDark" Font="Verdana, 9pt" LayoutStyle="VerticalStackWithOverflow" Size="23,562" TextDirection="Vertical90" Visible="False">
+    <MenuStrip Name="ms_Right" Dock="Right" AutoSize="False" BackColor="ControlDarkDark" Font="Verdana, 9pt" LayoutStyle="VerticalStackWithOverflow" Size="23,589" TextDirection="Vertical90" Visible="False">
       <ToolStripMenuItem Name="ms_Properties" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" Size="23,100" TextAlign="MiddleLeft" TextDirection="Vertical270" Visible="False" Text="Properties" />
       <ToolStripMenuItem Name="ms_Events" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" ImageTransparentColor="White" Size="23,100" TextDirection="Vertical270" Visible="False" Text="Events" />
     </MenuStrip>
-    <MenuStrip Name="ToolStrip" RenderMode="Professional" ShowItemToolTips="True" Text="ToolStrip1">
+    <MenuStrip Name="ToolStrip" ImageScalingSize="15,16" LayoutStyle="Flow" RenderMode="Professional" ShowItemToolTips="True" Text="ToolStrip1">
       <ToolStripButton Name="tsNewBtn" BackColor="Control" DisplayStyle="Image" ImageTransparentColor="White" Text="New" />
       <ToolStripButton Name="tsOpenbtn" DisplayStyle="Image" ImageTransparentColor="White" Text="ToolStripButton2" />
       <ToolStripButton Name="tsSavebtn" DisplayStyle="Image" Text="ToolStripButton4" />
       <ToolStripButton Name="tsSaveAsbtn" DisplayStyle="Image" Text="ToolStripButton5" />
-      <ToolStripSeparator Name="ToolStripSeparator7" Margin="10, 0, 10, 0" />
+      <ToolStripSeparator Name="ToolStripSeparator7" ForeColor="Brown" Margin="10, 0, 10, 0" />
       <ToolStripButton Name="tsUndoBtn" DisplayStyle="Image" Text="ToolStripButton6" />
       <ToolStripButton Name="tsRedoBtn" DisplayStyle="Image" Text="ToolStripButton7" />
+      <ToolStripSeparator Name="ToolStripSeparator13" />
       <ToolStripButton Name="tsCutBtn" DisplayStyle="Image" Text="ToolStripButton8" />
       <ToolStripButton Name="tsCopyBtn" DisplayStyle="Image" Text="ToolStripButton9" />
       <ToolStripButton Name="tsPasteBtn" DisplayStyle="Image" Text="ToolStripButton10" />
       <ToolStripButton Name="tsSelectAllBtn" DisplayStyle="Image" ImageTransparentColor="White" Text="ToolStripButton12" />
+      <ToolStripSeparator Name="ToolStripSeparator14" />
       <ToolStripButton Name="tsFindBtn" DisplayStyle="Image" Text="ToolStripButton13" />
       <ToolStripButton Name="tsReplaceBtn" DisplayStyle="Image" ImageTransparentColor="White" Text="ToolStripButton14" />
       <ToolStripButton Name="tsGoToLineBtn" DisplayStyle="Image" Text="ToolStripButton15" />
       <ToolStripButton Name="tsCollapseAllBtn" DisplayStyle="Image" Text="ToolStripButton16" />
       <ToolStripButton Name="tsExpandAllBtn" DisplayStyle="Image" ImageTransparentColor="White" Text="ToolStripButton17" />
+      <ToolStripSeparator Name="tsMacroSep" />
       <ToolStripButton Name="tsRecordBtn" ImageTransparentColor="White" ToolTipText=" " />
       <ToolStripButton Name="tsPlayBtn" ToolTipText=" " />
+      <ToolStripSeparator Name="ToolStripSeparator15" />
+      <ToolStripButton Name="tsBookmark" ToolTipText="Bookmark | Ctrl+1" />
+      <ToolStripButton Name="tsUnbookmark" ToolTipText="Unbookmark | Ctrl+2" />
+      <ToolStripButton Name="tsNextBookmark" ToolTipText="Next Bookmark | Ctrl+3" />
+      <ToolStripButton Name="tsPrevBookmark" ToolTipText="Previous Bookmark | Ctrl+4" />
+      <ToolStripSeparator Name="ToolStripSeparator18" />
+      <ToolStripButton Name="tsZoomIn" ToolTipText="Zoom In | Ctrl+{+}" />
+      <ToolStripButton Name="tsZoomNormal" ToolTipText="Zoom Normal | Ctrl+0" />
+      <ToolStripButton Name="tsZoomOut" ToolTipText="Zoom Out | Ctrl+{-}" />
       <ToolStripSeparator Name="ToolStripSeparator9" Margin="10, 0, 10, 0" />
       <ToolStripButton Name="tsRenameBtn" DisplayStyle="Image" Text="ToolStripButton16" />
       <ToolStripButton Name="tsDeleteBtn" DisplayStyle="Image" Text="ToolStripButton17" />
+      <ToolStripSeparator Name="ToolStripSeparator16" />
       <ToolStripButton Name="tsControlCopyBtn" DisplayStyle="Image" Text="ToolStripButton18" />
       <ToolStripButton Name="tsControlPasteBtn" DisplayStyle="Image" Text="ToolStripButton20" />
+      <ToolStripSeparator Name="ToolStripSeparator17" />
       <ToolStripButton Name="tsMoveUpBtn" DisplayStyle="Image" Text="ToolStripButton21" />
       <ToolStripButton Name="tsMoveDownBtn" DisplayStyle="Image" Text="ToolStripButton22" />
+      <ToolStripSeparator Name="ToolStripSeparator21" />
+      <ToolStripButton Name="tsImportControl" ToolTipText="Import Control | Ctrl+Alt+I" />
       <ToolStripSeparator Name="ToolStripSeparator10" Margin="10, 0, 10, 0" />
       <ToolStripButton Name="tsToolBoxBtn" Checked="True" CheckState="Checked" DisplayStyle="Image" Text="Toolbox" />
       <ToolStripButton Name="tsFormTreeBtn" Checked="True" CheckState="Checked" DisplayStyle="Image" Text="Form Tree" />
       <ToolStripButton Name="tsPropertiesBtn" Checked="True" CheckState="Checked" DisplayStyle="Image" Text="Properties" />
-      <ToolStripButton Name="tsEventsBtn" Checked="True" CheckState="Checked" DisplayStyle="Image" Text="Events" />
-      <ToolStripSeparator Name="ToolStripSeparator110" />
+      <ToolStripButton Name="tsEventsBtn" Checked="True" CheckState="Checked" DisplayStyle="Image" Text="Functions" />
+      <ToolStripSeparator Name="ToolStripSeparator110" Margin="10, 0, 10, 0" />
+      <ToolStripButton Name="tsImportForm" ToolTipText="Import Form | Ctrl+I" />
       <ToolStripButton Name="tsTermBtn" DisplayStyle="Image" ImageTransparentColor="White" Text="ToolStripButton28" />
       <ToolStripButton Name="tsGenerateBtn" DisplayStyle="Image" Text="ToolStripButton29" />
       <ToolStripButton Name="tsRunBtn" DisplayStyle="Image" Text="ToolStripButton30" />
@@ -253,9 +300,18 @@
         <ToolStripSeparator Name="EditSep6" />
         <ToolStripMenuItem Name="Collapse All" ShortcutKeyDisplayString="F10" ShortcutKeys="F10" Text="Co&amp;llapse All" />
         <ToolStripMenuItem Name="Expand All" ShortcutKeyDisplayString="F11" ShortcutKeys="F11" Text="E&amp;xpand All" />
-        <ToolStripSeparator Name="ToolStripSeparator11" />
+        <ToolStripSeparator Name="MacroSep" />
         <ToolStripMenuItem Name="mnuRecord" ShortcutKeyDisplayString="Ctrl+M" Text="R&amp;ecord Macro" />
         <ToolStripMenuItem Name="mnuPlay" ShortcutKeyDisplayString="Ctrl+E" Text="Play &amp;Macro" />
+        <ToolStripSeparator Name="ToolStripBkM" />
+        <ToolStripMenuItem Name="Bookmark" ShortcutKeyDisplayString="Ctrl+1" ShortcutKeys="Ctrl+1" Text="&amp;Bookmark" />
+        <ToolStripMenuItem Name="Unbookmark" ShortcutKeyDisplayString="Ctrl+2" ShortcutKeys="Ctrl+2" Text="U&amp;nbookmark" />
+        <ToolStripMenuItem Name="NextBookmark" ShortcutKeyDisplayString="Ctrl+3" ShortcutKeys="Ctrl+3" Text="Next Bookmar&amp;k" />
+        <ToolStripMenuItem Name="PrevBookmark" ShortcutKeyDisplayString="Ctrl+4" ShortcutKeys="Ctrl+4" Text="&amp;Previous Bookmark" />
+        <ToolStripSeparator Name="ToolStripSeparator20" />
+        <ToolStripMenuItem Name="ZoomIn" ShortcutKeyDisplayString="Ctrl++" Text="Zoom &amp;In" />
+        <ToolStripMenuItem Name="ZoomNormal" ShortcutKeyDisplayString="Ctrl+0" ShortcutKeys="Ctrl+NumPad0" Text="Zoom Norma&amp;l" />
+        <ToolStripMenuItem Name="ZoomOut" ShortcutKeyDisplayString="Ctrl--" Text="Zoom &amp;Out" />
       </ToolStripMenuItem>
       <ToolStripMenuItem Name="ts_Controls" Text="&amp;Controls">
         <ToolStripMenuItem Name="Rename" ShortcutKeyDisplayString="Ctrl+R" ShortcutKeys="Ctrl+R" Text="&amp;Rename" />
@@ -266,20 +322,28 @@
         <ToolStripSeparator Name="EditSep2" />
         <ToolStripMenuItem Name="Move Up" ShortcutKeyDisplayString="F5" ShortcutKeys="F5" Text="Move &amp;Up" />
         <ToolStripMenuItem Name="Move Down" ShortcutKeyDisplayString="F6" ShortcutKeys="F6" Text="Move &amp;Down" />
+        <ToolStripSeparator Name="ToolStripSeparator22" />
+        <ToolStripMenuItem Name="ImportControl" ShortcutKeys="Ctrl+Alt+I" Text="&amp;Import Control" />
       </ToolStripMenuItem>
       <ToolStripMenuItem Name="ts_View" Text="&amp;View">
         <ToolStripMenuItem Name="Toolbox" Checked="True" CheckState="Checked" ShortcutKeyDisplayString="F1" ShortcutKeys="F1" Text="&amp;Toolbox" />
         <ToolStripMenuItem Name="FormTree" Checked="True" CheckState="Checked" DisplayStyle="Text" ShortcutKeyDisplayString="F2" ShortcutKeys="F2" Text="&amp;Form Tree" />
         <ToolStripMenuItem Name="Properties" Checked="True" CheckState="Checked" DisplayStyle="Text" ShortcutKeyDisplayString="F3" ShortcutKeys="F3" Text="&amp;Properties" />
-        <ToolStripMenuItem Name="Events" Checked="True" CheckState="Checked" ShortcutKeyDisplayString="F4" ShortcutKeys="F4" Text="&amp;Events" />
+        <ToolStripMenuItem Name="Events" Checked="True" CheckState="Checked" ShortcutKeyDisplayString="F4" ShortcutKeys="F4" Text="F&amp;unctions" />
       </ToolStripMenuItem>
       <ToolStripMenuItem Name="ts_Tools" DisplayStyle="Text" Text="&amp;Tools">
+        <ToolStripMenuItem Name="ImportForm" ShortcutKeyDisplayString="" ShortcutKeys="Ctrl+I" Text="&amp;Import Form" />
         <ToolStripMenuItem Name="functionsModule" BackgroundImageLayout="None" DisplayStyle="Text" ShortcutKeys="F7" Text="&amp;Load Functions Module in PowerShell" />
+        <ToolStripMenuItem Name="GenerateFormLess" ShortcutKeys="Ctrl+L" Text="Generate &amp;Formless Script File" />
         <ToolStripMenuItem Name="Generate" BackgroundImageLayout="None" DisplayStyle="Text" ShortcutKeys="F8" Text="&amp;Generate Script File" />
         <ToolStripMenuItem Name="RunLast" BackgroundImageLayout="None" DisplayStyle="Text" ShortcutKeys="F9" Text="&amp;Run Script File" />
       </ToolStripMenuItem>
+      <ToolStripMenuItem Name="hBookmark" ShortcutKeys="Ctrl+NumPad1" Visible="False" />
+      <ToolStripMenuItem Name="hUnbookmark" ShortcutKeys="Ctrl+NumPad2" Visible="False" />
+      <ToolStripMenuItem Name="hNextBookmark" ShortcutKeys="Ctrl+NumPad3" Visible="False" />
+      <ToolStripMenuItem Name="hPrevBookmark" ShortcutKeys="Ctrl+NumPad4" Visible="False" />
     </MenuStrip>
-    <StatusStrip Name="sta_Status">
+    <StatusStrip Name="sta_Status" ImageScalingSize="15,15">
       <ToolStripStatusLabel Name="tsl_StatusLabel" Text="tsl_StatusLabel" />
       <ToolStripStatusLabel Name="tsLeftTop" ImageTransparentColor="White" Text="tsLeftTop" />
       <ToolStripStatusLabel Name="tsHeightWidth" Text="tsHeightWidth" />

@@ -192,7 +192,6 @@ $functionTimer.Add_Tick({
 	$lst_Functions.SetItemChecked($lst_Functions.Items.IndexOf("Set-Types"), $true)
 	$lst_Functions.SetItemChecked($lst_Functions.Items.IndexOf("Set-EnableVisualStyle"), $true)
 	$lst_Functions.SetItemChecked($lst_Functions.Items.IndexOf("Set-DPIAware"), $true)
-	$lst_Functions.SetItemChecked($lst_Functions.Items.IndexOf("Show-Form"), $true)
 	$lst_Functions.SetItemChecked($lst_Functions.Items.IndexOf("Update-ErrorLog"), $true)
 	$lst_Functions.SetItemChecked($lst_Functions.Items.IndexOf("Get-CurrentDirectory"), $true)
 	$lst_Functions.SetItemChecked($lst_Functions.Items.IndexOf("ConvertFrom-WinFormsXML"), $true)
