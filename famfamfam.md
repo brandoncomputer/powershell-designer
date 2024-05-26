@@ -25,13 +25,3 @@ mjames@gmail.com
 
 Any other questions about this icon set please
 contact mjames@gmail.com
-
-
-
-About the rest (all this repository but the icons)
-----------
-
-All the content of this repository (excepted the icon pack) 
-is licensed under the [MIT license](http://opensource.org/licenses/MIT).
-
-Though, it is just composed a few trivial json files and a Readme.
