@@ -12,7 +12,7 @@
 RootModule = 'powershell-designer.psm1'
 
 # Version number of this module.
-ModuleVersion = '2.6.0'
+ModuleVersion = '2.6.1'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -27,7 +27,7 @@ Author = 'Brandon Cunningham'
 CompanyName = 'Brandon Cunningham'
 
 # Copyright statement for this module
-Copyright = '(c) Brandon Cunningham. Portions (c) Benjamin Turmo & Pavel Torgashov'
+Copyright = '(c) Brandon Cunningham. Portions (c) Benjamin Turmo, Pavel Torgashov & Mark James'
 
 # Description of the functionality provided by this module
 Description = 'The best free form designer for powershell.'

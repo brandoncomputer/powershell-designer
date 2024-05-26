@@ -93,6 +93,7 @@
     <Function Name="Add-CTRL" />
     <Function Name="Assert-List" />
     <Function Name="ConvertFrom-WinFormsXML" />
+    <Function Name="ConvertFrom-WPFXaml" />
     <Function Name="Get-ActiveWindow" />
     <Function Name="Get-Answer" />
     <Function Name="Get-CarriageReturn" />
@@ -100,12 +101,12 @@
     <Function Name="Get-CurrentDirectory" />
     <Function Name="Get-FileExtension" />
     <Function Name="Get-FileName" />
+    <Function Name="Get-FilePath" />
     <Function Name="Get-InputBox" />
     <Function Name="Get-WindowExists" />
     <Function Name="Get-WindowPosition" />
     <Function Name="Get-WindowText" />
     <Function Name="Hide-Window" />
-    <Function Name="Initialize-FastColoredTextBox" />
     <Function Name="Invoke-Form" />
     <Function Name="Move-Window" />
     <Function Name="New-SendMessage" />
@@ -142,14 +143,14 @@
     <Function Name="Out-Null" />
     <Function Name="Where-Object" />
   </Functions>
-  <Form Name="MainForm" MinimumSize="800,600" Size="972,627" Tag="IsMDIContainer, DPIAware, VisualStyle" Text="PowerShell Designer">
-    <TabControl Name="tcl_Top" Dock="Top" ShowToolTips="True" Size="550,20">
-      <TabPage Name="tpg_Form1" Size="542,0" Text="NewProject.fbs" />
+  <Form Name="MainForm" MinimumSize="800,600" Size="1526,939" Tag="IsMDIContainer, DPIAware, VisualStyle" Text="PowerShell Designer">
+    <TabControl Name="tcl_Top" Dock="Top" ShowToolTips="True" Size="1104,20">
+      <TabPage Name="tpg_Form1" Size="1096,0" Text="NewProject.fbs" />
     </TabControl>
-    <Label Name="lbl_Left" Dock="Left" BackColor="35, 35, 35" Cursor="VSplit" Size="3,493" />
-    <Label Name="lbl_Right" Dock="Right" BackColor="35, 35, 35" Cursor="VSplit" Size="3,493" />
-    <Panel Name="pnl_Left" Dock="Left" BorderStyle="Fixed3D" Size="200,493">
-      <SplitContainer Name="spt_Left" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="240">
+    <Label Name="lbl_Left" Dock="Left" BackColor="35, 35, 35" Cursor="VSplit" Size="3,828" />
+    <Label Name="lbl_Right" Dock="Right" BackColor="35, 35, 35" Cursor="VSplit" Size="3,828" />
+    <Panel Name="pnl_Left" Dock="Left" BorderStyle="Fixed3D" Size="200,828">
+      <SplitContainer Name="spt_Left" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="359">
         <SplitterPanel Name="spt_Left_Panel1">
           <TreeView Name="trv_Controls" Dock="Fill" BackColor="Azure" />
         </SplitterPanel>
@@ -158,16 +159,16 @@
         </SplitterPanel>
       </SplitContainer>
     </Panel>
-    <Panel Name="pnl_Right" Dock="Right" BorderStyle="Fixed3D" Size="200,493">
-      <SplitContainer Name="spt_Right" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="253">
+    <Panel Name="pnl_Right" Dock="Right" BorderStyle="Fixed3D" Size="200,828">
+      <SplitContainer Name="spt_Right" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="387">
         <SplitterPanel Name="spt_Right_Panel1">
           <TabControl Name="TabControl5" Dock="Fill">
-            <TabPage Name="Tab 116" Size="188,227" Text="Properties">
+            <TabPage Name="Tab 116" Size="188,361" Text="Properties">
               <Button Name="btnInject" BackColor="ControlLight" Location="55,0" Size="24,24" UseVisualStyleBackColor="False" />
               <PropertyGrid Name="PropertyGrid" Dock="Fill" ViewBackColor="Azure" />
             </TabPage>
-            <TabPage Name="Tab 1" Size="188,402" Text="Events">
-              <SplitContainer Name="SplitContainer3" Dock="Fill" Orientation="Horizontal" SplitterDistance="323">
+            <TabPage Name="Tab 1" Size="188,331" Text="Events">
+              <SplitContainer Name="SplitContainer3" Dock="Fill" Orientation="Horizontal" SplitterDistance="302">
                 <SplitterPanel Name="SplitContainer3_Panel1" AutoScroll="True">
                   <ListView Name="lst_AvailableEvents" Dock="Fill" BackColor="Azure" GridLines="True" TileSize="160, 18" View="List" />
                 </SplitterPanel>
@@ -176,24 +177,24 @@
                 </SplitterPanel>
               </SplitContainer>
             </TabPage>
-            <TabPage Name="TabPage8" Size="188,402" Text="Methods">
+            <TabPage Name="TabPage8" Size="188,331" Text="Methods">
               <ListView Name="lst_Methods" Dock="Fill" BackColor="Azure" GridLines="True" TileSize="160, 18" View="List" />
             </TabPage>
           </TabControl>
         </SplitterPanel>
         <SplitterPanel Name="spt_Right_Panel2" BackColor="Control">
           <TabControl Name="TabControl2" Dock="Fill">
-            <TabPage Name="TabPage3" Size="188,206" Text="Functions">
-              <SplitContainer Name="SplitContainer4" Dock="Fill" Orientation="Horizontal" SplitterDistance="172">
+            <TabPage Name="TabPage3" Size="188,407" Text="Functions">
+              <SplitContainer Name="SplitContainer4" Dock="Fill" Orientation="Horizontal" SplitterDistance="318">
                 <SplitterPanel Name="SplitContainer4_Panel1" AutoScroll="True">
                   <CheckedListBox Name="lst_Functions" Dock="Fill" BackColor="Azure" ColumnWidth="175" MultiColumn="True" />
                 </SplitterPanel>
                 <SplitterPanel Name="SplitContainer4_Panel2" AutoScroll="True">
-                  <TextBox Name="lst_Params" Dock="Fill" BackColor="Azure" Multiline="True" ScrollBars="Both" Size="188,30" />
+                  <TextBox Name="lst_Params" Dock="Fill" BackColor="Azure" Multiline="True" ScrollBars="Both" Size="188,85" />
                 </SplitterPanel>
               </SplitContainer>
             </TabPage>
-            <TabPage Name="TabPage4" Size="188,325" Text="Finds">
+            <TabPage Name="TabPage4" Size="188,510" Text="Finds">
               <SplitContainer Name="SplitContainer5" Dock="Fill" Orientation="Horizontal" SplitterDistance="25">
                 <SplitterPanel Name="SplitContainer5_Panel1">
                   <SplitContainer Name="SplitContainer6" Dock="Fill" SplitterDistance="128">
@@ -215,11 +216,11 @@
         </SplitterPanel>
       </SplitContainer>
     </Panel>
-    <MenuStrip Name="ms_Left" Dock="Left" AutoSize="False" BackColor="ControlDarkDark" Font="Verdana, 9pt" LayoutStyle="VerticalStackWithOverflow" Size="23,589" TextDirection="Vertical90" Visible="False">
+    <MenuStrip Name="ms_Left" Dock="Left" AutoSize="False" BackColor="ControlDarkDark" Font="Verdana, 9pt" LayoutStyle="VerticalStackWithOverflow" Size="23,901" TextDirection="Vertical90" Visible="False">
       <ToolStripMenuItem Name="ms_Toolbox" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" Size="23,100" Visible="False" Text="Toolbox" />
       <ToolStripMenuItem Name="ms_FormTree" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" Size="23,100" TextAlign="MiddleLeft" TextDirection="Vertical90" Visible="False" Text="Form Tree" />
     </MenuStrip>
-    <MenuStrip Name="ms_Right" Dock="Right" AutoSize="False" BackColor="ControlDarkDark" Font="Verdana, 9pt" LayoutStyle="VerticalStackWithOverflow" Size="23,589" TextDirection="Vertical90" Visible="False">
+    <MenuStrip Name="ms_Right" Dock="Right" AutoSize="False" BackColor="ControlDarkDark" Font="Verdana, 9pt" LayoutStyle="VerticalStackWithOverflow" Size="23,901" TextDirection="Vertical90" Visible="False">
       <ToolStripMenuItem Name="ms_Properties" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" Size="23,100" TextAlign="MiddleLeft" TextDirection="Vertical270" Visible="False" Text="Properties" />
       <ToolStripMenuItem Name="ms_Events" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" ImageTransparentColor="White" Size="23,100" TextDirection="Vertical270" Visible="False" Text="Events" />
     </MenuStrip>
@@ -272,6 +273,7 @@
       <ToolStripButton Name="tsEventsBtn" Checked="True" CheckState="Checked" DisplayStyle="Image" Text="Functions" />
       <ToolStripSeparator Name="ToolStripSeparator110" Margin="10, 0, 10, 0" />
       <ToolStripButton Name="tsImportForm" ToolTipText="Import Form | Ctrl+I" />
+      <ToolStripButton Name="tsFormless" ToolTipText="Generate Formless Script File | Ctrl+L" />
       <ToolStripButton Name="tsTermBtn" DisplayStyle="Image" ImageTransparentColor="White" Text="ToolStripButton28" />
       <ToolStripButton Name="tsGenerateBtn" DisplayStyle="Image" Text="ToolStripButton29" />
       <ToolStripButton Name="tsRunBtn" DisplayStyle="Image" Text="ToolStripButton30" />
@@ -333,8 +335,8 @@
       </ToolStripMenuItem>
       <ToolStripMenuItem Name="ts_Tools" DisplayStyle="Text" Text="&amp;Tools">
         <ToolStripMenuItem Name="ImportForm" ShortcutKeyDisplayString="" ShortcutKeys="Ctrl+I" Text="&amp;Import Form" />
-        <ToolStripMenuItem Name="functionsModule" BackgroundImageLayout="None" DisplayStyle="Text" ShortcutKeys="F7" Text="&amp;Load Functions Module in PowerShell" />
         <ToolStripMenuItem Name="GenerateFormLess" ShortcutKeys="Ctrl+L" Text="Generate &amp;Formless Script File" />
+        <ToolStripMenuItem Name="functionsModule" BackgroundImageLayout="None" DisplayStyle="Text" ShortcutKeys="F7" Text="&amp;Load Functions Module in PowerShell" />
         <ToolStripMenuItem Name="Generate" BackgroundImageLayout="None" DisplayStyle="Text" ShortcutKeys="F8" Text="&amp;Generate Script File" />
         <ToolStripMenuItem Name="RunLast" BackgroundImageLayout="None" DisplayStyle="Text" ShortcutKeys="F9" Text="&amp;Run Script File" />
       </ToolStripMenuItem>

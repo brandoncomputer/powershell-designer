@@ -1344,6 +1344,469 @@ Butter"
     }
 }
 
+					 
+  
+			 
+																	  
+			 
+																	  
+																   
+							   
+  
+				
+									 
+	
+			 
+																   
+							   
+  
+				
+									 
+ 
+		 
+				  
+  
+		 
+						
+
+		 
+					
+  
+		
+				
+ 
+		 
+																							   
+  
+				  
+		   
+					   
+					  
+			   
+  
+																																										 
+				   
+																							   
+									 
+																							
+  
+					 
+ 
+ 
+
+							   
+  
+			 
+													
+			 
+													
+																  
+  
+					   
+															   
+									   
+													  
+															 
+															
+													 
+													   
+												  
+						  
+  
+					 
+									 
+  
+				
+									
+  
+			   
+								  
+
+				
+								   
+  
+				  
+							
+ 
+				 
+						   
+	
+			 
+																  
+  
+					   
+															   
+									   
+													  
+															 
+															
+													 
+													   
+												  
+						  
+  
+					 
+									 
+  
+				
+									
+  
+			   
+								  
+
+				
+								   
+  
+				  
+							
+ 
+				 
+						   
+ 
+		 
+																		 
+  
+		 
+																																 
+
+		 
+																													  
+  
+		
+																																	   
+ 
+		 
+									  
+  
+				  
+		   
+					   
+					  
+															
+															  
+																	   
+																		
+															 
+																 
+															
+								
+						 
+						
+					 
+						
+				
+						
+			   
+						
+				
+						
+				  
+						
+				
+  
+														   
+						   
+																
+								   
+									  
+								   
+							
+						  
+				
+ 
+ 
+
+						   
+  
+			 
+												  
+			 
+												  
+																
+  
+				 
+						  
+  
+				  
+						   
+ 
+				 
+						  
+ 
+				
+														 
+	
+			 
+																
+  
+				 
+						  
+  
+				  
+						   
+ 
+				 
+						  
+ 
+				
+														 
+ 
+		 
+														 
+  
+		 
+																					 
+
+		 
+																				
+  
+		
+																	
+ 
+		 
+						   
+  
+				  
+		   
+					   
+					  
+				 
+						
+				  
+						
+				 
+						
+			   
+  
+		   
+		 
+																	 
+														  
+												   
+					   
+		   
+		   
+  
+								  
+					
+ 
+ 
+
+									 
+  
+			 
+														  
+			 
+														  
+																		
+	
+			 
+																		
+ 
+						
+												   
+  
+				
+						 
+  
+		 
+											 
+  
+		 
+																	
+
+		 
+																			 
+  
+		
+										
+ 
+		 
+		
+ 
+	   
+																		 
+  
+				  
+		   
+					   
+					  
+						
+						
+			   
+  
+									 
+ 
+ 
+
+						   
+  
+			 
+																	 
+			 
+																	 
+																				   
+	
+			 
+																				   
+ 
+				  
+					 
+  
+				  
+																	  
+								 
+  
+		 
+								  
+  
+		 
+													
+
+		 
+											 
+  
+		
+									
+ 
+		 
+								
+  
+				  
+		   
+					   
+					  
+				  
+						
+													 
+				   
+  
+									  
+ 
+ 
+
+								  
+  
+			 
+													
+			 
+													
+																  
+  
+					   
+															   
+									   
+													  
+															 
+															
+													 
+													   
+												  
+						  
+  
+					 
+									 
+	
+			 
+																  
+  
+					   
+															   
+									   
+													  
+															 
+															
+													 
+													   
+												  
+						  
+  
+					 
+									 
+ 
+		 
+													 
+  
+		 
+																			 
+
+		 
+																  
+  
+		
+													 
+ 
+		 
+									  
+  
+				  
+		   
+					   
+					  
+															
+															  
+																	   
+																		
+															 
+																 
+															
+								
+						 
+						
+					
+  
+														   
+																
+				
+ 
+ 
+
+						   
+  
+			 
+																   
+			 
+																   
+																				 
+	
+			 
+																				 
+ 
+				  
+					 
+  
+				  
+																	
+								 
+  
+		 
+								 
+  
+		 
+												 
+
+		 
+										   
+  
+		
+									
+ 
+		 
+							  
+  
+				  
+		   
+					   
+					  
+				  
+						
+													 
+				   
+  
+									
+ 
+ 
+
 function Clear-Clipboard {
 <#
     .SYNOPSIS
@@ -1559,9 +2022,15 @@ function ConvertFrom-WinFormsXML {
 		switch ($Xml.ToString()){
 		'SplitterPanel'{}
 		'Form'{$newControl = [vdsForm] @{
-             ClientSize = New-Object System.Drawing.Point 0,0}}
-		'WebView2'{$newControl = New-Object Microsoft.Web.WebView2.WinForms.WebView2}
-		'FastColoredTextBox'{$newControl = New-Object FastColoredTextBoxNS.FastColoredTextBox}
+             ClientSize = New-Object System.Drawing.Point 0,0}
+			 $Cskip = $true
+			 }
+		'String'{$newControl = New-Object System.String
+		$Cskip = $true}
+		'WebView2'{$newControl = New-Object Microsoft.Web.WebView2.WinForms.WebView2
+		$Cskip = $true}
+		'FastColoredTextBox'{$newControl = New-Object FastColoredTextBoxNS.FastColoredTextBox
+		$Cskip = $true}
 		default{
 			if ($Cskip -eq $false){
 				$newControl = New-Object System.Windows.Forms.$($Xml.ToString())}}
@@ -1992,9 +2461,9 @@ function ConvertFrom-WinFormsXML {
 					}
 				}
 			}
-			if ($newControl.Name){ 			
-				if ((Test-Path variable:global:"$($newControl.Name)") -eq $False) {
-					New-Variable -Name $newControl.Name -Scope global -Value $newControl | Out-Null
+			if ($xml.Name){ 			
+				if ((Test-Path variable:global:"$($xml.Name)") -eq $False) {
+					New-Variable -Name $xml.Name -Scope global -Value $newControl | Out-Null
 				}
 			}
 			if (( $attrib.ToString() -eq 'Name' ) -and ( $Reference -ne '' )) {
@@ -5463,30 +5932,6 @@ function Initialize-Excel {
 	return new-object -comobject Excel.Application
 }
 
-function Initialize-FastColoredTextBox {
-<#
-	.SYNOPSIS
-		Loads the FastColoredTextBox module.
-		     
-    .DESCRIPTION
-		This function loads the FastColoredTextBox module.
-		
-	.EXAMPLE
-		Initialize-FastColoredTextBox
-#>
-	try {
-		if ((Get-Module -ListAvailable powershell-designer).count -gt 1){
-			[Reflection.Assembly]::LoadFile("$(split-path -path (Get-Module -ListAvailable powershell-designer)[0].path)\FastColoredTextBox.dll") | out-null
-		}
-		else{
-			[Reflection.Assembly]::LoadFile("$(split-path -path (Get-Module -ListAvailable powershell-designer).path)\FastColoredTextBox.dll") | out-null
-		}
-	}
-	catch {
-		[Reflection.Assembly]::LoadFile(".\FastColoredTextBox.dll") | out-null
-	}
-}
-
 function Initialize-ODBC {
 <#
 	.SYNOPSIS
@@ -5540,41 +5985,6 @@ function Initialize-Selenium {
     Add-Type -Path ($Path + 'WebDriver.dll')
     $ChromeOptions = New-Object OpenQA.Selenium.Chrome.ChromeOptions
     return New-Object OpenQA.Selenium.Chrome.ChromeDriver($ChromeOptions)
-}
-
-function Initialize-WebView2 {
-<#
-    .SYNOPSIS
-		Initializes the webview2 control.
-			 
-	.DESCRIPTION
-		This function initializes Initializes the webview2 control.
-	
-	.PARAMETER Path
-		The path to Microsoft.Web.WebView2.WinForms.dll
-		
-	.EXAMPLE
-		Initialize-WebView2 -Path $Path
-		
-	.EXAMPLE
-		Initialize-WebView2 $Path
-		
-	.EXAMPLE
-		$Path | Initialize-WebView2
-				
-	.INPUTS
-		Path as String
-	
-	.NOTES
-		Requires Microsoft.Web.WebView2.WinForms.dll to be present in the path specified.
-#>
-	[CmdletBinding()]
-	param (
-		[Parameter(Mandatory,
-			ValueFromPipeline)]
-		[string]$Path
-	)
-		Add-Type -Path "$Path\Microsoft.Web.WebView2.WinForms.dll"
 }
 
 function Invoke-Form {
@@ -9086,12 +9496,14 @@ function Show-Form {
 <#
 	.SYNOPSIS
 		Shows a form
+								   
 		
 		ALIAS
 			Dialog-Show
 		
     .DESCRIPTION
 		This function will show a form, or show a form modal according to the modal switch.
+				   
 	
 	.PARAMETER Form
 		The form to show.
@@ -9123,7 +9535,13 @@ function Show-Form {
 		$Form.ShowDialog() | Out-Null
 	}
 	else {
+									 
 			$Form.Show() | Out-Null
+   
+		
+							 
+															
+   
 	}
 }
 
@@ -9255,6 +9673,53 @@ function Show-OpenFileDialog {
 	$filedlg.ShowDialog() | Out-Null
 	return $filedlg.FileName
 }
+<#
+function Show-PageSetupDialog {
+<#
+	.SYNOPSIS
+		Shows a window for opening a file.
+		
+		ALIAS
+			Filedlg
+		
+    .DESCRIPTION
+		This function shows a window for opening a file.
+	
+	.PARAMETER InitialDirectory
+		The initial path for the file dialog.
+		
+	.PARAMETER Filter
+		The extension filter to apply
+	
+	.EXAMPLE	
+		$file = Show-OpenFileDialog '%userprofile%' 'Text Files|*.txt'
+
+	.EXAMPLE	
+		$file = Show-OpenFileDialog -InitialDirectory '%userprofile%' -Filter 'Text Files|*.txt'
+		
+	.EXAMPLE	
+		$file = '%userprofile%' | Show-OpenFileDialog -Filter 'Text Files|*.txt'
+	
+	.INPUTS
+		InitialDirectory as String, Filter as String
+	
+	.OUTPUTS
+		String
+#	
+	[Alias("Filedlg")]
+	[CmdletBinding()]
+    param (
+		[Parameter(ValueFromPipeline)]
+		[string]$InitialDirectory,
+		[string]$Filter
+	)
+	$filedlg = New-Object System.Windows.Forms.PageSetupDialog
+	$filedlg.initialDirectory = $initialDirectory
+	$filedlg.filter = $Filter
+	$filedlg.ShowDialog() | Out-Null
+	return $filedlg.FileName
+}
+#>
 
 function Show-SaveFileDialog {
 <#
