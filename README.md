@@ -17,3 +17,5 @@ There will be no exe compiler. It's not that I can't, it's that I can't make it 
             Next Solution: ps12exe by steve02081504  
             Next Solution: ps2exe by MScholtes  
             Next Solution: vds-exe compiler by brandoncomputer  
+
+My goal is not the best at everything. My goal is to be the best WinForms Designer for PowerShell.
