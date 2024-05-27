@@ -11,7 +11,7 @@ Made decision that there will not be a 'dark mode'.
             WindowTop by gileli121@gmail.com.  
               
 There will be no exe compiler. It's not that I can't, it's that I can't make it NetInfoSec compliant, and it would be inferior to other listed solutions. See bottom recommendation.  
-            Best solution: Develop a custom solution using a program that is not .Net based that allows a Text embed section that is changable via Resource Hacker. AES Encrypt/decrypt text using native function in program.  
+            Best solution: Develop a custom solution using a program that is not .Net based that allows a Text embed section that is changable via Resource Hacker by Angus Johnson. AES Encrypt/decrypt text using native function in program.  
             Next solution: Same as above but use base64  
             Next Solution: Same as above but don't encode or encrypt  
             Next Solution: ps12exe by steve02081504  
