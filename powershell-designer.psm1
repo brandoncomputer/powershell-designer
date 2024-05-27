@@ -32,6 +32,11 @@ function powershell-designer($a) {
 		Copy-Item -Path "$PSScriptRoot\Designer\finds.txt" -destination ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\Designer")
 	}
 	
+	$ExamplesExists = Test-Path -path ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\Examples")
+	if ($ExamplesExists -eq $false){
+		Copy-Item -Path "$PSScriptRoot\Examples" -destination ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\Examples") -recurse
+	}
+	
 	if ($a) {
 		if ((get-host).version.major -eq 7) {
 			if ((Get-Module -ListAvailable powershell-designer).count -gt 1){

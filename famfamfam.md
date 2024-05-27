@@ -1,3 +1,6 @@
+Original readme (from author of the icons)
+----------
+
 Silk icon set 1.3
 
 _________________________________________

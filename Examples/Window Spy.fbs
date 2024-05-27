@@ -1,0 +1,29 @@
+<Data>
+  <Events Desc="Events associated with controls">
+  </Events>
+  <Functions Desc="Functions associated with project">
+    <Function Name="Add-Tab" />
+    <Function Name="ConvertFrom-WinFormsXML" />
+    <Function Name="Get-ActiveWindow" />
+    <Function Name="Get-Answer" />
+    <Function Name="Get-CurrentDirectory" />
+    <Function Name="Get-MousePosition" />
+    <Function Name="Get-WindowClass" />
+    <Function Name="Get-WindowFromPoint" />
+    <Function Name="Get-WindowParent" />
+    <Function Name="Get-WindowPosition" />
+    <Function Name="Get-WindowText" />
+    <Function Name="Set-DPIAware" />
+    <Function Name="Set-EnableVisualStyle" />
+    <Function Name="Set-Types" />
+    <Function Name="Set-WindowOnTop" />
+    <Function Name="Show-InformationDialog" />
+    <Function Name="Update-ErrorLog" />
+    <Function Name="Start-Sleep" />
+  </Functions>
+  <Form Name="MainForm" Size="600,480" Tag="VisualStyle,DPIAware" Text="Window Spy">
+    <Button Name="Button" Location="15,400" Size="275,30" Text="Capture" />
+    <TextBox Name="Label1" Font="Segoe UI, 8.25pt, style=Bold" Location="15,15" Multiline="True" Size="550,380" />
+    <Button Name="Button2" Location="290,400" Size="275,30" Text="Countdown Capture" />
+  </Form>
+</Data>

@@ -78,8 +78,8 @@ SOFTWARE.
         FileName:     Designer.ps1
         Modified:     Brandon Cunningham
         Created On:   1/15/2020
-        Last Updated: 5/26/2024
-        Version:      2.6.1
+        Last Updated: 5/27/2024
+        Version:      2.6.2
     ===========================================================================
 
     .DESCRIPTION
@@ -412,6 +412,20 @@ SOFTWARE.
         Changed autocomplete to list view, because the parentless controls have few properties and wrecked the smallicon layout.
         Other minor GUI Changes
         
+    2.6.2 5/27/2024
+        Fixed #20 Assembly information only saved for the last imported control in controls.xml
+        Added automatic add of function dependencies when a function is typed in the code editor (less manual checking),
+            code hint to Events form active title bar for known commands, 
+            jumps to funciton in checked list box when selected which in turns displays help.
+        Fixed Events form scrollform code to prevent maximize, which creates a visual discrepency when looking for hints. 
+            This was the original intended behavior of the window.
+            (As a bonus side effects, we can now 'peek' the form window when it's maximized as well,
+            and the form window can no longer be accidently maximized via ctrl+tab)
+        Cleaned up code a little (orphaned code removal)
+        Shuffled Zoom controls. Corrected zoom tooltips.
+        Corrected issue where move buttons did not update after property grid changes.
+        Window Spy example / created example folder structure
+        
 BASIC MODIFICATIONS License
 Original available at https://www.pswinformscreator.com/ for deeper comparison.
         
@@ -456,7 +470,7 @@ SOFTWARE.
             [switch]$IncrementName
         )
 
-        try {
+        [Threading.Thread]::CurrentThread.CurrentCulture = 'en-US'; try {
             $controlType = $Xml.ToString()
             $controlName = "$($Xml.Name)"
             
@@ -951,26 +965,21 @@ SOFTWARE.
                                 $iflag = $true
                             }
                         }
-                        if ($ControlType -eq "FastColoredTextBox"){
-                            $newControl = New-Object FastColoredTextBoxNS.FastColoredTextBox
-                        }
-                        else {
-                            if ($iflag -eq $true){
-                                foreach ($key in $importedControls.Keys){
-                                    if ($controlType -eq $importedControls[$key]){
-                                    if ($script:dllExportString -like "*$key*") {}
-                                        else {
-                                            $script:dllExportString = "$($script:dllExportString)
+                        if ($iflag -eq $true){
+                            foreach ($key in $importedControls.Keys){
+                                if ($controlType -eq $importedControls[$key]){
+                                if ($script:dllExportString -like "*$key*") {}
+                                    else {
+                                        $script:dllExportString = "$($script:dllExportString)
 add-type -path $(Get-Character 34)$key$(Get-Character 34)                                 
 "
-                                        }
                                     }
                                 }
                             }
-                            else{
-                                $newControl = New-Object System.Windows.Forms.$ControlType
-                            }
                         }
+                        else{
+                            $newControl = New-Object System.Windows.Forms.$ControlType
+                        }                      
                         $newControl.Name = $ControlName
                         #Custom Control Step 2: Tree Node Exclusions
                         switch ($ControlType){
@@ -1643,11 +1652,12 @@ add-type -path $(Get-Character 34)$key$(Get-Character 34)
     function NewProjectClick {
         try {               
             if ( [System.Windows.Forms.MessageBox]::Show("Unsaved changes to the current project will be lost.  Are you sure you want to start a new project?", 'Confirm', 4) -eq 'Yes' ) {
+                $script:gridchanging = $true  
                 $global:control_track = @{}
                 $projectName = "NewProject.fbs"
                 $FastText.Clear()
                 $FastText.SelectedText = "#region Images
-                
+ 
 #endregion
 
 "
@@ -1671,8 +1681,10 @@ add-type -path $(Get-Character 34)$key$(Get-Character 34)
                 $Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].tag = "VisualStyle,DPIAware"
                 $baseicon = $Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].Icon          
             }
+            $script:gridchanging = $false
         } 
         catch {
+            $script:gridchanging = $false
             Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered during start of New Project."
         }
     }
@@ -2284,6 +2296,7 @@ $($FastText.Text)
             PropertyValueChanged = {
                 param($Sender,$e)
                 try {
+                $script:gridchanging = $true
                     $changedProperty = $e.ChangedItem
                     if ( @('Location','Size','Dock','AutoSize','Multiline') -contains $changedProperty.PropertyName ) {Move-SButtons -Object $Script:refs['PropertyGrid'].SelectedObject}
                     if ( $e.ChangedItem.PropertyDepth -gt 0 ) {
@@ -2366,8 +2379,11 @@ $($FastText.Text)
                             if ( $objRef.Changes[$controlName].Count -eq 0 ) {$objRef.Changes.Remove($controlName)}
                         }
                     }
+                $script:gridchanging = $false
+                Move-SButtons $Script:refs['PropertyGrid'].SelectedObject
                 } 
                 catch {
+                    $script:gridchanging = $false
                     Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered after changing property value ($($controlType) - $($controlName))."
                 }
             }
@@ -3043,7 +3059,7 @@ $($FastText.Text)
         $Script:refs['ms_Left'].Width = 0
         $eventform.height = $eventform.height * $ctscale
         $FastText.SelectedText = "#region Images
-
+ 
 #endregion
 
 "
@@ -3309,7 +3325,9 @@ $($FastText.Text)
         Set-WindowOntop $Popform.Handle
         Set-WindowParent $PopForm.Handle $Mainform.Handle
         $PopForm.Hide()
+        
         $FastText.add_selectionchanged({
+        $EventForm.Text = "Events"
             if ($FastText.selectionstart -ne 0){
                 if ($FastText.selection.Length -eq 0){
                     $r = $FastText.GetRange($FastText.selectionstart - 1,$FastText.Selectionstart)
@@ -3353,6 +3371,42 @@ $($FastText.Text)
                         $PopForm.Hide()
                         $FastText.Focus()
                     }
+                    #entrypoint
+                    if ($script:gridchanging -eq $true){
+                        return
+                    }
+                    $ii = 2
+                    while ($s.text -ne " ") {
+                        $s = $FastText.GetRange($FastText.selectionstart - $ii,$FastText.Selectionstart - $ii + 1)
+                        if ($s.text = " "){
+                            break
+                        }
+                        $ii = $ii + 1
+                        if ($ii -gt 1000){
+                            break
+                        }
+                        $selt =  $FastText.GetRange($FastText.selectionstart - $ii + 2,$FastText.Selectionstart).Text
+                        foreach ($item in $lst_Functions.Items){
+                            $checkItem = $lst_Functions.GetItemText($item).ToLower()
+                            if ($checkItem -eq $selt.ToLower()) {
+                                $lst_Functions.SetItemChecked($lst_Functions.Items.IndexOf($item), $true)
+                                $lst_Functions.SelectedItem = $item
+                                $bldStr = $selt
+                                $parameters = (get-command $selt).Parameters
+                                foreach ($param in $parameters){
+                                    foreach ($key in $param.Keys) {
+                                        switch ($key) {
+                                            Verbose{};Debug{};ErrorAction{};WarningAction{};InformationAction{};ErrorVariable{};WarningVariable{};InformationVariable{};OutVariable{};OutBuffer{};PipelineVariable{};
+                                            Default {
+                                                $bldStr = "$bldStr -$((($Key) | Out-String).Trim())"
+                                            }
+                                        }
+                                    }
+                                }
+                                $EventForm.Text = $bldStr.toString().trim()
+                            }
+                        }
+                    } 
                 }
             }
         })
@@ -3518,7 +3572,7 @@ $xaml""@
             $script:importedControls = Import-Clixml -path ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\controls.xml")
             
             foreach ($key in $importedControls.Keys){
-                if ("Assembly" -eq $key){
+            if ($key -like "*Assembly-*"){
                     $dllFile = $importedControls[$key]
                     if ($dllFile -ne '') {
                     try{
@@ -3540,7 +3594,7 @@ $xaml""@
                 $select = add-type -path $dllFile -PassThru | Out-GridView -PassThru
                 $classname = "$($select.Namespace).$($select.Name)"
                 $displayName = $select.Name
-                $importedControls.add("Assembly",$dllFile)
+                $importedControls.add("Assembly-$displayName",$dllFile)
                 $importedControls.Add($dllfile, $displayname)
                 $importedControls.Add($displayName, $classname)
                 $trv_Controls.Nodes[5].nodes.Add($displayName,$displayName)
@@ -3554,6 +3608,20 @@ $xaml""@
         
         $ImportControl.add_Click({param($sender, $e);
             Import-Control
+        })
+        
+        $eventform.add_Resize({param($sender, $e);
+            if ($eventform.windowstate -eq "Maximized") {
+            $top = $eventform.top
+            $left = $eventform.left
+            $height = $eventform.height
+            $width = $eventform.width
+            $eventform.windowstate = "Normal"
+            $eventform.top = 40
+            $eventform.left = $left
+            $eventform.height = $height -40
+            $eventform.width = $width
+            }
         })
 
         if ($null -ne $args[1]){
