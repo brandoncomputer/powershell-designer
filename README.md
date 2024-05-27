@@ -7,7 +7,7 @@ Made decision that there will not be a 'dark mode'.
         It's not that 'dark mode' isn't good, it's that there are a variety of other solutions that work solidly with this software, and anything developed will be inferior.  
             Windows screen filters  
             Windows Magnifier Negative Mode at 100%  
-            Best Solution: NegativeScreen by Melvyn Laily 'Smart Inversion' mode (This is usually even better than applications native 'dark mode' setting', and it works on everything)  
+            Best Solution: NegativeScreen by Melvyn Laily 'Smart Inversion' mode (This is usually even better than applications native 'dark mode' setting, and it works on everything)  
             WindowTop by gileli121@gmail.com.  
               
 There will be no exe compiler. It's not that I can't, it's that I can't make it NetInfoSec compliant, and it would be inferior to other listed solutions. See bottom recommendation.  
