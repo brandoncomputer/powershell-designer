@@ -1,0 +1,16 @@
+<Data>
+  <Events Desc="Events associated with controls">
+  </Events>
+  <Functions Desc="Functions associated with project">
+    <Function Name="ConvertFrom-WinFormsXML" />
+    <Function Name="ConvertFrom-WPFXaml" />
+    <Function Name="Get-CurrentDirectory" />
+    <Function Name="New-WPFWindow" />
+    <Function Name="Set-DPIAware" />
+    <Function Name="Set-EnableVisualStyle" />
+    <Function Name="Set-Types" />
+    <Function Name="Update-ErrorLog" />
+    <Function Name="New-Object" />
+  </Functions>
+  <Form Name="MainForm" Size="651,627" Tag="VisualStyle,DPIAware" WindowState="Maximized" Text="MainForm" />
+</Data>

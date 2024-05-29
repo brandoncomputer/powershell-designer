@@ -2523,7 +2523,7 @@ function ConvertFrom-WPFXaml {
 			ValueFromPipeline)]
 		[string]$xaml
 	)
-	$xaml = $xaml -replace "x:N", 'N' -replace 'd:DesignHeight="\d*?"', '' -replace 'x:Class=".*?"', '' -replace 'mc:Ignorable="d"', '' -replace 'd:DesignWidth="\d*?"', '' 
+	$xaml = $xaml -replace "x:Name", 'Name' -replace 'd:DesignHeight="\d*?"', '' -replace 'x:Class=".*?"', '' -replace 'mc:Ignorable="d"', '' -replace 'd:DesignWidth="\d*?"', '' 
 	[xml]$xaml = $xaml
 	$presentation = [Windows.Markup.XamlReader]::Load((new-object System.Xml.XmlNodeReader $xaml))
 	$xaml.SelectNodes("//*[@Name]") | %{

@@ -93,7 +93,6 @@
     <Function Name="Add-CTRL" />
     <Function Name="Assert-List" />
     <Function Name="ConvertFrom-WinFormsXML" />
-    <Function Name="ConvertFrom-WPFXaml" />
     <Function Name="Get-ActiveWindow" />
     <Function Name="Get-Answer" />
     <Function Name="Get-CarriageReturn" />
@@ -110,6 +109,7 @@
     <Function Name="Invoke-Form" />
     <Function Name="Move-Window" />
     <Function Name="New-SendMessage" />
+    <Function Name="New-Timer" />
     <Function Name="Send-Window" />
     <Function Name="Set-ActiveWindow" />
     <Function Name="Set-DPIAware" />
@@ -155,7 +155,7 @@
     <Label Name="lbl_Left" Dock="Left" BackColor="35, 35, 35" Cursor="VSplit" Size="3,828" />
     <Label Name="lbl_Right" Dock="Right" BackColor="35, 35, 35" Cursor="VSplit" Size="3,828" />
     <Panel Name="pnl_Left" Dock="Left" BorderStyle="Fixed3D" Size="200,828">
-      <SplitContainer Name="spt_Left" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="404">
+      <SplitContainer Name="spt_Left" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="451">
         <SplitterPanel Name="spt_Left_Panel1">
           <TreeView Name="trv_Controls" Dock="Fill" BackColor="Azure" />
         </SplitterPanel>
@@ -165,15 +165,15 @@
       </SplitContainer>
     </Panel>
     <Panel Name="pnl_Right" Dock="Right" BorderStyle="Fixed3D" Size="200,828">
-      <SplitContainer Name="spt_Right" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="427">
+      <SplitContainer Name="spt_Right" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="458">
         <SplitterPanel Name="spt_Right_Panel1">
           <TabControl Name="TabControl5" Dock="Fill">
-            <TabPage Name="Tab 116" Size="188,401" Text="Properties">
+            <TabPage Name="Tab 116" Size="188,432" Text="Properties">
               <Button Name="btnInject" BackColor="ControlLight" Location="55,0" Size="24,24" UseVisualStyleBackColor="False" />
               <PropertyGrid Name="PropertyGrid" Dock="Fill" ViewBackColor="Azure" />
             </TabPage>
-            <TabPage Name="Tab 1" Size="188,401" Text="Events">
-              <SplitContainer Name="SplitContainer3" Dock="Fill" Orientation="Horizontal" SplitterDistance="326">
+            <TabPage Name="Tab 1" Size="188,473" Text="Events">
+              <SplitContainer Name="SplitContainer3" Dock="Fill" Orientation="Horizontal" SplitterDistance="309">
                 <SplitterPanel Name="SplitContainer3_Panel1" AutoScroll="True">
                   <ListView Name="lst_AvailableEvents" Dock="Fill" BackColor="Azure" GridLines="True" TileSize="160, 18" View="List" />
                 </SplitterPanel>
@@ -182,24 +182,24 @@
                 </SplitterPanel>
               </SplitContainer>
             </TabPage>
-            <TabPage Name="TabPage8" Size="188,349" Text="Methods">
+            <TabPage Name="TabPage8" Size="188,473" Text="Methods">
               <ListView Name="lst_Methods" Dock="Fill" BackColor="Azure" GridLines="True" TileSize="160, 18" View="List" />
             </TabPage>
           </TabControl>
         </SplitterPanel>
         <SplitterPanel Name="spt_Right_Panel2" BackColor="Control">
           <TabControl Name="TabControl2" Dock="Fill">
-            <TabPage Name="TabPage3" Size="188,367" Text="Functions">
-              <SplitContainer Name="SplitContainer4" Dock="Fill" Orientation="Horizontal" SplitterDistance="263">
+            <TabPage Name="TabPage3" Size="188,336" Text="Functions">
+              <SplitContainer Name="SplitContainer4" Dock="Fill" Orientation="Horizontal" SplitterDistance="217">
                 <SplitterPanel Name="SplitContainer4_Panel1" AutoScroll="True">
                   <CheckedListBox Name="lst_Functions" Dock="Fill" BackColor="Azure" ColumnWidth="175" MultiColumn="True" />
                 </SplitterPanel>
                 <SplitterPanel Name="SplitContainer4_Panel2" AutoScroll="True">
-                  <TextBox Name="lst_Params" Dock="Fill" BackColor="Azure" Multiline="True" ScrollBars="Both" Size="188,100" />
+                  <TextBox Name="lst_Params" Dock="Fill" BackColor="Azure" Multiline="True" ScrollBars="Both" Size="188,115" />
                 </SplitterPanel>
               </SplitContainer>
             </TabPage>
-            <TabPage Name="TabPage4" Size="188,492" Text="Finds">
+            <TabPage Name="TabPage4" Size="188,368" Text="Finds">
               <SplitContainer Name="SplitContainer5" Dock="Fill" Orientation="Horizontal" SplitterDistance="25">
                 <SplitterPanel Name="SplitContainer5_Panel1">
                   <SplitContainer Name="SplitContainer6" Dock="Fill" SplitterDistance="128">

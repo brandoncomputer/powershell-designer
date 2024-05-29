@@ -1,0 +1,21 @@
+<Data>
+  <Events Desc="Events associated with controls">
+    <Form Name="MainForm" Root="Form|MainForm" Events="Shown" />
+  </Events>
+  <Functions Desc="Functions associated with project">
+    <Function Name="ConvertFrom-WinFormsXML" />
+    <Function Name="ConvertFrom-WPFXaml" />
+    <Function Name="Get-CurrentDirectory" />
+    <Function Name="Get-WindowExists" />
+    <Function Name="Invoke-Form" />
+    <Function Name="Move-Window" />
+    <Function Name="Set-ActiveWindow" />
+    <Function Name="Set-DPIAware" />
+    <Function Name="Set-EnableVisualStyle" />
+    <Function Name="Set-Types" />
+    <Function Name="Set-WindowParent" />
+    <Function Name="Show-InformationDialog" />
+    <Function Name="Update-ErrorLog" />
+  </Functions>
+  <Form Name="MainForm" MaximizeBox="False" Size="800,600" Tag="VisualStyle,DPIAware" Text="MainForm" />
+</Data>

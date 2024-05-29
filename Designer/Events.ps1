@@ -78,8 +78,8 @@ SOFTWARE.
         FileName:     Designer.ps1
         Modified:     Brandon Cunningham
         Created On:   1/15/2020
-        Last Updated: 5/27/2024
-        Version:      2.6.2
+        Last Updated: 5/28/2024
+        Version:      2.6.3
     ===========================================================================
 
     .DESCRIPTION
@@ -425,6 +425,17 @@ SOFTWARE.
         Shuffled Zoom controls. Corrected zoom tooltips.
         Corrected issue where move buttons did not update after property grid changes.
         Window Spy example / created example folder structure
+        
+    2.6.3 5/28/2024
+        Made controls.xml project dependent.
+        Fixed minor issue with newProject tracking.
+        New and Open Project now clear function checkboxes at the beginning of the function.
+        Improvement to ConvertFrom-WinFormsXML
+        Added XAMLExpress example.
+        Added WPF Window Fuse example.
+        Resolved issue with responsiveness of editor when not typing. 
+            This did disable the 'hyperlink' action of functions and dot clicking for autocomplete popview.
+            This fixed #21 somehow, although I don't know how they were related.
         
 BASIC MODIFICATIONS License
 Original available at https://www.pswinformscreator.com/ for deeper comparison.
@@ -1652,6 +1663,10 @@ add-type -path $(Get-Character 34)$key$(Get-Character 34)
     function NewProjectClick {
         try {               
             if ( [System.Windows.Forms.MessageBox]::Show("Unsaved changes to the current project will be lost.  Are you sure you want to start a new project?", 'Confirm', 4) -eq 'Yes' ) {
+
+                for($i=0; $i -lt $lst_functions.Items.count; $i++){$lst_Functions.SetItemChecked($i,$false)}
+                $trv_Controls.Nodes[5].nodes.Clear()
+                $script:importedControls = @{}
                 $script:gridchanging = $true  
                 $global:control_track = @{}
                 $projectName = "NewProject.fbs"
@@ -1689,11 +1704,25 @@ add-type -path $(Get-Character 34)$key$(Get-Character 34)
         }
     }
     
+function Wait ($duration){
+    $waitTimer = New-Timer 1
+    $waitTimer.Add_Tick({
+        $script:numtime = $script:numTime + 1
+        if ($numtime -lt $duration){
+            [System.Windows.Forms.Application]::DoEvents()
+        }
+        else{
+            $waitTimer.Dispose()
+        }
+    })
+}
+    
     function OpenProjectClick ([string]$fileName){
         if ($fileName -eq ''){
             if ( [System.Windows.Forms.MessageBox]::Show("You will lose all changes to the current project.  Are you sure?", 'Confirm', 4) -eq 'No' ) {
                 return
-            }   
+            } 
+           
             $openDialog = ConvertFrom-WinFormsXML -Xml @"
 <OpenFileDialog InitialDirectory="$($Script:projectsDir)" AddExtension="True" DefaultExt="fbs" Filter="fbs files (*.fbs)|*.fbs" FilterIndex="1" ValidateNames="True" CheckFileExists="True" RestoreDirectory="True" />
 "@
@@ -1705,6 +1734,33 @@ add-type -path $(Get-Character 34)$key$(Get-Character 34)
                 $fileName = $openDialog.FileName
                 $projectName = $refs['tpg_Form1'].Text
             }
+            for($i=0; $i -lt $lst_functions.Items.count; $i++){$lst_Functions.SetItemChecked($i,$false)}
+            $trv_Controls.Nodes[5].nodes.Clear()
+            $script:importedControls = @{}
+            $Script:refs['tpg_Form1'].Text = "$($fileName -replace "^.*\\")"
+            $projectName = $Script:refs['tpg_Form1'].Text
+            $global:projectDirName = $fileName
+            $generationPath = "$(Split-Path -Path $global:projectDirName)\$($projectName -replace "\..*$")"
+            if (Test-Path "$generationPath\controls.xml") {
+                $script:importedControls = Import-Clixml -path "$generationPath\controls.xml"
+                
+                foreach ($key in $importedControls.Keys){
+                if ($key -like "*Assembly-*"){
+                        $dllFile = $importedControls[$key]
+                        if ($dllFile -ne '') {
+                        try{
+                        $dll = add-type -path $dllFile
+                        }catch{}
+                        }
+                    }
+                    else {
+                        if ($key -like "*.*"){}
+                        else {
+                            $trv_Controls.Nodes[5].nodes.Add($key,$key)
+                        }
+                    }    
+                }
+            } 
             if ($fileName) {
                 for($i=0; $i -lt $lst_Functions.Items.Count; $i++){
                     $lst_Functions.SetItemChecked($i,$false)
@@ -1759,11 +1815,8 @@ add-type -path $(Get-Character 34)$key$(Get-Character 34)
             
             if ($fileName) {
                 $Script:refsFID.Form.Objects[$($Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }).Name].Visible = $true
-                $Script:refs['tpg_Form1'].Text = "$($fileName -replace "^.*\\")"
+                
                 $Script:refs['TreeView'].SelectedNode = $Script:refs['TreeView'].Nodes | Where-Object { $_.Text -match "^Form - " }
-                $global:projectDirName = $fileName
-                $projectName = $Script:refs['tpg_Form1'].Text
-                $generationPath = "$(Split-Path -Path $global:projectDirName)\$($projectName -replace "\..*$")"
                 if (Test-Path -path "$generationPath\Events.ps1") {
                     $FastText.OpenFile("$generationPath\Events.ps1")
                     Assert-List $lst_Find Clear
@@ -2009,8 +2062,8 @@ add-type -path $(Get-Character 34)$key$(Get-Character 34)
     
     function GenerateClick ([switch]$formless){
         $projectName = $Script:refs['tpg_Form1'].Text
-        if ("$global:projectDirName" -eq "") {
-            $Script:refs['tsl_StatusLabel'].text = "Please save this project before generating a script file","Script not generated"
+        if ($projectName -eq "newProject.fbs") {
+            $Script:refs['tsl_StatusLabel'].text = "Please save this project before generating a script file"
             return
         }
         $generationPath = "$(Split-Path -Path $global:projectDirName)\$($projectName -replace "\..*$")"
@@ -3328,85 +3381,87 @@ $($FastText.Text)
         
         $FastText.add_selectionchanged({
         $EventForm.Text = "Events"
-            if ($FastText.selectionstart -ne 0){
-                if ($FastText.selection.Length -eq 0){
-                    $r = $FastText.GetRange($FastText.selectionstart - 1,$FastText.Selectionstart)
-                    if ($r.Text -eq "."){
+            if ($CheckForTypingTimer.Enabled -eq $true){
+                if ($FastText.selectionstart -ne 0){
+                    if ($FastText.selection.Length -eq 0){
+                        $r = $FastText.GetRange($FastText.selectionstart - 1,$FastText.Selectionstart)
+                        if ($r.Text -eq "."){
+                            $ii = 2
+                            while ($s.text -ne "$"){
+                                $s = $FastText.GetRange($FastText.selectionstart - $ii,$FastText.Selectionstart - $ii + 1)
+                                if ($s.text = "$"){
+                                    break
+                                }
+                                $ii = $ii + 1
+                                if ($ii -gt 1000){
+                                    break
+                                }
+                            }
+                            $selt =  $FastText.GetRange($FastText.selectionstart - $ii + 2,$FastText.Selectionstart - 1).Text
+                            $Script:refs['TreeView'].SelectedNode = $Script:refsFID.Form.TreeNodes[$selt]
+                            foreach ($node in $TreeView.Nodes) { 
+                                if (($node.text).Split("-")[1].Trim().ToLower() -eq $selt.ToLower())
+                                    {$TreeView.SelectedNode = $node}
+                            }
+                            
+                            if ($null -ne $TreeView.SelectedNode) {
+                                $p = $FastText.PlaceToPoint($r.end)
+                                if ($pnl_Left.Visible -eq $true){
+                                    Move-Window $PopForm.handle ($p.X + $spt_left.width + 20 + $eventform.left * $ctscale) ($p.Y + $eventform.top + 120 * $ctscale) $PopForm.Width $Popform.Height
+                                }
+                                else
+                                {
+                                    Move-Window $PopForm.handle ($p.X + 20 + $eventform.left * $ctscale) ($p.Y + $eventform.top + 120 * $ctscale) $PopForm.Width $Popform.Height
+                                }
+                                $PopForm.Show()
+                                $PopListView.Focus()
+                            }
+                            else {
+                                $PopForm.Hide()
+                                $FastText.Focus()
+                            }
+                        }
+                        else {
+                            $PopForm.Hide()
+                            $FastText.Focus()
+                        }
+                        #entrypoint
+                        if ($script:gridchanging -eq $true){
+                            return
+                        }
                         $ii = 2
-                        while ($s.text -ne "$"){
+                        while ($s.text -ne " ") {
                             $s = $FastText.GetRange($FastText.selectionstart - $ii,$FastText.Selectionstart - $ii + 1)
-                            if ($s.text = "$"){
+                            if ($s.text = " "){
                                 break
                             }
                             $ii = $ii + 1
                             if ($ii -gt 1000){
                                 break
                             }
-                        }
-                        $selt =  $FastText.GetRange($FastText.selectionstart - $ii + 2,$FastText.Selectionstart - 1).Text
-                        $Script:refs['TreeView'].SelectedNode = $Script:refsFID.Form.TreeNodes[$selt]
-                        foreach ($node in $TreeView.Nodes) { 
-                            if (($node.text).Split("-")[1].Trim().ToLower() -eq $selt.ToLower())
-                                {$TreeView.SelectedNode = $node}
-                        }
-                        
-                        if ($null -ne $TreeView.SelectedNode) {
-                            $p = $FastText.PlaceToPoint($r.end)
-                            if ($pnl_Left.Visible -eq $true){
-                                Move-Window $PopForm.handle ($p.X + $spt_left.width + 20 + $eventform.left * $ctscale) ($p.Y + $eventform.top + 120 * $ctscale) $PopForm.Width $Popform.Height
-                            }
-                            else
-                            {
-                                Move-Window $PopForm.handle ($p.X + 20 + $eventform.left * $ctscale) ($p.Y + $eventform.top + 120 * $ctscale) $PopForm.Width $Popform.Height
-                            }
-                            $PopForm.Show()
-                            $PopListView.Focus()
-                        }
-                        else {
-                            $PopForm.Hide()
-                            $FastText.Focus()
-                        }
-                    }
-                    else {
-                        $PopForm.Hide()
-                        $FastText.Focus()
-                    }
-                    #entrypoint
-                    if ($script:gridchanging -eq $true){
-                        return
-                    }
-                    $ii = 2
-                    while ($s.text -ne " ") {
-                        $s = $FastText.GetRange($FastText.selectionstart - $ii,$FastText.Selectionstart - $ii + 1)
-                        if ($s.text = " "){
-                            break
-                        }
-                        $ii = $ii + 1
-                        if ($ii -gt 1000){
-                            break
-                        }
-                        $selt =  $FastText.GetRange($FastText.selectionstart - $ii + 2,$FastText.Selectionstart).Text
-                        foreach ($item in $lst_Functions.Items){
-                            $checkItem = $lst_Functions.GetItemText($item).ToLower()
-                            if ($checkItem -eq $selt.ToLower()) {
-                                $lst_Functions.SetItemChecked($lst_Functions.Items.IndexOf($item), $true)
-                                $lst_Functions.SelectedItem = $item
-                                $bldStr = $selt
-                                $parameters = (get-command $selt).Parameters
-                                foreach ($param in $parameters){
-                                    foreach ($key in $param.Keys) {
-                                        switch ($key) {
-                                            Verbose{};Debug{};ErrorAction{};WarningAction{};InformationAction{};ErrorVariable{};WarningVariable{};InformationVariable{};OutVariable{};OutBuffer{};PipelineVariable{};
-                                            Default {
-                                                $bldStr = "$bldStr -$((($Key) | Out-String).Trim())"
+                            $selt =  $FastText.GetRange($FastText.selectionstart - $ii + 2,$FastText.Selectionstart).Text
+                            foreach ($item in $lst_Functions.Items){
+                                $checkItem = $lst_Functions.GetItemText($item).ToLower()
+                                if ($checkItem -eq $selt.ToLower()) {
+                                    $lst_Functions.SetItemChecked($lst_Functions.Items.IndexOf($item), $true)
+                                    $lst_Functions.SelectedItem = $item
+                                    $bldStr = $selt
+                                    $parameters = (get-command $selt).Parameters
+                                    foreach ($param in $parameters){
+                                        foreach ($key in $param.Keys) {
+                                            switch ($key) {
+                                                Verbose{};Debug{};ErrorAction{};WarningAction{};InformationAction{};ErrorVariable{};WarningVariable{};InformationVariable{};OutVariable{};OutBuffer{};PipelineVariable{};
+                                                Default {
+                                                    $bldStr = "$bldStr -$((($Key) | Out-String).Trim())"
+                                                }
                                             }
                                         }
                                     }
+                                    $EventForm.Text = $bldStr.toString().trim()
                                 }
-                                $EventForm.Text = $bldStr.toString().trim()
                             }
-                        }
-                    } 
+                        } 
+                    }
                 }
             }
         })
@@ -3566,29 +3621,15 @@ $xaml""@
         })
         
         $trv_Controls.Nodes.Add("Imported Controls","Imported Controls")
-        
         $script:importedControls = @{}
-        if (Test-Path ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\controls.xml")) {
-            $script:importedControls = Import-Clixml -path ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\controls.xml")
-            
-            foreach ($key in $importedControls.Keys){
-            if ($key -like "*Assembly-*"){
-                    $dllFile = $importedControls[$key]
-                    if ($dllFile -ne '') {
-                    try{
-                    $dll = add-type -path $dllFile}catch{}
-                    }
-                }
-                else {
-                    if ($key -like "*.*"){}
-                    else {
-                        $trv_Controls.Nodes[5].nodes.Add($key,$key)
-                    }
-                }    
-            }
-        }
         
         function Import-Control {
+        $projectName = $Script:refs['tpg_Form1'].Text
+        if ($projectName -eq "newProject.fbs") {
+                $Script:refs['tsl_StatusLabel'].text = "Please save this project before importing controls"
+                return
+            }
+            $generationPath = "$(Split-Path -Path $global:projectDirName)\$($projectName -replace "\..*$")"
             $dllFile = Show-OpenFileDialog -Filter "Dynamic Link Library|*.dll"
             if ($dllFile -ne '') {
                 $select = add-type -path $dllFile -PassThru | Out-GridView -PassThru
@@ -3598,7 +3639,7 @@ $xaml""@
                 $importedControls.Add($dllfile, $displayname)
                 $importedControls.Add($displayName, $classname)
                 $trv_Controls.Nodes[5].nodes.Add($displayName,$displayName)
-                $importedControls | Export-Clixml -Path ([Environment]::GetFolderPath("MyDocuments")+"\PowerShell Designer\functions\controls.xml")
+                $importedControls | Export-Clixml -Path "$generationPath\controls.xml"
             }
         }
         
