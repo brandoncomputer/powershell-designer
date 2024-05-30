@@ -54,6 +54,7 @@
     <ToolStripButton Name="tsTermBtn" Root="Form|MainForm" Events="Click" />
     <ToolStripButton Name="tsGenerateBtn" Root="Form|MainForm" Events="Click" />
     <ToolStripButton Name="tsRunBtn" Root="Form|MainForm" Events="Click" />
+    <ToolStripButton Name="tsDebug" Root="Form|MainForm" Events="Click" />
     <ToolStripMenuItem Name="New" Root="Form|MainForm" Events="Click" />
     <ToolStripMenuItem Name="Open" Root="Form|MainForm" Events="Click" />
     <ToolStripMenuItem Name="Save" Root="Form|MainForm" Events="Click" />
@@ -133,12 +134,14 @@
     <Function Name="New-Variable" />
     <Function Name="Out-File" />
     <Function Name="Out-GridView" />
+    <Function Name="Out-String" />
     <Function Name="Remove-Variable" />
     <Function Name="Select-Xml" />
     <Function Name="Start-Sleep" />
     <Function Name="Add-Content" />
     <Function Name="Get-Content" />
     <Function Name="New-Item" />
+    <Function Name="Set-Content" />
     <Function Name="Split-Path" />
     <Function Name="Start-Process" />
     <Function Name="Test-Path" />
@@ -155,7 +158,7 @@
     <Label Name="lbl_Left" Dock="Left" BackColor="35, 35, 35" Cursor="VSplit" Size="3,828" />
     <Label Name="lbl_Right" Dock="Right" BackColor="35, 35, 35" Cursor="VSplit" Size="3,828" />
     <Panel Name="pnl_Left" Dock="Left" BorderStyle="Fixed3D" Size="200,828">
-      <SplitContainer Name="spt_Left" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="451">
+      <SplitContainer Name="spt_Left" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="390">
         <SplitterPanel Name="spt_Left_Panel1">
           <TreeView Name="trv_Controls" Dock="Fill" BackColor="Azure" />
         </SplitterPanel>
@@ -165,15 +168,15 @@
       </SplitContainer>
     </Panel>
     <Panel Name="pnl_Right" Dock="Right" BorderStyle="Fixed3D" Size="200,828">
-      <SplitContainer Name="spt_Right" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="458">
+      <SplitContainer Name="spt_Right" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="401">
         <SplitterPanel Name="spt_Right_Panel1">
           <TabControl Name="TabControl5" Dock="Fill">
-            <TabPage Name="Tab 116" Size="188,432" Text="Properties">
+            <TabPage Name="Tab 116" Size="188,375" Text="Properties">
               <Button Name="btnInject" BackColor="ControlLight" Location="55,0" Size="24,24" UseVisualStyleBackColor="False" />
               <PropertyGrid Name="PropertyGrid" Dock="Fill" ViewBackColor="Azure" />
             </TabPage>
-            <TabPage Name="Tab 1" Size="188,473" Text="Events">
-              <SplitContainer Name="SplitContainer3" Dock="Fill" Orientation="Horizontal" SplitterDistance="309">
+            <TabPage Name="Tab 1" Size="188,411" Text="Events">
+              <SplitContainer Name="SplitContainer3" Dock="Fill" Orientation="Horizontal" SplitterDistance="373">
                 <SplitterPanel Name="SplitContainer3_Panel1" AutoScroll="True">
                   <ListView Name="lst_AvailableEvents" Dock="Fill" BackColor="Azure" GridLines="True" TileSize="160, 18" View="List" />
                 </SplitterPanel>
@@ -182,24 +185,24 @@
                 </SplitterPanel>
               </SplitContainer>
             </TabPage>
-            <TabPage Name="TabPage8" Size="188,473" Text="Methods">
+            <TabPage Name="TabPage8" Size="188,411" Text="Methods">
               <ListView Name="lst_Methods" Dock="Fill" BackColor="Azure" GridLines="True" TileSize="160, 18" View="List" />
             </TabPage>
           </TabControl>
         </SplitterPanel>
         <SplitterPanel Name="spt_Right_Panel2" BackColor="Control">
           <TabControl Name="TabControl2" Dock="Fill">
-            <TabPage Name="TabPage3" Size="188,336" Text="Functions">
-              <SplitContainer Name="SplitContainer4" Dock="Fill" Orientation="Horizontal" SplitterDistance="217">
+            <TabPage Name="TabPage3" Size="188,393" Text="Functions">
+              <SplitContainer Name="SplitContainer4" Dock="Fill" Orientation="Horizontal" SplitterDistance="235">
                 <SplitterPanel Name="SplitContainer4_Panel1" AutoScroll="True">
                   <CheckedListBox Name="lst_Functions" Dock="Fill" BackColor="Azure" ColumnWidth="175" MultiColumn="True" />
                 </SplitterPanel>
                 <SplitterPanel Name="SplitContainer4_Panel2" AutoScroll="True">
-                  <TextBox Name="lst_Params" Dock="Fill" BackColor="Azure" Multiline="True" ScrollBars="Both" Size="188,115" />
+                  <TextBox Name="lst_Params" Dock="Fill" BackColor="Azure" Multiline="True" ScrollBars="Both" Size="188,154" />
                 </SplitterPanel>
               </SplitContainer>
             </TabPage>
-            <TabPage Name="TabPage4" Size="188,368" Text="Finds">
+            <TabPage Name="TabPage4" Size="188,393" Text="Finds">
               <SplitContainer Name="SplitContainer5" Dock="Fill" Orientation="Horizontal" SplitterDistance="25">
                 <SplitterPanel Name="SplitContainer5_Panel1">
                   <SplitContainer Name="SplitContainer6" Dock="Fill" SplitterDistance="128">
@@ -282,6 +285,7 @@
       <ToolStripButton Name="tsTermBtn" DisplayStyle="Image" ImageTransparentColor="White" Text="ToolStripButton28" />
       <ToolStripButton Name="tsGenerateBtn" DisplayStyle="Image" Text="ToolStripButton29" />
       <ToolStripButton Name="tsRunBtn" DisplayStyle="Image" Text="ToolStripButton30" />
+      <ToolStripButton Name="tsDebug" ToolTipText="Debug Script File | Ctrl+F9" />
     </MenuStrip>
     <MenuStrip Name="MenuStrip" RenderMode="Professional">
       <ToolStripMenuItem Name="ts_File" DisplayStyle="Text" Text="&amp;File">
@@ -344,6 +348,7 @@
         <ToolStripMenuItem Name="functionsModule" BackgroundImageLayout="None" DisplayStyle="Text" ShortcutKeys="F7" Text="&amp;Load Functions Module in PowerShell" />
         <ToolStripMenuItem Name="Generate" BackgroundImageLayout="None" DisplayStyle="Text" ShortcutKeys="F8" Text="&amp;Generate Script File" />
         <ToolStripMenuItem Name="RunLast" BackgroundImageLayout="None" DisplayStyle="Text" ShortcutKeys="F9" Text="&amp;Run Script File" />
+        <ToolStripMenuItem Name="LastDebug" ShortcutKeys="Ctrl+F9" Text="&amp;Debug Script File" />
       </ToolStripMenuItem>
       <ToolStripMenuItem Name="hBookmark" ShortcutKeys="Ctrl+NumPad1" Visible="False" />
       <ToolStripMenuItem Name="hUnbookmark" ShortcutKeys="Ctrl+NumPad2" Visible="False" />

@@ -1,4 +1,5 @@
 ﻿#region Images
+$tsDebug.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBsRXhpZgAATU0AKgAAAAgABQExAAIAAAARAAAASgMBAAUAAAABAAAAXFEQAAEAAAABAQAAAFERAAQAAAABAAAAAFESAAQAAAABAAAAAAAAAABBZG9iZSBJbWFnZVJlYWR5AAAAAYagAACvyP/bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/AO81jxU13PcpaO6W81q1tcwXCFWtn3EFiOm4qSAAfr0rI8N6xdaVr1vawypM1+wixdyhFdVQ7OQCyEHCgchtwA7EdB4q8KX11rA1Cxj+1xXDJ9pt96oyFQAGUkgEEDBGcg4PTOOGe3j8TSjSNOs5DfGVgySqUMGDh2kJyQB09c8Dnr5dR1IVLv5HnSU4z5pb9D//2Q=="))
 $tsFormless.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBsRXhpZgAATU0AKgAAAAgABQExAAIAAAARAAAASgMBAAUAAAABAAAAXFEQAAEAAAABAQAAAFERAAQAAAABAAAOxFESAAQAAAABAAAOxAAAAABBZG9iZSBJbWFnZVJlYWR5AAAAAYagAACvyP/bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/AOxgsNSudRs1isLmK/DK0+p8FGUj52VwozkE4+c9eg7dI2n31hLBcHV7qULcQqyOWwwaRVI5cj+L0rJ17VtU0nT7S2a3mtRFZ7Y2Z1CzzqAApZXGFxk9QTzwcYPP/wDCR6lPLFHO90FEYkhMgAZ5FIMYCiU71LA84YkgDPcTh6f1fmindN+RpiKv1hqTVrLzP//Z"))
 $tsPropertiesBtn.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBaRXhpZgAATU0AKgAAAAgABQMBAAUAAAABAAAASgMDAAEAAAABAAAAAFEQAAEAAAABAQAAAFERAAQAAAABAAAOxFESAAQAAAABAAAOxAAAAAAAAYagAACxj//bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/APVV0++v5Z7gavdRBriZVRC2FCyMoHDgfw+lVZLe8t7d5f7auDIvnYTcx/1Zbk5fodp7Gtm0kvLFJYG0m7m/0iZ1kieHayvKzj70gPRh1FVJIdQltblP7Mu1eSO4RAXiwPMZiCT5nuM4H58V1KpLbS3yMHBf1c//2Q=="))
 $tsEventsBtn.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBaRXhpZgAATU0AKgAAAAgABQMBAAUAAAABAAAASgMDAAEAAAABAAAAAFEQAAEAAAABAQAAAFERAAQAAAABAAAOxFESAAQAAAABAAAOxAAAAAAAAYagAACxj//bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/APVV0++v5Z7gavdRBriZVRC2FCyMoHDgfw+lVHgvYIpX/tm4MkaysFMh52Fx0MmednoevtW1aSXliksDaTdzf6RM6yRPDtZXlZx96QHow6iqE1vqk0MyLp90gkWdQjSJjLlyCcTbf4xnKnp9Mdcajva6t8jnlBf1c//Z"))
@@ -78,8 +79,8 @@ SOFTWARE.
         FileName:     Designer.ps1
         Modified:     Brandon Cunningham
         Created On:   1/15/2020
-        Last Updated: 5/28/2024
-        Version:      2.6.3
+        Last Updated: 5/30/2024
+        Version:      2.6.4
     ===========================================================================
 
     .DESCRIPTION
@@ -436,6 +437,17 @@ SOFTWARE.
         Resolved issue with responsiveness of editor when not typing. 
             This did disable the 'hyperlink' action of functions and dot clicking for autocomplete popview.
             This fixed #21 somehow, although I don't know how they were related.
+            
+    2.6.4 5/30/2024
+        Proper publish of improvement to ConvertFrom-WinFormsXML, which fixes the XAMLPad Express example.
+        Added true Debugging. Differentiated language between run and debug. Run no longer leaves console window open.
+        Implemented several changes due to problems found with the new debugger.    
+            SelectedText check improvements for selecting objects
+            AutoComplete actions
+            Loading of functions to checkedlistbox improvements
+            Timer tweaks and improvements
+        Fixed #22 (mispublish)
+        Fixed #23         
         
 BASIC MODIFICATIONS License
 Original available at https://www.pswinformscreator.com/ for deeper comparison.
@@ -912,6 +924,8 @@ SOFTWARE.
                                         $Script:MouseMoving = $true
                                         Move-SButtons -Object $msObj
                                         $Script:MouseMoving = $false
+                                        $tsLeftTop.Text = "$($Script:refs['PropertyGrid'].SelectedObject.Location.Y),$($Script:refs['PropertyGrid'].SelectedObject.Location.X)"
+                                        $tsHeightWidth.Text = "$($Script:refs['PropertyGrid'].SelectedObject.Size.Width),$($Script:refs['PropertyGrid'].SelectedObject.Size.Height)"
                                         $refFID = $Script:refsFID.Form.Objects.Values.Where({$_.GetType().Name -eq 'Form'})
                                         $clientParent = $Script:refs['PropertyGrid'].SelectedObject.Parent.PointToClient([System.Drawing.Point]::Empty)
                                         $clientForm = $refFID.PointToClient([System.Drawing.Point]::Empty)
@@ -1164,7 +1178,7 @@ add-type -path $(Get-Character 34)$key$(Get-Character 34)
             if ($Object.GetType().Name -ne 'HashTable') {
                 $refFID = $Script:refsFID.Form.Objects.Values.Where({$_.GetType().Name -eq 'Form'})
                 $Script:sButtons.GetEnumerator().ForEach({$_.Value.Visible = $true})
-                $newLoc = $Object.PointToClient([System.Drawing.Point]::Empty)
+                try{$newLoc = $Object.PointToClient([System.Drawing.Point]::Empty)}catch{return}
                 $clientParent = $Object.Parent.PointToClient([System.Drawing.Point]::Empty)
                 $clientForm = $refFID.PointToClient([System.Drawing.Point]::Empty)
                 $clientOffset = New-Object System.Drawing.Point((($clientParent.X - $clientForm.X) * -1),(($clientParent.Y - $clientForm.Y) * -1))
@@ -1234,12 +1248,6 @@ add-type -path $(Get-Character 34)$key$(Get-Character 34)
         }
     }
     
-    $stlTimer = new-timer 100
-    $stlTimer.Add_Tick({
-        $tsLeftTop.Text = "$($Script:refs['PropertyGrid'].SelectedObject.Location.Y),$($Script:refs['PropertyGrid'].SelectedObject.Location.X)"
-        $tsHeightWidth.Text = "$($Script:refs['PropertyGrid'].SelectedObject.Size.Width),$($Script:refs['PropertyGrid'].SelectedObject.Size.Height)"
-    })
-
     function Save-Project {
         param(
             [switch]$SaveAs,
@@ -2061,6 +2069,7 @@ function Wait ($duration){
     }
     
     function GenerateClick ([switch]$formless){
+        $script:trackformless = $formless
         $projectName = $Script:refs['tpg_Form1'].Text
         if ($projectName -eq "newProject.fbs") {
             $Script:refs['tsl_StatusLabel'].text = "Please save this project before generating a script file"
@@ -2081,21 +2090,22 @@ function Wait ($duration){
         $outstring = "#region VDS
 `$RunSpace = [RunspaceFactory]::CreateRunspacePool(); `$RunSpace.ApartmentState = `"STA`"; `$RunSpace.Open(); `$PowerShell = [powershell]::Create();`$PowerShell.RunspacePool = `$RunSpace; [void]`$PowerShell.AddScript({"
         }
+        
         foreach ($item in $lst_Functions.items){
-        $checkItem = $lst_Functions.GetItemCheckState($lst_Functions.Items.IndexOf($item)).ToString()
-        $i = $lst_Functions.Items.IndexOf($item)
-        if ($checkItem -eq 'Checked') {
-            if (($functions[$i].Extent) -ne $null){
-        $outstring = "$outstring
+            $checkItem = $lst_Functions.GetItemCheckState($lst_Functions.Items.IndexOf($item)).ToString()
+            $i = $lst_Functions.Items.IndexOf($item)
+            if ($checkItem -eq 'Checked') {
+                if (($functions[$i].Extent) -ne $null){
+            $outstring = "$outstring
 
 $(($functions[$i].Extent).text)"
                 if ($functions[$i].Name -eq 'Set-Types'){
                     $outstring = "$outstring
 Set-Types"
+                    }
                 }
             }
         }
-    }
     
     $xmlObj = [xml](([xml](Get-Content "$global:projectDirName" -Encoding utf8)).Data.Form.OuterXml)
     $FormName = $xmlObj.Form.Name
@@ -2214,6 +2224,8 @@ $($FastText.Text)
         $outstring | Out-File "$($generationPath)\$($projectName -replace "fbs$","ps1")" -Encoding utf8 -Force
         $Script:refs['tsl_StatusLabel'].text = "Script saved to $($generationPath)\$($projectName -replace "fbs$","ps1")"
     }
+    
+    
     $eventSB = @{
         'New' = @{
             Click = {
@@ -2853,17 +2865,168 @@ $($FastText.Text)
         $Script:refs['trv_Controls'].Add_DoubleClick($eventSB['trv_Controls'].DoubleClick)
         $Script:refs['lst_AvailableEvents'].Add_DoubleClick($eventSB['lst_AvailableEvents'].DoubleClick)
         $Script:refs['lst_AssignedEvents'].Add_DoubleClick($eventSB['lst_AssignedEvents'].DoubleClick)
-        function RunLast {
-            $projectName = $refs['tpg_Form1'].Text  
-            if ($projectName -ne "NewProject.fbs") {                
-            $generationPath = "$(Split-Path -Path $global:projectDirName)\$($projectName -replace "\..*$")"
-                if (Test-Path -path $generationPath) {
-                    #do nothing
+    
+    $LastDebug.add_Click({param($sender, $e);
+        Debug
+    })
+        
+    function Debug {
+    $formless = $script:trackformless
+        $projectName = $Script:refs['tpg_Form1'].Text
+        if ($projectName -eq "newProject.fbs") {
+            $Script:refs['tsl_StatusLabel'].text = "Please save this project before generating a script file"
+            return
+        }
+        $generationPath = "$(Split-Path -Path $global:projectDirName)\$($projectName -replace "\..*$")"
+        if ((Get-Module -ListAvailable powershell-designer).count -gt 1){
+            $designerpath = "$(path $(Get-Module -ListAvailable PowerShell-Designer)[0].path)\functions\functions.psm1"
+        }
+        else {
+            $designerpath = "$(path $(Get-Module -ListAvailable PowerShell-Designer).path)\functions\functions.psm1"
+        }                                                                                                                  
+        New-Variable astTokens -Force
+        New-Variable astErr -Force
+        $AST = [System.Management.Automation.Language.Parser]::ParseFile($designerpath, [ref]$astTokens, [ref]$astErr)
+        $functions = $ast.FindAll({ $args[0] -is [System.Management.Automation.Language.FunctionDefinitionAst] }, $true)
+
+        $outstring = "#region VDS
+Set-PSDebug -Trace 2"
+
+        
+        foreach ($item in $lst_Functions.items){
+            $checkItem = $lst_Functions.GetItemCheckState($lst_Functions.Items.IndexOf($item)).ToString()
+            $i = $lst_Functions.Items.IndexOf($item)
+            if ($checkItem -eq 'Checked') {
+                if (($functions[$i].Extent) -ne $null){
+            $outstring = "$outstring
+
+$(($functions[$i].Extent).text)"
+                if ($functions[$i].Name -eq 'Set-Types'){
+                    $outstring = "$outstring
+Set-Types"
+                    }
                 }
-                else {
-                New-Item -ItemType directory -Path $generationPath
-                }
-                $file = "`"$($generationPath)\$($projectName -replace "fbs$","ps1")`""
+            }
+        }
+    
+    $xmlObj = [xml](([xml](Get-Content "$global:projectDirName" -Encoding utf8)).Data.Form.OuterXml)
+    $FormName = $xmlObj.Form.Name
+    $Script:refs['TreeView'].Nodes.ForEach({
+        $controlName = $_.Name
+        $controlType = $_.Text -replace " - .*$"
+        if ( $controlType -eq 'Form' ) {
+            if ($Script:refsFID.Form.Objects[$controlName].Tag.Contains("IsMDIContainer")){
+                $xmlObj.Form.SetAttribute("IsMDIContainer","True")
+            }
+        }
+    })
+    $xmlText = $xmlObj.OuterXml | Out-String
+    
+    $xmlPart2 = [xml](([xml](Get-Content "$global:projectDirName" -Encoding utf8)).Data.OuterXml)
+    $xmlP2 = $xmlPart2.SelectNodes("//FolderBrowserDialog")
+    $xmlP3 = $xmlPart2.SelectNodes("//ColorDialog")
+    $xmlP4 = $xmlPart2.SelectNodes("//FontDialog")
+    $xmlP5 = $xmlPart2.SelectNodes("//OpenFileDialog")
+    $xmlP6 = $xmlPart2.SelectNodes("//PageSetupDialog")
+    $xmlP7 = $xmlPart2.SelectNodes("//PrintDialog")
+    $xmlP8 = $xmlPart2.SelectNodes("//PrintPreviewDialog")
+    $xmlP9 = $xmlPart2.SelectNodes("//SaveFileDialog")
+    $xmlP0 = $xmlPart2.SelectNodes("//Timer")
+    
+    
+    if ($formless) {
+        $outstring = "$outstring
+$($script:dllExportString)
+"
+        $outstring = "$outstring
+$($FastText.Text)"
+    }
+    else {
+        $outstring = "$outstring
+$($script:dllExportString)
+"
+    $outstring = "$outstring
+ConvertFrom-WinFormsXML -Reference refs -Suppress -Xml @""
+$xmlText""@"
+
+    foreach ($node in $xmlP2) {
+        $string = $node.OuterXML | Out-String
+        $outstring = "$outstring
+ConvertFrom-WinFormsXML -Reference refs -Suppress -Xml @""
+$string""@"
+    }
+    
+    foreach ($node in $xmlP3) {
+        $string = $node.OuterXML | Out-String
+        $outstring = "$outstring
+ConvertFrom-WinFormsXML -Reference refs -Suppress -Xml @""
+$string""@"
+    }
+    
+    foreach ($node in $xmlP4) {
+        $string = $node.OuterXML | Out-String
+        $outstring = "$outstring
+ConvertFrom-WinFormsXML -Reference refs -Suppress -Xml @""
+$string""@"
+    }
+
+    foreach ($node in $xmlP5) {
+        $string = $node.OuterXML | Out-String
+        $outstring = "$outstring
+ConvertFrom-WinFormsXML -Reference refs -Suppress -Xml @""
+$string""@"
+    }
+
+    foreach ($node in $xmlP6) {
+        $string = $node.OuterXML | Out-String
+        $outstring = "$outstring
+ConvertFrom-WinFormsXML -Reference refs -Suppress -Xml @""
+$string""@"
+    }
+
+    foreach ($node in $xmlP7) {
+        $string = $node.OuterXML | Out-String
+        $outstring = "$outstring
+ConvertFrom-WinFormsXML -Reference refs -Suppress -Xml @""
+$string""@"
+    }
+
+    foreach ($node in $xmlP8) {
+        $string = $node.OuterXML | Out-String
+        $outstring = "$outstring
+ConvertFrom-WinFormsXML -Reference refs -Suppress -Xml @""
+$string""@"
+    }
+
+    foreach ($node in $xmlP9) {
+        $string = $node.OuterXML | Out-String
+        $outstring = "$outstring
+ConvertFrom-WinFormsXML -Reference refs -Suppress -Xml @""
+$string""@"
+    }
+
+    foreach ($node in $xmlP0) {
+        $string = $node.OuterXML | Out-String
+        $outstring = "$outstring
+ConvertFrom-WinFormsXML -Reference refs -Suppress -Xml @""
+$string""@"
+    }
+
+    $outstring = "$outstring
+$($FastText.Text)
+[System.Windows.Forms.Application]::Run(`$$FormName) | Out-Null"
+    }
+
+        if ( (Test-Path -Path "$($generationPath)" -PathType Container) -eq $false ) {
+            New-Item -Path "$($generationPath)" -ItemType Directory | Out-Null
+        }
+        $utf8 = [System.Text.Encoding]::UTF8
+        $FastText.SaveToFile("$generationPath\Events.ps1",$utf8)
+        $outstring | Out-File "$($generationPath)\LastDebug.ps1" -Encoding utf8 -Force
+    
+
+
+            $file = "`"$($generationPath)\LastDebug.ps1`""
                 if ((get-host).version.major -eq 7) {
                     start-process -filepath pwsh.exe -argumentlist '-ep bypass','-sta','-noexit',"-file $file"
                 }
@@ -2873,11 +3036,42 @@ $($FastText.Text)
             start-sleep -s 1
             Set-WindowOnTop -Handle (get-windowexists "ConsoleWindowClass")
             Set-WindowText (get-windowexists "ConsoleWindowClass") "Windows PowerShell - PowerShell Designer Debug Window"
+            $Script:refs['tsl_StatusLabel'].text = "Debugging $file. Be certain to close the Debug Window when execution is complete"
+            }
+    
+        
+        $tsDebug.add_Click({param($sender, $e)
+            Debug
+        })
+        
+        function RunLast {
+            $projectName = $refs['tpg_Form1'].Text  
+            if ($projectName -ne "NewProject.fbs") {                
+            $generationPath = "$(Split-Path -Path $global:projectDirName)\$($projectName -replace "\..*$")"
+                if (Test-Path -path $generationPath) {
+                    #do nothing
+                }
+                else {
+                    New-Item -ItemType directory -Path $generationPath
+                }
+                $file = "`"$($generationPath)\$($projectName -replace "fbs$","ps1")`""
+                if ((get-host).version.major -eq 7) {
+                    start-process -filepath pwsh.exe -argumentlist '-ep bypass','-sta',"-file $file"
+                }
+                else {
+                    start-process -filepath powershell.exe -argumentlist '-ep bypass','-sta',"-file $file"
+                }
+            start-sleep -s 1
+            Set-WindowOnTop -Handle (get-windowexists "ConsoleWindowClass")
+            Set-WindowText (get-windowexists "ConsoleWindowClass") "Windows PowerShell - PowerShell Designer Run Window"
+            $Script:refs['tsl_StatusLabel'].text = "Running $file."
             }
         }
+        
         $Script:refs['RunLast'].Add_Click({
             RunLast
         })
+        
         function LoadFunctionModule {
             if ((get-host).version.major -eq 7) {
                 if ((Get-Module -ListAvailable powershell-designer).count -gt 1){
@@ -3129,7 +3323,16 @@ $($FastText.Text)
         }
         else {
             iex (Get-Content "$(path $(Get-Module -ListAvailable PowerShell-Designer).path)\functions\Dependencies.ps1" | Out-String) 
-        } 
+        }
+        
+        
+        for ( $i=0;$i -le $lst_Functions.items.count -1;$i++ ) {
+            if (($lst_Functions.Items[$i]).ToString() -eq "") {
+                $lst_Functions.items.Removeat($i)
+                $i = $i - 1
+            }
+        }
+            
         $lst_Functions.Add_DoubleClick({
             $lst_Functions.SetItemChecked($lst_Functions.Items.IndexOf($lst_Functions.SelectedItem.ToString()), $true)
             $bldStr = "$($lst_Functions.SelectedItem.ToString())"
@@ -3150,17 +3353,6 @@ $($FastText.Text)
         $lst_Functions.add_SelectedIndexChanged({param($sender, $e)
             $lst_Params.text = "$(((Get-Help $lst_Functions.SelectedItem.ToString() -detailed) | Out-String))"
         })
-        
-        function EmptyListString{
-            foreach ($item in $lst_Functions.items){
-                if ($item.ToString() -eq ""){
-                    $lst_Functions.items.Remove($item)
-                    EmptyListString
-                    return
-                }
-            }
-        }
-        EmptyListString
         
         $tsRunBtn.ToolTipText = "Run Script File | F9"
         $tsGenerateBtn.ToolTipText = "Generate Script File | F8"
@@ -3226,8 +3418,8 @@ $($FastText.Text)
         Hide-Window $FindWindowHandle
         Hide-Window $ReplaceWindowHandle
         
-
-        $CheckForTypingTimer = new-timer 2000
+        
+        $CheckForTypingTimer = new-timer 10000
         $CheckForTypingTimer.Add_Tick({
             $FastText.OnTextChanged()
             $CheckForTypingTimer.Enabled = $false
@@ -3332,27 +3524,24 @@ $($FastText.Text)
         $PopForm.controls.add($poplistview)
 
         
-        
         function PopView {
-            foreach ($item in $PopListView.items){
-                if ($item.Selected) {
-                    switch ($item.ImageKey){
-                        'Property'{
-                            $text = $item.text
-                            $FastText.SelectedText = "$text"
-                        }
-                        'Method'{
-                            $text = $item.text
-                            $FastText.SelectedText = "$text()"
-                        }
-                        'Event'{
-                            $text = $item.text
-                            $FastText.SelectedText = "add_$text({param(`$sender, `$e);})"
-                        }
-                    }
+            $item = $PopListView.SelectedItems
+            switch ($item.ImageKey){
+                'Property'{
+                    $text = $item.text
+                    $FastText.SelectedText = "$text"
+                }
+                'Method'{
+                    $text = $item.text
+                    $FastText.SelectedText = "$text()"
+                }
+                'Event'{
+                    $text = $item.text
+                    $FastText.SelectedText = "add_$text({param(`$sender, `$e);})"
                 }
             }
         }
+            
         
         $PopListView.add_DoubleClick({param($sender, $e)
             PopView
@@ -3381,89 +3570,83 @@ $($FastText.Text)
         
         $FastText.add_selectionchanged({
         $EventForm.Text = "Events"
-            if ($CheckForTypingTimer.Enabled -eq $true){
-                if ($FastText.selectionstart -ne 0){
-                    if ($FastText.selection.Length -eq 0){
-                        $r = $FastText.GetRange($FastText.selectionstart - 1,$FastText.Selectionstart)
-                        if ($r.Text -eq "."){
-                            $ii = 2
-                            while ($s.text -ne "$"){
-                                $s = $FastText.GetRange($FastText.selectionstart - $ii,$FastText.Selectionstart - $ii + 1)
-                                if ($s.text = "$"){
-                                    break
-                                }
-                                $ii = $ii + 1
-                                if ($ii -gt 1000){
-                                    break
-                                }
+            if ($FastText.selectionstart -ne 0){
+                if ($FastText.selection.Length -eq 0){
+                    $r = $FastText.GetRange($FastText.selectionstart - 1,$FastText.Selectionstart)
+                    if ($r.Text -eq "."){
+                        $ii = 2
+                        while ($s.text -ne "$"){
+                            $s = $FastText.GetRange($FastText.selectionstart - $ii,$FastText.Selectionstart - $ii + 1)
+                            $ii = $ii + 1
+                            if ($ii -gt 50){
+                                break
                             }
-                            $selt =  $FastText.GetRange($FastText.selectionstart - $ii + 2,$FastText.Selectionstart - 1).Text
-                            $Script:refs['TreeView'].SelectedNode = $Script:refsFID.Form.TreeNodes[$selt]
-                            foreach ($node in $TreeView.Nodes) { 
-                                if (($node.text).Split("-")[1].Trim().ToLower() -eq $selt.ToLower())
-                                    {$TreeView.SelectedNode = $node}
+                        }
+                        $selt =  $FastText.GetRange($FastText.selectionstart - $ii + 2,$FastText.Selectionstart - 1).Text
+                        $Script:refs['TreeView'].SelectedNode = $Script:refsFID.Form.TreeNodes[$selt]
+                        foreach ($node in $TreeView.Nodes) { 
+                            if (($node.text).Split("-")[1].Trim().ToLower() -eq $selt.ToLower())
+                                {$TreeView.SelectedNode = $node}
+                        }
+                        
+                        if ($null -ne $TreeView.SelectedNode) {
+                            $p = $FastText.PlaceToPoint($r.end)
+                            if ($pnl_Left.Visible -eq $true){
+                                Move-Window $PopForm.handle ($p.X + $spt_left.width + 20 + $eventform.left * $ctscale) ($p.Y + $eventform.top + 120 * $ctscale) $PopForm.Width $Popform.Height
                             }
-                            
-                            if ($null -ne $TreeView.SelectedNode) {
-                                $p = $FastText.PlaceToPoint($r.end)
-                                if ($pnl_Left.Visible -eq $true){
-                                    Move-Window $PopForm.handle ($p.X + $spt_left.width + 20 + $eventform.left * $ctscale) ($p.Y + $eventform.top + 120 * $ctscale) $PopForm.Width $Popform.Height
-                                }
-                                else
-                                {
-                                    Move-Window $PopForm.handle ($p.X + 20 + $eventform.left * $ctscale) ($p.Y + $eventform.top + 120 * $ctscale) $PopForm.Width $Popform.Height
-                                }
-                                $PopForm.Show()
-                                $PopListView.Focus()
+                            else
+                            {
+                                Move-Window $PopForm.handle ($p.X + 20 + $eventform.left * $ctscale) ($p.Y + $eventform.top + 120 * $ctscale) $PopForm.Width $Popform.Height
                             }
-                            else {
-                                $PopForm.Hide()
-                                $FastText.Focus()
-                            }
+                            $PopForm.Show()
+                            $PopListView.Focus()
                         }
                         else {
                             $PopForm.Hide()
                             $FastText.Focus()
                         }
-                        #entrypoint
-                        if ($script:gridchanging -eq $true){
-                            return
+                    }
+                    else {
+                        $PopForm.Hide()
+                        $FastText.Focus()
+                    }
+                    #entrypoint
+                    if ($script:gridchanging -eq $true){
+                        return
+                    }
+                    $ii = 2
+                    while ($s.text -ne " ") {
+                        $s = $FastText.GetRange($FastText.selectionstart - $ii,$FastText.Selectionstart - $ii + 1)
+                        $ii = $ii + 1
+                        if ($ii -gt 100){
+                            break
                         }
-                        $ii = 2
-                        while ($s.text -ne " ") {
-                            $s = $FastText.GetRange($FastText.selectionstart - $ii,$FastText.Selectionstart - $ii + 1)
-                            if ($s.text = " "){
-                                break
-                            }
-                            $ii = $ii + 1
-                            if ($ii -gt 1000){
-                                break
-                            }
-                            $selt =  $FastText.GetRange($FastText.selectionstart - $ii + 2,$FastText.Selectionstart).Text
-                            foreach ($item in $lst_Functions.Items){
-                                $checkItem = $lst_Functions.GetItemText($item).ToLower()
-                                if ($checkItem -eq $selt.ToLower()) {
-                                    $lst_Functions.SetItemChecked($lst_Functions.Items.IndexOf($item), $true)
-                                    $lst_Functions.SelectedItem = $item
-                                    $bldStr = $selt
-                                    $parameters = (get-command $selt).Parameters
-                                    foreach ($param in $parameters){
-                                        foreach ($key in $param.Keys) {
-                                            switch ($key) {
-                                                Verbose{};Debug{};ErrorAction{};WarningAction{};InformationAction{};ErrorVariable{};WarningVariable{};InformationVariable{};OutVariable{};OutBuffer{};PipelineVariable{};
-                                                Default {
-                                                    $bldStr = "$bldStr -$((($Key) | Out-String).Trim())"
-                                                }
+                        $selt =  $FastText.GetRange($FastText.selectionstart - $ii + 2,$FastText.Selectionstart).Text
+
+                        $index = $lst_Functions.findstring($selt)
+                        if ($index -ne -1){
+                            if ($selt.tolower() -eq $lst_Functions.items[$index].tolower()){
+                                $lst_Functions.SetItemChecked($index,$true)
+                                $lst_Functions.SelectedItem = $lst_Functions.items[$index]
+                                                                    $bldStr = $selt
+                                $parameters = (get-command $selt).Parameters
+                                foreach ($param in $parameters){
+                                    foreach ($key in $param.Keys) {
+                                        switch ($key) {
+                                            Verbose{};Debug{};ErrorAction{};WarningAction{};InformationAction{};ErrorVariable{};WarningVariable{};InformationVariable{};OutVariable{};OutBuffer{};PipelineVariable{};
+                                            Default {
+                                                $bldStr = "$bldStr -$((($Key) | Out-String).Trim())"
                                             }
                                         }
                                     }
-                                    $EventForm.Text = $bldStr.toString().trim()
                                 }
+                                $EventForm.Text = $bldStr.toString().trim()
                             }
-                        } 
-                    }
+                        }
+                    } 
                 }
             }
+
         })
         
         $eventForm.add_ResizeBegin({param($sender, $e)

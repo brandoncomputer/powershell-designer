@@ -1,8 +1,8 @@
 $lst_Functions.items.addrange(((((get-command -module Microsoft.PowerShell.Utility) | select -expandproperty Name) | Out-String).split((get-character 13)+(get-character 10))).Trim())
 $lst_Functions.items.addrange(((((get-command -module Microsoft.PowerShell.Management) | select -expandproperty Name) | Out-String).split((get-character 13)+(get-character 10))).Trim())			
-$lst_Functions.items.addrange(((((get-command -module Microsoft.PowerShell.Core) | select -expandproperty Name) | Out-String).split((get-character 13)+(get-character 10))).Trim())			
+$lst_Functions.items.addrange(((((get-command -module Microsoft.PowerShell.Core) | select -expandproperty Name) | Out-String).split((get-character 13)+(get-character 10))).Trim())
 
-$functionTimer = (New-Timer -Interval 100)
+$functionTimer = (New-Timer -Interval 10000)
 $functionTimer.Add_Tick({
 	if ($lst_Functions.GetItemChecked($lst_Functions.Items.IndexOf("Set-WindowNotOnTop")) -eq $True) {
 		$lst_Functions.SetItemChecked($lst_Functions.Items.IndexOf("Get-WindowPosition"), $true)
