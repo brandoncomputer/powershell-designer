@@ -1,5 +1,6 @@
 ﻿#region Images
-$tsDebug.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBsRXhpZgAATU0AKgAAAAgABQExAAIAAAARAAAASgMBAAUAAAABAAAAXFEQAAEAAAABAQAAAFERAAQAAAABAAAAAFESAAQAAAABAAAAAAAAAABBZG9iZSBJbWFnZVJlYWR5AAAAAYagAACvyP/bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/AO81jxU13PcpaO6W81q1tcwXCFWtn3EFiOm4qSAAfr0rI8N6xdaVr1vawypM1+wixdyhFdVQ7OQCyEHCgchtwA7EdB4q8KX11rA1Cxj+1xXDJ9pt96oyFQAGUkgEEDBGcg4PTOOGe3j8TSjSNOs5DfGVgySqUMGDh2kJyQB09c8Dnr5dR1IVLv5HnSU4z5pb9D//2Q=="))
+$tsDebug.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBsRXhpZgAATU0AKgAAAAgABQExAAIAAAARAAAASgMBAAUAAAABAAAAXFEQAAEAAAABAQAAAFERAAQAAAABAAAAAFESAAQAAAABAAAAAAAAAABBZG9iZSBJbWFnZVJlYWR5AAAAAYagAACvyP/bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/AO81jxU13PcpaO6W81q1tcwXCFWtn3EFiOm4qSAAfr0rJ8N6vd6TrtvbwyLL/aDeUPtkgRJAqHZggFkIOFA5B3ADsRu+LvC2oXOptqOmxG8W4K+db71VkZVwrAsQCuByCc5weRkDmPCnhy98RXw1C7trGfTopZbS5srqSVJoHIAc8IBvAII574+UjK+fyVfa3ZwclRVLvc//2Q=="))
+$tsDebugAfterLoad.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBsRXhpZgAATU0AKgAAAAgABQExAAIAAAARAAAASgMBAAUAAAABAAAAXFEQAAEAAAABAQAAAFERAAQAAAABAAAAAFESAAQAAAABAAAAAAAAAABBZG9iZSBJbWFnZVJlYWR5AAAAAYagAACvyP/bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/AO81jxU13PcpaO6W81q1tcwXCFWtn3EFiOm4qSAAfr0rI8N6xdaVr1vawypM1+wixdyhFdVQ7OQCyEHCgchtwA7EdB4q8KX11rA1Cxj+1xXDJ9pt96oyFQAGUkgEEDBGcg4PTOOGe3j8TSjSNOs5DfGVgySqUMGDh2kJyQB09c8Dnr5dR1IVLv5HnSU4z5pb9D//2Q=="))
 $tsFormless.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBsRXhpZgAATU0AKgAAAAgABQExAAIAAAARAAAASgMBAAUAAAABAAAAXFEQAAEAAAABAQAAAFERAAQAAAABAAAOxFESAAQAAAABAAAOxAAAAABBZG9iZSBJbWFnZVJlYWR5AAAAAYagAACvyP/bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/AOxgsNSudRs1isLmK/DK0+p8FGUj52VwozkE4+c9eg7dI2n31hLBcHV7qULcQqyOWwwaRVI5cj+L0rJ17VtU0nT7S2a3mtRFZ7Y2Z1CzzqAApZXGFxk9QTzwcYPP/wDCR6lPLFHO90FEYkhMgAZ5FIMYCiU71LA84YkgDPcTh6f1fmindN+RpiKv1hqTVrLzP//Z"))
 $tsPropertiesBtn.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBaRXhpZgAATU0AKgAAAAgABQMBAAUAAAABAAAASgMDAAEAAAABAAAAAFEQAAEAAAABAQAAAFERAAQAAAABAAAOxFESAAQAAAABAAAOxAAAAAAAAYagAACxj//bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/APVV0++v5Z7gavdRBriZVRC2FCyMoHDgfw+lVZLe8t7d5f7auDIvnYTcx/1Zbk5fodp7Gtm0kvLFJYG0m7m/0iZ1kieHayvKzj70gPRh1FVJIdQltblP7Mu1eSO4RAXiwPMZiCT5nuM4H58V1KpLbS3yMHBf1c//2Q=="))
 $tsEventsBtn.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBaRXhpZgAATU0AKgAAAAgABQMBAAUAAAABAAAASgMDAAEAAAABAAAAAFEQAAEAAAABAQAAAFERAAQAAAABAAAOxFESAAQAAAABAAAOxAAAAAAAAYagAACxj//bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/APVV0++v5Z7gavdRBriZVRC2FCyMoHDgfw+lVHgvYIpX/tm4MkaysFMh52Fx0MmednoevtW1aSXliksDaTdzf6RM6yRPDtZXlZx96QHow6iqE1vqk0MyLp90gkWdQjSJjLlyCcTbf4xnKnp9Mdcajva6t8jnlBf1c//Z"))
@@ -79,8 +80,8 @@ SOFTWARE.
         FileName:     Designer.ps1
         Modified:     Brandon Cunningham
         Created On:   1/15/2020
-        Last Updated: 5/30/2024
-        Version:      2.6.4
+        Last Updated: 5/31/2024
+        Version:      2.6.5
     ===========================================================================
 
     .DESCRIPTION
@@ -447,7 +448,18 @@ SOFTWARE.
             Loading of functions to checkedlistbox improvements
             Timer tweaks and improvements
         Fixed #22 (mispublish)
-        Fixed #23         
+        Fixed #23
+        
+    2.6.5 5/31/2024
+        Fixed bug where selecting another object did not update status bar position labels.
+        Saving project now colors block comments on demand.
+        Check for variables before removing where errors were thrown.
+        Fixed #24. Changes to publish pipeline. Last two publications had errors.
+        Minor code clean up and efficiencies.
+        Added $script:debugging variable for conditional actions within the script while debugging
+        Added Debug After Load, which for formless begins debugging after the functions load, otherwise begins debugging right before the form is shown.
+        #21 wontfix
+        Hyperdots are back, maybe as of 2.6.4
         
 BASIC MODIFICATIONS License
 Original available at https://www.pswinformscreator.com/ for deeper comparison.
@@ -641,7 +653,9 @@ SOFTWARE.
             if ($Reference -ne '') {
                 New-Variable -Name $Reference -Scope Script -Value $refControl
             }
-            Remove-Variable -Name refGuid -Scope Script
+            if ((Test-Path variable:script:refGuid) -eq $true){
+                Remove-Variable -Name refGuid -Scope Script
+            }
             if ($Suppress -eq $false) {
                 return $control
             }
@@ -827,7 +841,9 @@ SOFTWARE.
                             }
                             $Script:oldMousePos = [System.Windows.Forms.Cursor]::Position
                             $Script:OldMousePos.Y = 125 + $MainForm.Top + ($btn_SizeAll.Parent).Top
-                            $Script.OldMousePos.X = $MainForm.Left + ($btn_SizeAll.Parent).Left
+                            try {
+                                $Script.OldMousePos.X = $MainForm.Left + ($btn_SizeAll.Parent).Left
+                            }catch{}
                             $MainForm.Cursor = "SizeAll"
                             New-SendMessage -hWnd $btn_SizeAll.handle -Msg 0x0201 -wParam 0 -lParam 0
                         }
@@ -855,7 +871,9 @@ SOFTWARE.
                         $this.ParentForm.Refresh()
                     })
                     $Script:sButtons = $null
-                    Remove-Variable -Name btn_SizeAll -Scope global
+                    if ((Test-Path variable:global:btn_SizeAll) -eq $true){
+                        Remove-Variable -Name btn_SizeAll -Scope global
+                    }
                     Remove-Variable -Name sButtons -Scope Script -ErrorAction SilentlyContinue
                     ConvertFrom-WinFormsXML -ParentControl $form -Reference sButtons -Suppress -Xml '<Button Name="btn_SizeAll" Cursor="SizeAll" BackColor="White" Size="8,8" Visible="False" />'
                     ConvertFrom-WinFormsXML -ParentControl $form -Reference sButtons -Suppress -Xml '<Button Name="btn_TLeft" Cursor="SizeNWSE" BackColor="White" Size="8,8" Visible="False" />'
@@ -1254,6 +1272,7 @@ add-type -path $(Get-Character 34)$key$(Get-Character 34)
             [switch]$Suppress,
             [switch]$ReturnXML
         )
+        $FastText.OnTextChanged()
         $projectName = $refs['tpg_Form1'].Text
         if ($ReturnXML -eq $false) {
             if (($SaveAs) -or ($projectName -eq 'NewProject.fbs')) {
@@ -1389,7 +1408,6 @@ add-type -path $(Get-Character 34)$key$(Get-Character 34)
                         })
                         
                         # spot for injecting into xml save DLL
-                        #info $newElementType
                         foreach ($key in $importedControls.Keys){
                             if ($newElementType -eq $key){
                                 $newElement.SetAttribute('ControlType', $importedControls[$key]) 
@@ -2349,7 +2367,10 @@ $($FastText.Text)
                             $Script:refs['lst_AvailableEvents'].Enabled = $false
                         }
                         $Script:refs['lst_AvailableEvents'].EndUpdate()
-                    } 
+                     
+                        $tsLeftTop.Text = "$($Script:refs['PropertyGrid'].SelectedObject.Location.Y),$($Script:refs['PropertyGrid'].SelectedObject.Location.X)"
+                        $tsHeightWidth.Text = "$($Script:refs['PropertyGrid'].SelectedObject.Size.Width),$($Script:refs['PropertyGrid'].SelectedObject.Size.Height)"
+                    }                 
                     catch {
                         Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered after selecting TreeNode."
                     }
@@ -2565,7 +2586,6 @@ $($FastText.Text)
                         $text = $item.text
                     }
                 }
-             #   info "A $text"
                 $controlName = $Script:refs['TreeView'].SelectedNode.Name
                 $objRef = Get-RootNodeObjRef -TreeNode $Script:refs['TreeView'].SelectedNode
                 if ( $Script:refs['lst_AssignedEvents'].Items -notcontains $text ) {
@@ -2870,7 +2890,7 @@ $($FastText.Text)
         Debug
     })
         
-    function Debug {
+    function Debug ([switch]$AfterLoad){
     $formless = $script:trackformless
         $projectName = $Script:refs['tpg_Form1'].Text
         if ($projectName -eq "newProject.fbs") {
@@ -2888,9 +2908,11 @@ $($FastText.Text)
         New-Variable astErr -Force
         $AST = [System.Management.Automation.Language.Parser]::ParseFile($designerpath, [ref]$astTokens, [ref]$astErr)
         $functions = $ast.FindAll({ $args[0] -is [System.Management.Automation.Language.FunctionDefinitionAst] }, $true)
-
-        $outstring = "#region VDS
+        if ($afterload -eq $false){
+            $outstring = "#region VDS
+`$script:debugging = `$true
 Set-PSDebug -Trace 2"
+        }
 
         
         foreach ($item in $lst_Functions.items){
@@ -2938,6 +2960,13 @@ Set-Types"
         $outstring = "$outstring
 $($script:dllExportString)
 "
+
+    if ($afterload -eq $true){
+        $outstring = "$outstring
+`$script:debugging = `$true
+Set-PSDebug -Trace 2"
+        }
+        
         $outstring = "$outstring
 $($FastText.Text)"
     }
@@ -3012,9 +3041,20 @@ ConvertFrom-WinFormsXML -Reference refs -Suppress -Xml @""
 $string""@"
     }
 
+    
     $outstring = "$outstring
-$($FastText.Text)
+$($FastText.Text)"
+
+        if ($afterload -eq $true){
+            $outstring = "$outstring
+`$script:debugging = `$true
+Set-PSDebug -Trace 2"
+        }
+        
+        if ($formless -eq $false) {
+            $outstring = "$outstring
 [System.Windows.Forms.Application]::Run(`$$FormName) | Out-Null"
+        }
     }
 
         if ( (Test-Path -Path "$($generationPath)" -PathType Container) -eq $false ) {
@@ -3043,6 +3083,15 @@ $($FastText.Text)
         $tsDebug.add_Click({param($sender, $e)
             Debug
         })
+        
+        $tsDebugAfterLoad.add_Click({param($sender, $e);
+            Debug -AfterLoad
+        })
+        
+        $DebugAfterLoad.add_Click({param($sender, $e)
+            Debug -AfterLoad
+        })
+        
         
         function RunLast {
             $projectName = $refs['tpg_Form1'].Text  
@@ -3847,6 +3896,12 @@ $xaml""@
             $eventform.width = $width
             }
         })
+        
+        
+        $spt_Left.SplitterDistance = (($MainForm.Height - 125) / 2)
+        $spt_Right.SplitterDistance = (($MainForm.Height - 125) / 2)
+        $SplitContainer3.SplitterDistance = 250
+        $SplitContainer4.SplitterDistance = 275
 
         if ($null -ne $args[1]){
             if (($args[0].tolower() -eq "-file") -and (Test-File $args[1])){OpenProjectClick $args[1]}
