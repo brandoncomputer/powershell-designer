@@ -80,8 +80,8 @@ SOFTWARE.
         FileName:     Designer.ps1
         Modified:     Brandon Cunningham
         Created On:   1/15/2020
-        Last Updated: 5/31/2024
-        Version:      2.6.5
+        Last Updated: 6/1/2024
+        Version:      2.6.6
     ===========================================================================
 
     .DESCRIPTION
@@ -460,6 +460,12 @@ SOFTWARE.
         Added Debug After Load, which for formless begins debugging after the functions load, otherwise begins debugging right before the form is shown.
         #21 wontfix
         Hyperdots are back, maybe as of 2.6.4
+        
+    2.6.6 6/1/2024
+        Fixed bug with form resizing not updating status bar.
+        Removed (commented) all .Refresh() statements, and it seems to have smoothed out flickering.
+        As a side effect, the move markers now draw unneeded artifacts, I'll take the lack of flicker.
+        Right clicking an object in the design window will now switch to the editor and invoke PopView.
         
 BASIC MODIFICATIONS License
 Original available at https://www.pswinformscreator.com/ for deeper comparison.
@@ -849,26 +855,33 @@ SOFTWARE.
                         }
                     })
                     $form.Add_Click({
-                        if (($Script:refs['PropertyGrid'].SelectedObject -ne $this ) -and ( $args[1].Button -eq 'Left')) {
+                        if (($Script:refs['PropertyGrid'].SelectedObject -ne $this )) {
                             $Script:refs['TreeView'].SelectedNode = $Script:refsFID.Form.TreeNodes[$this.Name]
                         }
+                        if ( $args[1].Button -eq 'Right'){
+                            $controlName = $Script:refs['TreeView'].SelectedNode.Name
+                            $FastText.SelectedText = "`$$controlName."                       
+                        }
+                        
                     })
                     $form.Add_ReSize({
                         if ($Script:refs['PropertyGrid'].SelectedObject -ne $this) {
                             $Script:refs['TreeView'].SelectedNode = $Script:refsFID.Form.TreeNodes[$this.Name]
                         }
-                        $Script:refs['PropertyGrid'].Refresh()
-                        $this.ParentForm.Refresh()
+                        $tsLeftTop.Text = "$($Script:refs['PropertyGrid'].SelectedObject.Location.Y),$($Script:refs['PropertyGrid'].SelectedObject.Location.X)"
+                        $tsHeightWidth.Text = "$($Script:refs['PropertyGrid'].SelectedObject.Size.Width),$($Script:refs['PropertyGrid'].SelectedObject.Size.Height)"
+                        #$Script:refs['PropertyGrid'].Refresh()
+                        #$this.ParentForm.Refresh()
                     })
                     $form.Add_LocationChanged({
-                        $this.ParentForm.Refresh()
+                        #$this.ParentForm.Refresh()
                     })
                     $form.Add_ReSizeEnd({
                         if ($Script:refs['PropertyGrid'].SelectedObject -ne $this) {
                             $Script:refs['TreeView'].SelectedNode = $Script:refsFID.Form.TreeNodes[$this.Name]
                         }
-                        $Script:refs['PropertyGrid'].Refresh()
-                        $this.ParentForm.Refresh()
+                        #$Script:refs['PropertyGrid'].Refresh()
+                        #$this.ParentForm.Refresh()
                     })
                     $Script:sButtons = $null
                     if ((Test-Path variable:global:btn_SizeAll) -eq $true){
@@ -952,7 +965,7 @@ SOFTWARE.
                                         $Script:refs['PropertyGrid'].SelectedObject.Location = $newLocation
                                     }
                                     $Script:oldMousePos = $currentMousePOS
-                                    $Script:refs['PropertyGrid'].Refresh()
+                                    #$Script:refs['PropertyGrid'].Refresh()
                                 } 
                                 else {
                                     $Script:oldMousePos = [System.Windows.Forms.Cursor]::Position
@@ -1071,8 +1084,14 @@ add-type -path $(Get-Character 34)$key$(Get-Character 34)
                         if ($ControlType -ne 'WebBrowser'){                     
                             try {
                                 $newControl.Add_MouseUp({
-                                    if (( $Script:refs['PropertyGrid'].SelectedObject -ne $this ) -and ( $args[1].Button -eq 'Left' )) {
+                                    if (( $Script:refs['PropertyGrid'].SelectedObject -ne $this )) {
                                         $Script:refs['TreeView'].SelectedNode = $Script:refsFID.Form.TreeNodes[$this.Name]
+                                    }
+                                    if  ( $args[1].Button -eq 'Right' ){
+                                        $eventForm.Focus()
+                                        $PopForm.Focus()
+                                        $controlName = $Script:refs['TreeView'].SelectedNode.Name
+                                        $FastText.SelectedText = "`$$ControlName."
                                     }
                                 })
                             } 
@@ -1253,11 +1272,11 @@ add-type -path $(Get-Character 34)$key$(Get-Character 34)
                     }
                 }
                 $btn.BringToFront()
-                $btn.Refresh()
+                #$btn.Refresh()
             })
 
-            $Script:refs['PropertyGrid'].SelectedObject.Refresh()
-            $Script:refs['PropertyGrid'].SelectedObject.Parent.Refresh()
+            #$Script:refs['PropertyGrid'].SelectedObject.Refresh()
+            #$Script:refs['PropertyGrid'].SelectedObject.Parent.Refresh()
         }
         else {
             $Script:sButtons.GetEnumerator().ForEach({
@@ -2630,7 +2649,7 @@ $($FastText.Text)
                     $side = $Sender.Name -replace "^lbl_"
                     if ( $side -eq 'Right' ) {$newX = $refs["pnl_$($side)"].Size.Width - $e.Location.X} else {$newX = $refs["pnl_$($side)"].Size.Width + $e.Location.X}
                     if ( $newX -ge 100 ) {$refs["pnl_$($side)"].Size = New-Object System.Drawing.Size($newX,$refs["pnl_$($side)"].Size.Y)}
-                    $Sender.Parent.Refresh()
+                    #$Sender.Parent.Refresh()
                 }
             }
         }
@@ -3532,7 +3551,9 @@ Set-PSDebug -Trace 2"
         })
 
         $TreeView.add_DoubleClick({param($sender, $e)
-            $FastText.SelectedText = "`$$($Script:refs['PropertyGrid'].SelectedObject.Name)"
+            $FastText.SelectedText = "`$$($Script:refs['PropertyGrid'].SelectedObject.Name)."
+            $eventform.Focus()
+            $PopForm.Focus()
         })
 
 
