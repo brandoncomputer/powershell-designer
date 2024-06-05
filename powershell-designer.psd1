@@ -12,7 +12,7 @@
 RootModule = 'powershell-designer.psm1'
 
 # Version number of this module.
-ModuleVersion = '2.6.6'
+ModuleVersion = '2.6.7'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()

@@ -80,8 +80,8 @@ SOFTWARE.
         FileName:     Designer.ps1
         Modified:     Brandon Cunningham
         Created On:   1/15/2020
-        Last Updated: 6/1/2024
-        Version:      2.6.6
+        Last Updated: 6/5/2024
+        Version:      2.6.7
     ===========================================================================
 
     .DESCRIPTION
@@ -467,6 +467,13 @@ SOFTWARE.
         As a side effect, the move markers now draw unneeded artifacts, I'll take the lack of flicker.
         Right clicking an object in the design window will now switch to the editor and invoke PopView.
         
+    2.6.7 6/5/2024
+        Minor correction to pixel precision in statusbar display (this was broke in 2.6.4). 
+            Repositioned Statusbar labels.
+        Major improvement to control positioning during drag and drop.
+        Changes to Run and Debug Console handling. Buggy ontop code removed.
+        
+        
 BASIC MODIFICATIONS License
 Original available at https://www.pswinformscreator.com/ for deeper comparison.
         
@@ -846,10 +853,9 @@ SOFTWARE.
                                 }
                             }
                             $Script:oldMousePos = [System.Windows.Forms.Cursor]::Position
-                            $Script:OldMousePos.Y = 125 + $MainForm.Top + ($btn_SizeAll.Parent).Top
-                            try {
-                                $Script.OldMousePos.X = $MainForm.Left + ($btn_SizeAll.Parent).Left
-                            }catch{}
+                            #$tsl_StatusLabel.Text = $Script:oldMousePos.X
+                            $Script:oldMousePos.Y = (Get-WindowPosition $btn_SizeAll.handle).Top
+                            $Script:oldMousePos.X = (Get-WindowPosition $btn_SizeAll.handle).Left
                             $MainForm.Cursor = "SizeAll"
                             New-SendMessage -hWnd $btn_SizeAll.handle -Msg 0x0201 -wParam 0 -lParam 0
                         }
@@ -955,14 +961,15 @@ SOFTWARE.
                                         $Script:MouseMoving = $true
                                         Move-SButtons -Object $msObj
                                         $Script:MouseMoving = $false
-                                        $tsLeftTop.Text = "$($Script:refs['PropertyGrid'].SelectedObject.Location.Y),$($Script:refs['PropertyGrid'].SelectedObject.Location.X)"
-                                        $tsHeightWidth.Text = "$($Script:refs['PropertyGrid'].SelectedObject.Size.Width),$($Script:refs['PropertyGrid'].SelectedObject.Size.Height)"
                                         $refFID = $Script:refsFID.Form.Objects.Values.Where({$_.GetType().Name -eq 'Form'})
                                         $clientParent = $Script:refs['PropertyGrid'].SelectedObject.Parent.PointToClient([System.Drawing.Point]::Empty)
                                         $clientForm = $refFID.PointToClient([System.Drawing.Point]::Empty)
                                         $newLocation = New-Object System.Drawing.Point(($Script:sRect.Location.X - (($clientParent.X - $clientForm.X) * -1)),($Script:sRect.Location.Y - (($clientParent.Y - $clientForm.Y) * -1)))
                                         $Script:refs['PropertyGrid'].SelectedObject.Size = $Script:sRect.Size
                                         $Script:refs['PropertyGrid'].SelectedObject.Location = $newLocation
+                                        $tsLeftTop.Text = "$($Script:refs['PropertyGrid'].SelectedObject.Location.Y),$($Script:refs['PropertyGrid'].SelectedObject.Location.X)"
+                                        $tsHeightWidth.Text = "$($Script:refs['PropertyGrid'].SelectedObject.Size.Width),$($Script:refs['PropertyGrid'].SelectedObject.Size.Height)"
+                                        
                                     }
                                     $Script:oldMousePos = $currentMousePOS
                                     #$Script:refs['PropertyGrid'].Refresh()
@@ -976,7 +983,7 @@ SOFTWARE.
                             }
                         })
                         $_.Value.Add_MouseUp({
-                        #do not uncomment # Move-SButtons -Object $Script:refs['PropertyGrid'].SelectedObject
+                        Move-SButtons -Object $Script:refs['PropertyGrid'].SelectedObject
                         $MainForm.Cursor = "Default"
                         })
                     })
@@ -1283,6 +1290,8 @@ add-type -path $(Get-Character 34)$key$(Get-Character 34)
                 $_.Value.Visible = $false
             })
         }
+        $tsLeftTop.Text = "$($Script:refs['PropertyGrid'].SelectedObject.Location.Y),$($Script:refs['PropertyGrid'].SelectedObject.Location.X)"
+        $tsHeightWidth.Text = "$($Script:refs['PropertyGrid'].SelectedObject.Size.Width),$($Script:refs['PropertyGrid'].SelectedObject.Size.Height)"
     }
     
     function Save-Project {
@@ -3087,15 +3096,12 @@ Set-PSDebug -Trace 2"
 
             $file = "`"$($generationPath)\LastDebug.ps1`""
                 if ((get-host).version.major -eq 7) {
-                    start-process -filepath pwsh.exe -argumentlist '-ep bypass','-sta','-noexit',"-file $file"
+                    start-process -filepath pwsh.exe -argumentlist -argumentlist '-ep bypass','-sta','-noexit',"-command `$host.UI.RawUI.WindowTitle = `'Windows PowerShell - PowerShell Designer Debug Window`';. `'$file`'"
                 }
                 else {
-                    start-process -filepath powershell.exe -argumentlist '-ep bypass','-sta','-noexit',"-file $file"
+                    start-process -filepath powershell.exe -argumentlist '-ep bypass','-sta','-noexit',"-command `$host.UI.RawUI.WindowTitle = `'Windows PowerShell - PowerShell Designer Debug Window`';. `'$file`'"
                 }
-            start-sleep -s 1
-            Set-WindowOnTop -Handle (get-windowexists "ConsoleWindowClass")
-            Set-WindowText (get-windowexists "ConsoleWindowClass") "Windows PowerShell - PowerShell Designer Debug Window"
-            $Script:refs['tsl_StatusLabel'].text = "Debugging $file. Be certain to close the Debug Window when execution is complete"
+                $Script:refs['tsl_StatusLabel'].text = "Debugging $file. Be certain to close the Debug Window when execution is complete"
             }
     
         
@@ -3124,15 +3130,12 @@ Set-PSDebug -Trace 2"
                 }
                 $file = "`"$($generationPath)\$($projectName -replace "fbs$","ps1")`""
                 if ((get-host).version.major -eq 7) {
-                    start-process -filepath pwsh.exe -argumentlist '-ep bypass','-sta',"-file $file"
+                start-process -filepath pwsh.exe -argumentlist '-ep bypass','-sta',"-command `$host.UI.RawUI.WindowTitle = `'Windows PowerShell - PowerShell Designer Run Window`';. `'$file`'"
                 }
                 else {
-                    start-process -filepath powershell.exe -argumentlist '-ep bypass','-sta',"-file $file"
+                    start-process -filepath powershell.exe -argumentlist '-ep bypass','-sta',"-command `$host.UI.RawUI.WindowTitle = `'Windows PowerShell - PowerShell Designer Run Window`';. `'$file`'"
                 }
-            start-sleep -s 1
-            Set-WindowOnTop -Handle (get-windowexists "ConsoleWindowClass")
-            Set-WindowText (get-windowexists "ConsoleWindowClass") "Windows PowerShell - PowerShell Designer Run Window"
-            $Script:refs['tsl_StatusLabel'].text = "Running $file."
+                $Script:refs['tsl_StatusLabel'].text = "Running $file."
             }
         }
         
@@ -3143,22 +3146,20 @@ Set-PSDebug -Trace 2"
         function LoadFunctionModule {
             if ((get-host).version.major -eq 7) {
                 if ((Get-Module -ListAvailable powershell-designer).count -gt 1){
-                    start-process -filepath pwsh.exe -argumentlist '-noexit', "-command import-module `'`"$(path $(Get-Module -ListAvailable PowerShell-Designer)[0].path)\functions\functions.psm1`'`";Set-Types"
+                start-process -filepath pwsh.exe -argumentlist '-noexit', "-command import-module `'`"$(path $(Get-Module -ListAvailable PowerShell-Designer)[0].path)\functions\functions.psm1`'`";Set-Types;`$host.UI.RawUI.WindowTitle = `'Windows PowerShell - PowerShell Designer Custom Functions Enabled | Set-Types`'"
                 }
                 else {
-                    start-process -filepath pwsh.exe -argumentlist '-noexit', "-command import-module `'`"$(path $(Get-Module -ListAvailable PowerShell-Designer).path)\functions\functions.psm1`'`";Set-Types"
+                    start-process -filepath pwsh.exe -argumentlist '-noexit', "-command import-module `'`"$(path $(Get-Module -ListAvailable PowerShell-Designer).path)\functions\functions.psm1`'`";Set-Types;`$host.UI.RawUI.WindowTitle = `'Windows PowerShell - PowerShell Designer Custom Functions Enabled | Set-Types`'"
                 }
             }
             else {
                 if ((Get-Module -ListAvailable powershell-designer).count -gt 1){
-                start-process -filepath powershell.exe -argumentlist '-noexit', "-command import-module `'`"$(path $(Get-Module -ListAvailable PowerShell-Designer)[0].path)\functions\functions.psm1`'`";Set-Types"
+                start-process -filepath powershell.exe -argumentlist '-noexit', "-command import-module `'`"$(path $(Get-Module -ListAvailable PowerShell-Designer)[0].path)\functions\functions.psm1`'`";Set-Types;;`$host.UI.RawUI.WindowTitle = `'Windows PowerShell - PowerShell Designer Custom Functions Enabled | Set-Types`'"
                 }
                 else {
-                    start-process -filepath powershell.exe -argumentlist '-noexit', "-command import-module `'`"$(path $(Get-Module -ListAvailable PowerShell-Designer).path)\functions\functions.psm1`'`"; Set-Types"
+                start-process -filepath powershell.exe -argumentlist '-noexit', "-command import-module `'`"$(path $(Get-Module -ListAvailable PowerShell-Designer).path)\functions\functions.psm1`'`"; Set-Types;;`$host.UI.RawUI.WindowTitle = `'Windows PowerShell - PowerShell Designer Custom Functions Enabled | Set-Types`'"
                 }
             }
-            start-sleep -s 1
-            Set-WindowText (get-windowexists "ConsoleWindowClass") "Windows PowerShell - PowerShell Designer Custom Functions Enabled | Set-Types"
         }
 
         $functionsModule.Add_Click({
@@ -3935,12 +3936,12 @@ $xaml""@
     }
    
     Set-ActiveWindow $MainForm.Handle
-
-    if ((get-windowexists "Windows PowerShell - PowerShell Designer Debug Window") -ne $null){
-        Show-Window (get-windowexists "Windows PowerShell - PowerShell Designer Debug Window")
-    }
-    else{
-        Hide-Window -Handle (get-windowexists "ConsoleWindowClass")
-    } 
-
     
+
+    $hideConsoleTimer = new-timer 1000
+    $hideConsoleTimer.add_Tick({
+        if ($script:debugging -ne $true){
+            Hide-Window -Handle (get-windowexists "ConsoleWindowClass")
+        } 
+        $hideConsoleTimer.Enabled = $false
+    })

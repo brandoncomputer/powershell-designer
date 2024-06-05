@@ -1,5 +1,4 @@
 <#
-Visual DesignerShell 3.0.0
 This project merges a restyled Visual DialogShell vds 0.3.38 and 
 powershell-designer 2.1.7
 The intent of this project is to bring the functionality of Visual DialogShell
@@ -4361,7 +4360,7 @@ function Get-PowerShellDesignerVersion {
 	.EXAMPLE
 		$PSDVersion = Get-PowerShellDesignerVersion
 #>
-	return '2.6.6'
+	return '2.6.7'
 }
 
 function Get-PowerShellVersion {
