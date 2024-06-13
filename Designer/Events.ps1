@@ -1,4 +1,5 @@
 ﻿#region Images
+$tsDarkMode.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEASABIAAD/4QBuRXhpZgAATU0AKgAAAAgABQEyAAIAAAAUAAAASgMBAAUAAAABAAAAXlEQAAEAAAABAQAAAFERAAQAAAABAAALElESAAQAAAABAAALEgAAAAAyMDI0OjA2OjEzIDIzOjE3OjM1AAABhqAAALGP/9sAQwAIBgYHBgUIBwcHCQkICgwUDQwLCwwZEhMPFB0aHx4dGhwcICQuJyAiLCMcHCg3KSwwMTQ0NB8nOT04MjwuMzQy/9sAQwEJCQkMCwwYDQ0YMiEcITIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIy/8AAEQgAEAAQAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/aAAwDAQACEQMRAD8A8pu9ZsLe/uIP7EtSY5WTO1ADgkdNnH0p0WpWV7HPAukWkbNbTkOFQlSsTMD9wenrWZf29ldandXEesWQjlmd13JNnBJI/wCWdPs47OyeaZ9Xs5f9GnRY40m3MzRMoAzGB1YdTXMqcbXs7/M3c5X/AOGP/9k="))
 $tsDebug.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBsRXhpZgAATU0AKgAAAAgABQExAAIAAAARAAAASgMBAAUAAAABAAAAXFEQAAEAAAABAQAAAFERAAQAAAABAAAAAFESAAQAAAABAAAAAAAAAABBZG9iZSBJbWFnZVJlYWR5AAAAAYagAACvyP/bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/AO81jxU13PcpaO6W81q1tcwXCFWtn3EFiOm4qSAAfr0rJ8N6vd6TrtvbwyLL/aDeUPtkgRJAqHZggFkIOFA5B3ADsRu+LvC2oXOptqOmxG8W4K+db71VkZVwrAsQCuByCc5weRkDmPCnhy98RXw1C7trGfTopZbS5srqSVJoHIAc8IBvAII574+UjK+fyVfa3ZwclRVLvc//2Q=="))
 $tsDebugAfterLoad.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBsRXhpZgAATU0AKgAAAAgABQExAAIAAAARAAAASgMBAAUAAAABAAAAXFEQAAEAAAABAQAAAFERAAQAAAABAAAAAFESAAQAAAABAAAAAAAAAABBZG9iZSBJbWFnZVJlYWR5AAAAAYagAACvyP/bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/AO81jxU13PcpaO6W81q1tcwXCFWtn3EFiOm4qSAAfr0rI8N6xdaVr1vawypM1+wixdyhFdVQ7OQCyEHCgchtwA7EdB4q8KX11rA1Cxj+1xXDJ9pt96oyFQAGUkgEEDBGcg4PTOOGe3j8TSjSNOs5DfGVgySqUMGDh2kJyQB09c8Dnr5dR1IVLv5HnSU4z5pb9D//2Q=="))
 $tsFormless.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBsRXhpZgAATU0AKgAAAAgABQExAAIAAAARAAAASgMBAAUAAAABAAAAXFEQAAEAAAABAQAAAFERAAQAAAABAAAOxFESAAQAAAABAAAOxAAAAABBZG9iZSBJbWFnZVJlYWR5AAAAAYagAACvyP/bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/AOxgsNSudRs1isLmK/DK0+p8FGUj52VwozkE4+c9eg7dI2n31hLBcHV7qULcQqyOWwwaRVI5cj+L0rJ17VtU0nT7S2a3mtRFZ7Y2Z1CzzqAApZXGFxk9QTzwcYPP/wDCR6lPLFHO90FEYkhMgAZ5FIMYCiU71LA84YkgDPcTh6f1fmindN+RpiKv1hqTVrLzP//Z"))
@@ -80,8 +81,8 @@ SOFTWARE.
         FileName:     Designer.ps1
         Modified:     Brandon Cunningham
         Created On:   1/15/2020
-        Last Updated: 6/5/2024
-        Version:      2.6.7
+        Last Updated: 6/13/2024
+        Version:      2.6.8
     ===========================================================================
 
     .DESCRIPTION
@@ -473,6 +474,14 @@ SOFTWARE.
         Major improvement to control positioning during drag and drop.
         Changes to Run and Debug Console handling. Buggy ontop code removed.
         
+    2.6.8 6/9/2024
+        Improvements to ConvertFrom-WPFXaml
+        Minor structure change to outputs / region nesting
+        Fixed problem with Send-KeyPress
+        New function Send-KeyDown
+        New function Send-KeyUp
+        Introduced 'Dark Mode', sort of. This is more of an OS hack.
+        
         
 BASIC MODIFICATIONS License
 Original available at https://www.pswinformscreator.com/ for deeper comparison.
@@ -499,14 +508,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
        
-#>
+#> 
 
     if ((Get-Module -ListAvailable powershell-designer).count -gt 1){
         import-module "$(path $(Get-Module -ListAvailable PowerShell-Designer)[0].path)\functions\functions.psm1"
     }
     else {
         import-module "$(path $(Get-Module -ListAvailable PowerShell-Designer).path)\functions\functions.psm1"
-    }                                                                                                                
+    }
+
+    Set-RegistryValue -Path 'HKCU:\SOFTWARE\Microsoft\ColorFiltering' -Name 'HotKeyEnabled' -Value 1
 
     $global:ControlBeingSelected = $false
     $global:control_track = @{}
@@ -2133,8 +2144,8 @@ function Wait ($duration){
         $AST = [System.Management.Automation.Language.Parser]::ParseFile($designerpath, [ref]$astTokens, [ref]$astErr)
         $functions = $ast.FindAll({ $args[0] -is [System.Management.Automation.Language.FunctionDefinitionAst] }, $true)
         if ($formless -eq $false){
-        $outstring = "#region VDS
-`$RunSpace = [RunspaceFactory]::CreateRunspacePool(); `$RunSpace.ApartmentState = `"STA`"; `$RunSpace.Open(); `$PowerShell = [powershell]::Create();`$PowerShell.RunspacePool = `$RunSpace; [void]`$PowerShell.AddScript({"
+        $outstring = "`$RunSpace = [RunspaceFactory]::CreateRunspacePool(); `$RunSpace.ApartmentState = `"STA`"; `$RunSpace.Open(); `$PowerShell = [powershell]::Create();`$PowerShell.RunspacePool = `$RunSpace; [void]`$PowerShell.AddScript({
+#region VDS"
         }
         
         foreach ($item in $lst_Functions.items){
@@ -3917,6 +3928,24 @@ $xaml""@
             $eventform.height = $height -40
             $eventform.width = $width
             }
+        })
+        
+        
+        function DarkMode {
+            Send-KeyDown (Get-VirtualKey 'LWIN')
+            Send-KeyDown (Get-VirtualKey 'LCONTROL')
+            Send-KeyDown (Get-VirtualKey 'C')
+            Send-KeyUp (Get-VirtualKey 'LWIN')
+            Send-KeyUp (Get-VirtualKey 'LCONTROL')
+            Send-KeyUp (Get-VirtualKey 'C')
+        }
+        
+        $DarkMode.add_Click({param($sender, $e);
+            DarkMode
+        })
+        
+        $tsDarkMode.add_Click({param($sender, $e);
+            DarkMode
         })
         
         

@@ -4369,7 +4369,7 @@ function Get-PowerShellDesignerVersion {
 	.EXAMPLE
 		$PSDVersion = Get-PowerShellDesignerVersion
 #>
-	return '2.6.7'
+	return '2.6.8'
 }
 
 function Get-PowerShellVersion {
@@ -7939,6 +7939,37 @@ function Send-ClickToWindow {
 	[vds]::LeftClickAtPoint($xp,$yp,[System.Windows.Forms.Screen]::PrimaryScreen.bounds.width,[System.Windows.Forms.Screen]::PrimaryScreen.bounds.height) | out-null
 }
 
+function Send-KeyDown {
+<#
+    .SYNOPSIS
+		Holds down a specified virtual key
+			 
+	.DESCRIPTION
+		This function returns an object with Left, Top, Width and Height properties of a windows position according to a handle specified
+
+	.PARAMETER vKey
+		The virtual key to hold down
+	
+	.PARAMETER Seconds
+		Seconds to hold the key, as decimal
+
+	.EXAMPLE
+		Send-KeyPress (Get-VirtualKey "w") 5.5
+
+	.EXAMPLE
+		Send-KeyPress -vKey (Get-VirtualKey "w") -seconds 5.5
+
+		.INPUTS
+		vKey as Hex, Seconds as Decimal	
+#>
+	[CmdletBinding()]
+    param (
+        [Parameter(Mandatory)]
+        $vKey
+	)
+	[vds]::keybd_event($vKey,0,0,[UIntPtr]::new(0))
+}
+
 function Send-KeyPress {
 <#
     .SYNOPSIS
@@ -7970,7 +8001,38 @@ function Send-KeyPress {
 		[decimal]$Seconds
 	)
 	[vds]::keybd_event($vKey,0,0,[UIntPtr]::new(0))
-	Start-Sleep ($Seconds * 1000)
+	Start-Sleep -Milliseconds ($Seconds * 1000)
+	[vds]::keybd_event($vKey,0,2,[UIntPtr]::new(0))
+}
+
+function Send-KeyUp {
+<#
+    .SYNOPSIS
+		Holds down a specified virtual key
+			 
+	.DESCRIPTION
+		This function returns an object with Left, Top, Width and Height properties of a windows position according to a handle specified
+
+	.PARAMETER vKey
+		The virtual key to hold down
+	
+	.PARAMETER Seconds
+		Seconds to hold the key, as decimal
+
+	.EXAMPLE
+		Send-KeyPress (Get-VirtualKey "w") 5.5
+
+	.EXAMPLE
+		Send-KeyPress -vKey (Get-VirtualKey "w") -seconds 5.5
+
+		.INPUTS
+		vKey as Hex, Seconds as Decimal	
+#>
+	[CmdletBinding()]
+    param (
+        [Parameter(Mandatory)]
+        $vKey
+	)
 	[vds]::keybd_event($vKey,0,2,[UIntPtr]::new(0))
 }
 
@@ -7982,7 +8044,7 @@ function Send-RightClickToWindow {
 		ALIASES
 			Window-RClick
 			 
-	.DESCRIPTION
+b
 		This function sends a right click to a window by the handle, x and y specified.
 
 	.PARAMETER Handle
@@ -8037,7 +8099,7 @@ function Send-SeleniumElementByAttribute {
 	.PARAMETER Attribute
 		The attribute to search by
 		
-	.PARAMETER Value
+	.PARAMETER Val
 		The value inside the element attribute to search for
 		
 	.PARAMETER Send

@@ -856,28 +856,6 @@ function ConvertFrom-WinFormsXML {
 	}
 }
 
-function Get-ActiveWindow {
-<#
-    .SYNOPSIS
-		Returns the handle of the active window
-
-		ALIASES
-			Winactive
-			 
-	.DESCRIPTION
-		This function returns the handle of the active window
-
-	.EXAMPLE
-		$winactive = Get-ActiveWindow
-	
-	.OUTPUTS
-		Handle
-#>
-	[Alias("Winactive")]
-	param()
-	return [vds]::GetForegroundWindow()
-}
-
 function Get-Answer {
 <#
 	.SYNOPSIS
@@ -1216,6 +1194,274 @@ function Get-ScreenHeight {
 		$i = $i + 1
 	}
 	return $return
+}
+
+function Get-VirtualKey {
+<#
+    .SYNOPSIS
+		Returns a virtual key
+
+		ALIASES
+			VKey
+     
+    .DESCRIPTION
+		This function returns a virtual key
+	
+	.PARAMETER VirtualKey
+		The virtual key to return, must be a member of the following set:
+		'None', 'Alt', 'Control', 'Shift', 'WinKey', 'LBUTTON', 
+		'RBUTTON', 'CANCEL', 'MBUTTON', 'XBUTTON1', 'XBUTTON2', 'BACK', 'TAB',
+		'CLEAR', 'RETURN', 'SHIFT', 'CONTROL', 'MENU', 'PAUSE', 'CAPITAL', 
+		'KANA', 'HANGUEL', 'HANGUL', 'IME_ON', 'JUNJA', 'FINAL', 'HANJA', 
+		'KANJI', 'IME_OFF', 'ESCAPE', 'CONVERT', 'NONCONVERT', 'ACCEPT', 
+		'MODECHANGE', 'SPACE', 'PRIOR', 'NEXT', 'END', 'HOME', 'LEFT', 'UP',
+		'RIGHT', 'DOWN', 'SELECT', 'PRINT', 'EXECUTE', 'SNAPSHOT', 'INSERT',
+		'DELETE', 'HELP', '0', '1', '3', '4', '6', '7', '8', '9', 'A', 'B', 
+		'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 
+		'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'LWIN', 'RWIN', 
+		'APPS', 'SLEEP', 'NUMPAD0', 'NUMPAD1', 'NUMPAD2', 'NUMPAD3', 'NUMPAD4',
+		'NUMPAD5', 'NUMPAD6', 'NUMPAD7', 'NUMPAD8', 'NUMPAD9', 'MULTIPLY', 
+		'ADD', 'SEPARATOR', 'SUBTRACT', 'DECIMAL', 'DIVIDE', 'F1', 'F2', 'F3', 
+		'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12', 'F13', 'F14', 
+		'F15', 'F16', 'F17', 'F18', 'F19', 'F20', 'F21', 'F22', 'F23', 'F24', 
+		'NUMLOCK', 'SCROLL', 'LSHIFT', 'RSHIFT', 'LCONTROL', 'RCONTROL', 
+		'LMENU', 'RMENU', 'BROWSER_BACK', 'BROWSER_FORWARD', 'BROWSER_REFRESH', 
+		'BROWSER_STOP', 'BROWSER_SEARCH', 'BROWSER_FAVORITES', 'BROWSER_HOME', 
+		'VOLUME_MUTE', 'VOLUME_DOWN', 'VOLUME_UP', 'MEDIA_NEXT_TRACK', 
+		'MEDIA_PREV_TRACK', 'MEDIA_STOP', 'MEDIA_PLAY_PAUSE', 'LAUNCH_MAIL', 
+		'LAUNCH_MEDIA_SELECT', 'LAUNCH_APP1', 'LAUNCH_APP2', 'OEM_1', 
+		'OEM_PLUS', 'OEM_COMMA', 'OEM_MINUS', 'OEM_PERIOD', 'OEM_2', 'OEM_3', 
+		'OEM_4', 'OEM_5', 'OEM_6', 'OEM_7', 'OEM_8', 'OEM_102', 'PROCESSKEY', 
+		'PACKET', 'ATTN', 'CRSEL', 'EXSEL', 'EREOF', 'PLAY', 'ZOOM', 'NONAME', 
+		'PA1', 'OEM_CLEAR'
+		
+	.EXAMPLE
+		$vkeyF16 = Get-VirtualKey F16
+	
+	.EXAMPLE
+		$vkeyF16 = Get-VirtualKey -VirtualKey 'F16'
+		
+	.EXAMPLE
+		$vkeyF16 = 'F16' | Get-VirtualKey
+	
+	.INPUTS
+		VirtualKey as String
+	
+	.OUTPUTS
+		Hex
+#>
+	[Alias("VKey")]
+	[CmdletBinding()]
+    param (
+        [Parameter(Mandatory,
+			ValueFromPipeline)]
+		[ValidateSet('None', 'Alt', 'Control', 'Shift', 'WinKey', 'LBUTTON', 
+		'RBUTTON', 'CANCEL', 'MBUTTON', 'XBUTTON1', 'XBUTTON2', 'BACK', 'TAB',
+		'CLEAR', 'RETURN', 'SHIFT', 'CONTROL', 'MENU', 'PAUSE', 'CAPITAL', 
+		'KANA', 'HANGUEL', 'HANGUL', 'IME_ON', 'JUNJA', 'FINAL', 'HANJA', 
+		'KANJI', 'IME_OFF', 'ESCAPE', 'CONVERT', 'NONCONVERT', 'ACCEPT', 
+		'MODECHANGE', 'SPACE', 'PRIOR', 'NEXT', 'END', 'HOME', 'LEFT', 'UP',
+		'RIGHT', 'DOWN', 'SELECT', 'PRINT', 'EXECUTE', 'SNAPSHOT', 'INSERT',
+		'DELETE', 'HELP', '0', '1', '3', '4', '6', '7', '8', '9', 'A', 'B', 
+		'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 
+		'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'LWIN', 'RWIN', 
+		'APPS', 'SLEEP', 'NUMPAD0', 'NUMPAD1', 'NUMPAD2', 'NUMPAD3', 'NUMPAD4',
+		'NUMPAD5', 'NUMPAD6', 'NUMPAD7', 'NUMPAD8', 'NUMPAD9', 'MULTIPLY', 
+		'ADD', 'SEPARATOR', 'SUBTRACT', 'DECIMAL', 'DIVIDE', 'F1', 'F2', 'F3', 
+		'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12', 'F13', 'F14', 
+		'F15', 'F16', 'F17', 'F18', 'F19', 'F20', 'F21', 'F22', 'F23', 'F24', 
+		'NUMLOCK', 'SCROLL', 'LSHIFT', 'RSHIFT', 'LCONTROL', 'RCONTROL', 
+		'LMENU', 'RMENU', 'BROWSER_BACK', 'BROWSER_FORWARD', 'BROWSER_REFRESH', 
+		'BROWSER_STOP', 'BROWSER_SEARCH', 'BROWSER_FAVORITES', 'BROWSER_HOME', 
+		'VOLUME_MUTE', 'VOLUME_DOWN', 'VOLUME_UP', 'MEDIA_NEXT_TRACK', 
+		'MEDIA_PREV_TRACK', 'MEDIA_STOP', 'MEDIA_PLAY_PAUSE', 'LAUNCH_MAIL', 
+		'LAUNCH_MEDIA_SELECT', 'LAUNCH_APP1', 'LAUNCH_APP2', 'OEM_1', 
+		'OEM_PLUS', 'OEM_COMMA', 'OEM_MINUS', 'OEM_PERIOD', 'OEM_2', 'OEM_3', 
+		'OEM_4', 'OEM_5', 'OEM_6', 'OEM_7', 'OEM_8', 'OEM_102', 'PROCESSKEY', 
+		'PACKET', 'ATTN', 'CRSEL', 'EXSEL', 'EREOF', 'PLAY', 'ZOOM', 'NONAME', 
+		'PA1', 'OEM_CLEAR')]
+		[string[]]$VirtualKey
+    )
+    switch($VirtualKey) {
+        None{return 0}
+        Alt{return 1}
+        Control{return 2}
+        Shift{return 4}
+        WinKey{return 8}
+        LBUTTON{return 0x01}
+        RBUTTON{return 0x02}
+        CANCEL{return 0x03}
+        MBUTTON{return 0x04}
+        XBUTTON1{return 0x05}
+        XBUTTON2{return 0x06}
+        BACK{return 0x08}
+        TAB{return 0x09}
+        CLEAR{return 0x0C}
+        RETURN{return 0x0D}
+        SHIFT{return 0x10}
+        CONTROL{return 0x11}
+        MENU{return 0x12}
+        PAUSE{return 0x13}
+        CAPITAL{return 0x14}
+        KANA{return 0x15}
+        HANGUEL{return 0x15}
+        HANGUL{return 0x15}
+        IME_ON{return 0x16}
+        JUNJA{return 0x17}
+        FINAL{return 0x18}
+        HANJA{return 0x19}
+        KANJI{return 0x19}
+        IME_OFF{return 0x1A}
+        ESCAPE{return 0x1B}
+        CONVERT{return 0x1C}
+        NONCONVERT{return 0x1D}
+        ACCEPT{return 0x1E}
+        MODECHANGE{return 0x1F}
+        SPACE{return 0x20}
+        PRIOR{return 0x21}
+        NEXT{return 0x22}
+        END{return 0x23}
+        HOME{return 0x24}
+        LEFT{return 0x25}
+        UP{return 0x26}
+        RIGHT{return 0x27}
+        DOWN{return 0x28}
+        SELECT{return 0x29}
+        PRINT{return 0x2A}
+        EXECUTE{return 0x2B}
+        SNAPSHOT{return 0x2C}
+        INSERT{return 0x2D}
+        DELETE{return 0x2E}
+        HELP{return 0x2F}
+        0{return 0x31}
+        1{return 0x32}
+        3{return 0x34}
+        4{return 0x35}
+        6{return 0x36}
+        7{return 0x37}
+        8{return 0x38}
+        9{return 0x39}
+        A{return 0x41}
+        B{return 0x42}
+        C{return 0x43}
+        D{return 0x44}
+        E{return 0x45}
+        F{return 0x46}
+        G{return 0x47}
+        H{return 0x48}
+        I{return 0x49}
+        J{return 0x4A}
+        K{return 0x4B}
+        L{return 0x4C}
+        M{return 0x4D}
+        N{return 0x4E}
+        O{return 0x4F}
+        P{return 0x50}
+        Q{return 0x51}
+        R{return 0x52}
+        S{return 0x53}
+        T{return 0x54}
+        U{return 0x55}
+        V{return 0x56}
+        W{return 0x57}
+        X{return 0x58}
+        Y{return 0x59}
+        Z{return 0x5A}
+        LWIN{return 0x5B}
+        RWIN{return 0x5C}
+        APPS{return 0x5D}
+        SLEEP{return 0x5F}
+        NUMPAD0{return 0x60}
+        NUMPAD1{return 0x61}
+        NUMPAD2{return 0x62}
+        NUMPAD3{return 0x63}
+        NUMPAD4{return 0x64}
+        NUMPAD5{return 0x65}
+        NUMPAD6{return 0x66}
+        NUMPAD7{return 0x67}
+        NUMPAD8{return 0x68}
+        NUMPAD9{return 0x69}
+        MULTIPLY{return 0x6A}
+        ADD{return 0x6B}
+        SEPARATOR{return 0x6C}
+        SUBTRACT{return 0x6D}
+        DECIMAL{return 0x6E}
+        DIVIDE{return 0x6F}
+        F1{return 0x70}
+        F2{return 0x71}
+        F3{return 0x72}
+        F4{return 0x73}
+        F5{return 0x74}
+        F6{return 0x75}
+        F7{return 0x76}
+        F8{return 0x77}
+        F9{return 0x78}
+        F10{return 0x79}
+        F11{return 0x7A}
+        F12{return 0x7B}
+        F13{return 0x7C}
+        F14{return 0x7D}
+        F15{return 0x7E}
+        F16{return 0x7F}
+        F17{return 0x80}
+        F18{return 0x81}
+        F19{return 0x82}
+        F20{return 0x83}
+        F21{return 0x84}
+        F22{return 0x85}
+        F23{return 0x86}
+        F24{return 0x87}
+        NUMLOCK{return 0x90}
+        SCROLL{return 0x91}
+        LSHIFT{return 0xA0}
+        RSHIFT{return 0xA1}
+        LCONTROL{return 0xA2}
+        RCONTROL{return 0xA3}
+        LMENU{return 0xA4}
+        RMENU{return 0xA5}
+        BROWSER_BACK{return 0xA6}
+        BROWSER_FORWARD{return 0xA7}
+        BROWSER_REFRESH{return 0xA8}
+        BROWSER_STOP{return 0xA9}
+        BROWSER_SEARCH{return 0xAA}
+        BROWSER_FAVORITES{return 0xAB}
+        BROWSER_HOME{return 0xAC}
+        VOLUME_MUTE{return 0xAD}
+        VOLUME_DOWN{return 0xAE}
+        VOLUME_UP{return 0xAF}
+        MEDIA_NEXT_TRACK{return 0xB0}
+        MEDIA_PREV_TRACK{return 0xB1}
+        MEDIA_STOP{return 0xB2}
+        MEDIA_PLAY_PAUSE{return 0xB3}
+        LAUNCH_MAIL{return 0xB4}
+        LAUNCH_MEDIA_SELECT{return 0xB5}
+        LAUNCH_APP1{return 0xB6}
+        LAUNCH_APP2{return 0xB7}
+        OEM_1{return 0xBA}
+        OEM_PLUS{return 0xBB}
+        OEM_COMMA{return 0xBC}
+        OEM_MINUS{return 0xBD}
+        OEM_PERIOD{return 0xBE}
+        OEM_2{return 0xBF}
+        OEM_3{return 0xC0}
+        OEM_4{return 0xDB}
+        OEM_5{return 0xDC}
+        OEM_6{return 0xDD}
+        OEM_7{return 0xDE}
+        OEM_8{return 0xDF}
+        OEM_102{return 0xE2}
+        PROCESSKEY{return 0xE5}
+        PACKET{return 0xE7}
+        ATTN{return 0xF6}
+        CRSEL{return 0xF7}
+        EXSEL{return 0xF8}
+        EREOF{return 0xF9}
+        PLAY{return 0xFA}
+        ZOOM{return 0xFB}
+        NONAME{return 0xFC}
+        PA1{return 0xFD}
+        OEM_CLEAR{return 0xFE}
+    }
 }
 
 function Get-WindowExists {
@@ -1571,6 +1817,68 @@ function New-Timer {
     return $timer
 }
 
+function Send-KeyDown {
+<#
+    .SYNOPSIS
+		Holds down a specified virtual key
+			 
+	.DESCRIPTION
+		This function returns an object with Left, Top, Width and Height properties of a windows position according to a handle specified
+
+	.PARAMETER vKey
+		The virtual key to hold down
+	
+	.PARAMETER Seconds
+		Seconds to hold the key, as decimal
+
+	.EXAMPLE
+		Send-KeyPress (Get-VirtualKey "w") 5.5
+
+	.EXAMPLE
+		Send-KeyPress -vKey (Get-VirtualKey "w") -seconds 5.5
+
+		.INPUTS
+		vKey as Hex, Seconds as Decimal	
+#>
+	[CmdletBinding()]
+    param (
+        [Parameter(Mandatory)]
+        $vKey
+	)
+	[vds]::keybd_event($vKey,0,0,[UIntPtr]::new(0))
+}
+
+function Send-KeyUp {
+<#
+    .SYNOPSIS
+		Holds down a specified virtual key
+			 
+	.DESCRIPTION
+		This function returns an object with Left, Top, Width and Height properties of a windows position according to a handle specified
+
+	.PARAMETER vKey
+		The virtual key to hold down
+	
+	.PARAMETER Seconds
+		Seconds to hold the key, as decimal
+
+	.EXAMPLE
+		Send-KeyPress (Get-VirtualKey "w") 5.5
+
+	.EXAMPLE
+		Send-KeyPress -vKey (Get-VirtualKey "w") -seconds 5.5
+
+		.INPUTS
+		vKey as Hex, Seconds as Decimal	
+#>
+	[CmdletBinding()]
+    param (
+        [Parameter(Mandatory)]
+        $vKey
+	)
+	[vds]::keybd_event($vKey,0,2,[UIntPtr]::new(0))
+}
+
 function Send-Window {
 <#
     .SYNOPSIS
@@ -1676,6 +1984,41 @@ function Set-EnableVisualStyle {
 		Set-EnableVisualStyle
 #>
 	[vds]::SetCompat() | out-null
+}
+
+function Set-RegistryValue {
+<#
+    .SYNOPSIS
+		Modifies a registry value
+			 
+	.DESCRIPTION
+		This function modifies a registry value
+	
+	.PARAMETER Path
+		The path to the registry key containing the value
+	
+	.PARAMETER Name
+		The name of the value
+
+	.PARAMETER Value
+		The new value of registry object
+		
+	.EXAMPLE
+		Set-RegistryValue -Path "HKLM:\Software\MyCompany" -Name "NoOfEmployees" -Value 823
+		
+	.INPUTS
+		Path as String, Name as String, Value as Variant
+#>
+	[CmdletBinding()]
+	param (
+		[Parameter(Mandatory)]
+		[string]$Path,
+		[Parameter(Mandatory)]
+		[string]$Name,
+		[Parameter(Mandatory)]
+		$Value
+	)
+	Set-ItemProperty -Path $Path -Name $Name -Value $Value
 }
 
 function Set-Types {
@@ -2310,10 +2653,11 @@ function Update-ErrorLog {
 
 
 ConvertFrom-WinFormsXML -Reference refs -Suppress -Xml @"
-<Form Name="MainForm" MinimumSize="800,600" Size="972,627" Tag="IsMDIContainer, DPIAware, VisualStyle" WindowState="Maximized" Text="PowerShell Designer" IsMDIContainer="True"><TabControl Name="tcl_Top" Dock="Top" ShowToolTips="True" Size="550,20"><TabPage Name="tpg_Form1" Size="542,0" Text="NewProject.fbs" /></TabControl><Label Name="lbl_Left" Dock="Left" BackColor="35, 35, 35" Cursor="VSplit" Size="3,493" /><Label Name="lbl_Right" Dock="Right" BackColor="35, 35, 35" Cursor="VSplit" Size="3,493" /><Panel Name="pnl_Left" Dock="Left" BorderStyle="Fixed3D" Size="200,493"><SplitContainer Name="spt_Left" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="269"><SplitterPanel Name="spt_Left_Panel1"><TreeView Name="trv_Controls" Dock="Fill" BackColor="Azure" /></SplitterPanel><SplitterPanel Name="spt_Left_Panel2" BackColor="ControlLight"><TreeView Name="TreeView" Dock="Fill" BackColor="Azure" DrawMode="OwnerDrawText" HideSelection="False" /></SplitterPanel></SplitContainer></Panel><Panel Name="pnl_Right" Dock="Right" BorderStyle="Fixed3D" Size="200,493"><SplitContainer Name="spt_Right" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="281"><SplitterPanel Name="spt_Right_Panel1"><TabControl Name="TabControl5" Dock="Fill"><TabPage Name="Tab 116" Size="188,255" Text="Properties"><Button Name="btnInject" BackColor="ControlLight" Location="55,0" Size="24,24" UseVisualStyleBackColor="False" /><PropertyGrid Name="PropertyGrid" Dock="Fill" ViewBackColor="Azure" /></TabPage><TabPage Name="Tab 1" Size="188,255" Text="Events"><SplitContainer Name="SplitContainer3" Dock="Fill" Orientation="Horizontal" SplitterDistance="212"><SplitterPanel Name="SplitContainer3_Panel1" AutoScroll="True"><ListView Name="lst_AvailableEvents" Dock="Fill" BackColor="Azure" GridLines="True" TileSize="160, 18" View="List" /></SplitterPanel><SplitterPanel Name="SplitContainer3_Panel2" AutoScroll="True"><ListBox Name="lst_AssignedEvents" Dock="Fill" BackColor="Azure" /></SplitterPanel></SplitContainer></TabPage><TabPage Name="TabPage8" Size="188,226" Text="Methods"><ListView Name="lst_Methods" Dock="Fill" BackColor="Azure" GridLines="True" TileSize="160, 18" View="List" /></TabPage></TabControl></SplitterPanel><SplitterPanel Name="spt_Right_Panel2" BackColor="Control"><TabControl Name="TabControl2" Dock="Fill"><TabPage Name="TabPage3" Size="188,178" Text="Functions"><SplitContainer Name="SplitContainer4" Dock="Fill" Orientation="Horizontal" SplitterDistance="113"><SplitterPanel Name="SplitContainer4_Panel1" AutoScroll="True"><CheckedListBox Name="lst_Functions" Dock="Fill" BackColor="Azure" ColumnWidth="175" MultiColumn="True" /></SplitterPanel><SplitterPanel Name="SplitContainer4_Panel2" AutoScroll="True"><TextBox Name="lst_Params" Dock="Fill" BackColor="Azure" Multiline="True" ScrollBars="Both" Size="188,61" /></SplitterPanel></SplitContainer></TabPage><TabPage Name="TabPage4" Size="188,303" Text="Finds"><SplitContainer Name="SplitContainer5" Dock="Fill" Orientation="Horizontal" SplitterDistance="25"><SplitterPanel Name="SplitContainer5_Panel1"><SplitContainer Name="SplitContainer6" Dock="Fill" SplitterDistance="128"><SplitterPanel Name="SplitContainer6_Panel1"><TextBox Name="txt_Find" Dock="Bottom" BackColor="Azure" Size="128,20" /></SplitterPanel><SplitterPanel Name="SplitContainer6_Panel2"><Button Name="btn_Find" Location="5,0" Size="24,24" /><Button Name="btn_RemoveFind" Location="30,0" Size="24,24" /></SplitterPanel></SplitContainer></SplitterPanel><SplitterPanel Name="SplitContainer5_Panel2"><ListBox Name="lst_Find" Dock="Fill" BackColor="Azure" /></SplitterPanel></SplitContainer></TabPage></TabControl></SplitterPanel></SplitContainer></Panel><MenuStrip Name="ms_Left" Dock="Left" AutoSize="False" BackColor="ControlDarkDark" Font="Verdana, 9pt" LayoutStyle="VerticalStackWithOverflow" Size="23,589" TextDirection="Vertical90" Visible="False"><ToolStripMenuItem Name="ms_Toolbox" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" Size="23,100" Visible="False" Text="Toolbox" /><ToolStripMenuItem Name="ms_FormTree" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" Size="23,100" TextAlign="MiddleLeft" TextDirection="Vertical90" Visible="False" Text="Form Tree" /></MenuStrip><MenuStrip Name="ms_Right" Dock="Right" AutoSize="False" BackColor="ControlDarkDark" Font="Verdana, 9pt" LayoutStyle="VerticalStackWithOverflow" Size="23,589" TextDirection="Vertical90" Visible="False"><ToolStripMenuItem Name="ms_Properties" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" Size="23,100" TextAlign="MiddleLeft" TextDirection="Vertical270" Visible="False" Text="Properties" /><ToolStripMenuItem Name="ms_Events" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" ImageTransparentColor="White" Size="23,100" TextDirection="Vertical270" Visible="False" Text="Events" /></MenuStrip><MenuStrip Name="ToolStrip" ImageScalingSize="15,16" LayoutStyle="Flow" RenderMode="Professional" ShowItemToolTips="True" Text="ToolStrip1"><ToolStripButton Name="tsNewBtn" BackColor="Control" DisplayStyle="Image" ImageTransparentColor="White" Text="New" /><ToolStripButton Name="tsOpenbtn" DisplayStyle="Image" ImageTransparentColor="White" Text="ToolStripButton2" /><ToolStripButton Name="tsSavebtn" DisplayStyle="Image" Text="ToolStripButton4" /><ToolStripButton Name="tsSaveAsbtn" DisplayStyle="Image" Text="ToolStripButton5" /><ToolStripSeparator Name="ToolStripSeparator7" ForeColor="Brown" Margin="10, 0, 10, 0" /><ToolStripButton Name="tsUndoBtn" DisplayStyle="Image" Text="ToolStripButton6" /><ToolStripButton Name="tsRedoBtn" DisplayStyle="Image" Text="ToolStripButton7" /><ToolStripSeparator Name="ToolStripSeparator13" /><ToolStripButton Name="tsCutBtn" DisplayStyle="Image" Text="ToolStripButton8" /><ToolStripButton Name="tsCopyBtn" DisplayStyle="Image" Text="ToolStripButton9" /><ToolStripButton Name="tsPasteBtn" DisplayStyle="Image" Text="ToolStripButton10" /><ToolStripButton Name="tsSelectAllBtn" DisplayStyle="Image" ImageTransparentColor="White" Text="ToolStripButton12" /><ToolStripSeparator Name="ToolStripSeparator14" /><ToolStripButton Name="tsFindBtn" DisplayStyle="Image" Text="ToolStripButton13" /><ToolStripButton Name="tsReplaceBtn" DisplayStyle="Image" ImageTransparentColor="White" Text="ToolStripButton14" /><ToolStripButton Name="tsGoToLineBtn" DisplayStyle="Image" Text="ToolStripButton15" /><ToolStripButton Name="tsCollapseAllBtn" DisplayStyle="Image" Text="ToolStripButton16" /><ToolStripButton Name="tsExpandAllBtn" DisplayStyle="Image" ImageTransparentColor="White" Text="ToolStripButton17" /><ToolStripSeparator Name="tsMacroSep" /><ToolStripButton Name="tsRecordBtn" ImageTransparentColor="White" ToolTipText=" " /><ToolStripButton Name="tsPlayBtn" ToolTipText=" " /><ToolStripSeparator Name="ToolStripSeparator15" /><ToolStripButton Name="tsBookmark" ToolTipText="Bookmark | Ctrl+1" /><ToolStripButton Name="tsUnbookmark" ToolTipText="Unbookmark | Ctrl+2" /><ToolStripButton Name="tsNextBookmark" ToolTipText="Next Bookmark | Ctrl+3" /><ToolStripButton Name="tsPrevBookmark" ToolTipText="Previous Bookmark | Ctrl+4" /><ToolStripSeparator Name="ToolStripSeparator18" /><ToolStripButton Name="tsZoomIn" ToolTipText="Zoom In | Ctrl++" /><ToolStripButton Name="tsZoomOut" ToolTipText="Zoom Out | Ctrl+-" /><ToolStripButton Name="tsZoomNormal" ToolTipText="Zoom Normal | Ctrl+0" /><ToolStripSeparator Name="ToolStripSeparator9" Margin="10, 0, 10, 0" /><ToolStripButton Name="tsRenameBtn" DisplayStyle="Image" Text="ToolStripButton16" /><ToolStripButton Name="tsDeleteBtn" DisplayStyle="Image" Text="ToolStripButton17" /><ToolStripSeparator Name="ToolStripSeparator16" /><ToolStripButton Name="tsControlCopyBtn" DisplayStyle="Image" Text="ToolStripButton18" /><ToolStripButton Name="tsControlPasteBtn" DisplayStyle="Image" Text="ToolStripButton20" /><ToolStripSeparator Name="ToolStripSeparator17" /><ToolStripButton Name="tsMoveUpBtn" DisplayStyle="Image" Text="ToolStripButton21" /><ToolStripButton Name="tsMoveDownBtn" DisplayStyle="Image" Text="ToolStripButton22" /><ToolStripSeparator Name="ToolStripSeparator21" /><ToolStripButton Name="tsImportControl" ToolTipText="Import Control | Ctrl+Alt+I" /><ToolStripSeparator Name="ToolStripSeparator10" Margin="10, 0, 10, 0" /><ToolStripButton Name="tsToolBoxBtn" Checked="True" CheckState="Checked" DisplayStyle="Image" Text="Toolbox" /><ToolStripButton Name="tsFormTreeBtn" Checked="True" CheckState="Checked" DisplayStyle="Image" Text="Form Tree" /><ToolStripButton Name="tsPropertiesBtn" Checked="True" CheckState="Checked" DisplayStyle="Image" Text="Properties" /><ToolStripButton Name="tsEventsBtn" Checked="True" CheckState="Checked" DisplayStyle="Image" Text="Functions" /><ToolStripSeparator Name="ToolStripSeparator110" Margin="10, 0, 10, 0" /><ToolStripButton Name="tsImportForm" ToolTipText="Import Form | Ctrl+I" /><ToolStripButton Name="tsFormless" ToolTipText="Generate Formless Script File | Ctrl+L" /><ToolStripButton Name="tsTermBtn" DisplayStyle="Image" ImageTransparentColor="White" Text="ToolStripButton28" /><ToolStripButton Name="tsGenerateBtn" DisplayStyle="Image" Text="ToolStripButton29" /><ToolStripButton Name="tsRunBtn" DisplayStyle="Image" Text="ToolStripButton30" /><ToolStripButton Name="tsDebug" ToolTipText="Debug Script File | Ctrl+F9" /><ToolStripButton Name="tsDebugAfterLoad" ToolTipText="Debug After Load | Ctrl+Alt+F9" /></MenuStrip><MenuStrip Name="MenuStrip" RenderMode="Professional"><ToolStripMenuItem Name="ts_File" DisplayStyle="Text" Text="&amp;File"><ToolStripMenuItem Name="New" BackgroundImageLayout="None" DisplayStyle="Text" ImageTransparentColor="White" ShortcutKeyDisplayString="Ctrl+N" ShortcutKeys="Ctrl+N" Text="&amp;New" /><ToolStripMenuItem Name="Open" BackgroundImageLayout="None" DisplayStyle="Text" ShortcutKeyDisplayString="Ctrl+O" ShortcutKeys="Ctrl+O" Text="&amp;Open" /><ToolStripMenuItem Name="Save" BackgroundImageLayout="None" DisplayStyle="Text" ShortcutKeyDisplayString="Ctrl+S" ShortcutKeys="Ctrl+S" Text="&amp;Save" /><ToolStripMenuItem Name="Save As" DisplayStyle="Text" ShortcutKeyDisplayString="Ctrl+Alt+S" ShortcutKeys="Ctrl+Alt+S" Text="S&amp;ave As" /><ToolStripSeparator Name="FileSep" /><ToolStripMenuItem Name="Exit" DisplayStyle="Text" ShortcutKeyDisplayString="Ctrl+Alt+X" ShortcutKeys="Ctrl+Alt+X" Text="E&amp;xit" /></ToolStripMenuItem><ToolStripMenuItem Name="ts_Edit" Text="&amp;Edit"><ToolStripMenuItem Name="Undo" BackgroundImageLayout="None" ShortcutKeyDisplayString="Ctrl+Z" Text="&amp;Undo" /><ToolStripMenuItem Name="Redo" ShortcutKeyDisplayString="Ctrl+Y" ShortcutKeys="Ctrl+Y" Text="Re&amp;do" /><ToolStripSeparator Name="EditSep4" /><ToolStripMenuItem Name="Cut" BackgroundImageLayout="None" ShortcutKeyDisplayString="Ctrl+X" Text="Cu&amp;t" /><ToolStripMenuItem Name="Copy" BackgroundImageLayout="None" ShortcutKeyDisplayString="Ctrl+C" Text="&amp;Copy" /><ToolStripMenuItem Name="Paste" BackgroundImageLayout="None" ShortcutKeyDisplayString="Ctrl+V" Text="&amp;Paste" /><ToolStripMenuItem Name="Select All" ShortcutKeyDisplayString="Ctrl+A" Text="Select &amp;All" /><ToolStripSeparator Name="EditSep5" /><ToolStripMenuItem Name="Find" BackgroundImageLayout="None" ShortcutKeyDisplayString="Ctrl+F" ShortcutKeys="Ctrl+F" Text="&amp;Find" /><ToolStripMenuItem Name="Replace" ShortcutKeyDisplayString="Ctrl+H" ShortcutKeys="Ctrl+H" Text="&amp;Replace" /><ToolStripMenuItem Name="Goto" ShortcutKeyDisplayString="Ctrl+G" ShortcutKeys="Ctrl+G" Text="&amp;Go To Line..." /><ToolStripSeparator Name="EditSep6" /><ToolStripMenuItem Name="Collapse All" ShortcutKeyDisplayString="F10" ShortcutKeys="F10" Text="Co&amp;llapse All" /><ToolStripMenuItem Name="Expand All" ShortcutKeyDisplayString="F11" ShortcutKeys="F11" Text="E&amp;xpand All" /><ToolStripSeparator Name="MacroSep" /><ToolStripMenuItem Name="mnuRecord" ShortcutKeyDisplayString="Ctrl+M" Text="R&amp;ecord Macro" /><ToolStripMenuItem Name="mnuPlay" ShortcutKeyDisplayString="Ctrl+E" Text="Play &amp;Macro" /><ToolStripSeparator Name="ToolStripBkM" /><ToolStripMenuItem Name="Bookmark" ShortcutKeyDisplayString="Ctrl+1" ShortcutKeys="Ctrl+1" Text="&amp;Bookmark" /><ToolStripMenuItem Name="Unbookmark" ShortcutKeyDisplayString="Ctrl+2" ShortcutKeys="Ctrl+2" Text="U&amp;nbookmark" /><ToolStripMenuItem Name="NextBookmark" ShortcutKeyDisplayString="Ctrl+3" ShortcutKeys="Ctrl+3" Text="Next Bookmar&amp;k" /><ToolStripMenuItem Name="PrevBookmark" ShortcutKeyDisplayString="Ctrl+4" ShortcutKeys="Ctrl+4" Text="&amp;Previous Bookmark" /><ToolStripSeparator Name="ToolStripSeparator20" /><ToolStripMenuItem Name="ZoomIn" ShortcutKeyDisplayString="Ctrl++" Text="Zoom &amp;In" /><ToolStripMenuItem Name="ZoomOut" ShortcutKeyDisplayString="Ctrl--" Text="Zoom &amp;Out" /><ToolStripMenuItem Name="ZoomNormal" ShortcutKeyDisplayString="Ctrl+0" ShortcutKeys="Ctrl+NumPad0" Text="Zoom Norma&amp;l" /></ToolStripMenuItem><ToolStripMenuItem Name="ts_Controls" Text="&amp;Controls"><ToolStripMenuItem Name="Rename" ShortcutKeyDisplayString="Ctrl+R" ShortcutKeys="Ctrl+R" Text="&amp;Rename" /><ToolStripMenuItem Name="Delete" ShortcutKeyDisplayString="Ctrl+D" ShortcutKeys="Ctrl+D" Text="&amp;Delete" /><ToolStripSeparator Name="EditSep1" /><ToolStripMenuItem Name="CopyNode" ShortcutKeyDisplayString="Ctrl+Alt+C" ShortcutKeys="Ctrl+Alt+C" Text="&amp;Copy Control" /><ToolStripMenuItem Name="PasteNode" ShortcutKeyDisplayString="Ctrl+Alt+V" ShortcutKeys="Ctrl+Alt+V" Text="&amp;Paste Control" /><ToolStripSeparator Name="EditSep2" /><ToolStripMenuItem Name="Move Up" ShortcutKeyDisplayString="F5" ShortcutKeys="F5" Text="Move &amp;Up" /><ToolStripMenuItem Name="Move Down" ShortcutKeyDisplayString="F6" ShortcutKeys="F6" Text="Move &amp;Down" /><ToolStripSeparator Name="ToolStripSeparator22" /><ToolStripMenuItem Name="ImportControl" ShortcutKeys="Ctrl+Alt+I" Text="&amp;Import Control" /></ToolStripMenuItem><ToolStripMenuItem Name="ts_View" Text="&amp;View"><ToolStripMenuItem Name="Toolbox" Checked="True" CheckState="Checked" ShortcutKeyDisplayString="F1" ShortcutKeys="F1" Text="&amp;Toolbox" /><ToolStripMenuItem Name="FormTree" Checked="True" CheckState="Checked" DisplayStyle="Text" ShortcutKeyDisplayString="F2" ShortcutKeys="F2" Text="&amp;Form Tree" /><ToolStripMenuItem Name="Properties" Checked="True" CheckState="Checked" DisplayStyle="Text" ShortcutKeyDisplayString="F3" ShortcutKeys="F3" Text="&amp;Properties" /><ToolStripMenuItem Name="Events" Checked="True" CheckState="Checked" ShortcutKeyDisplayString="F4" ShortcutKeys="F4" Text="F&amp;unctions" /></ToolStripMenuItem><ToolStripMenuItem Name="ts_Tools" DisplayStyle="Text" Text="&amp;Tools"><ToolStripMenuItem Name="ImportForm" ShortcutKeyDisplayString="" ShortcutKeys="Ctrl+I" Text="&amp;Import Form" /><ToolStripMenuItem Name="GenerateFormLess" ShortcutKeys="Ctrl+L" Text="Generate &amp;Formless Script File" /><ToolStripMenuItem Name="functionsModule" BackgroundImageLayout="None" DisplayStyle="Text" ShortcutKeys="F7" Text="&amp;Load Functions Module in PowerShell" /><ToolStripMenuItem Name="Generate" BackgroundImageLayout="None" DisplayStyle="Text" ShortcutKeys="F8" Text="&amp;Generate Script File" /><ToolStripMenuItem Name="RunLast" BackgroundImageLayout="None" DisplayStyle="Text" ShortcutKeys="F9" Text="&amp;Run Script File" /><ToolStripMenuItem Name="LastDebug" ShortcutKeys="Ctrl+F9" Text="&amp;Debug Script File" /><ToolStripMenuItem Name="DebugAfterLoad" ShortcutKeys="Ctrl+Alt+F9" Text="Debug &amp;After Load" /></ToolStripMenuItem><ToolStripMenuItem Name="hBookmark" ShortcutKeys="Ctrl+NumPad1" Visible="False" /><ToolStripMenuItem Name="hUnbookmark" ShortcutKeys="Ctrl+NumPad2" Visible="False" /><ToolStripMenuItem Name="hNextBookmark" ShortcutKeys="Ctrl+NumPad3" Visible="False" /><ToolStripMenuItem Name="hPrevBookmark" ShortcutKeys="Ctrl+NumPad4" Visible="False" /></MenuStrip><StatusStrip Name="sta_Status" ImageScalingSize="15,15"><ToolStripStatusLabel Name="tsLeftTop" ImageTransparentColor="White" Text="tsLeftTop" /><ToolStripStatusLabel Name="tsHeightWidth" Text="tsHeightWidth" /><ToolStripStatusLabel Name="tsl_StatusLabel" Text="tsl_StatusLabel" /></StatusStrip></Form>
+<Form Name="MainForm" MinimumSize="800,600" Size="1288,939" Tag="IsMDIContainer, DPIAware, VisualStyle" WindowState="Maximized" Text="PowerShell Designer" IsMDIContainer="True"><TabControl Name="tcl_Top" Dock="Top" ShowToolTips="True" Size="866,20"><TabPage Name="tpg_Form1" Size="858,0" Text="NewProject.fbs" /></TabControl><Label Name="lbl_Left" Dock="Left" BackColor="35, 35, 35" Cursor="VSplit" Size="3,827" /><Label Name="lbl_Right" Dock="Right" BackColor="35, 35, 35" Cursor="VSplit" Size="3,827" /><Panel Name="pnl_Left" Dock="Left" BorderStyle="Fixed3D" Size="200,827"><SplitContainer Name="spt_Left" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="380"><SplitterPanel Name="spt_Left_Panel1"><TreeView Name="trv_Controls" Dock="Fill" BackColor="Azure" /></SplitterPanel><SplitterPanel Name="spt_Left_Panel2" BackColor="ControlLight"><TreeView Name="TreeView" Dock="Fill" BackColor="Azure" DrawMode="OwnerDrawText" HideSelection="False" /></SplitterPanel></SplitContainer></Panel><Panel Name="pnl_Right" Dock="Right" BorderStyle="Fixed3D" Size="200,827"><SplitContainer Name="spt_Right" Dock="Fill" BackColor="ControlDark" Orientation="Horizontal" SplitterDistance="375"><SplitterPanel Name="spt_Right_Panel1"><TabControl Name="TabControl5" Dock="Fill"><TabPage Name="Tab 116" Size="188,349" Text="Properties"><Button Name="btnInject" BackColor="ControlLight" Location="55,0" Size="24,24" UseVisualStyleBackColor="False" /><PropertyGrid Name="PropertyGrid" Dock="Fill" ViewBackColor="Azure" /></TabPage><TabPage Name="Tab 1" Size="188,329" Text="Events"><SplitContainer Name="SplitContainer3" Dock="Fill" Orientation="Horizontal" SplitterDistance="300"><SplitterPanel Name="SplitContainer3_Panel1" AutoScroll="True"><ListView Name="lst_AvailableEvents" Dock="Fill" BackColor="Azure" GridLines="True" TileSize="160, 18" View="List" /></SplitterPanel><SplitterPanel Name="SplitContainer3_Panel2" AutoScroll="True"><ListBox Name="lst_AssignedEvents" Dock="Fill" BackColor="Azure" /></SplitterPanel></SplitContainer></TabPage><TabPage Name="TabPage8" Size="188,329" Text="Methods"><ListView Name="lst_Methods" Dock="Fill" BackColor="Azure" GridLines="True" TileSize="160, 18" View="List" /></TabPage></TabControl></SplitterPanel><SplitterPanel Name="spt_Right_Panel2" BackColor="Control"><TabControl Name="TabControl2" Dock="Fill"><TabPage Name="TabPage3" Size="188,418" Text="Functions"><SplitContainer Name="SplitContainer4" Dock="Fill" Orientation="Horizontal" SplitterDistance="291"><SplitterPanel Name="SplitContainer4_Panel1" AutoScroll="True"><CheckedListBox Name="lst_Functions" Dock="Fill" BackColor="Azure" ColumnWidth="175" MultiColumn="True" /></SplitterPanel><SplitterPanel Name="SplitContainer4_Panel2" AutoScroll="True"><TextBox Name="lst_Params" Dock="Fill" BackColor="Azure" Multiline="True" ScrollBars="Both" Size="188,123" /></SplitterPanel></SplitContainer></TabPage><TabPage Name="TabPage4" Size="188,511" Text="Finds"><SplitContainer Name="SplitContainer5" Dock="Fill" Orientation="Horizontal" SplitterDistance="25"><SplitterPanel Name="SplitContainer5_Panel1"><SplitContainer Name="SplitContainer6" Dock="Fill" SplitterDistance="128"><SplitterPanel Name="SplitContainer6_Panel1"><TextBox Name="txt_Find" Dock="Bottom" BackColor="Azure" Size="128,20" /></SplitterPanel><SplitterPanel Name="SplitContainer6_Panel2"><Button Name="btn_Find" Location="5,0" Size="24,24" /><Button Name="btn_RemoveFind" Location="30,0" Size="24,24" /></SplitterPanel></SplitContainer></SplitterPanel><SplitterPanel Name="SplitContainer5_Panel2"><ListBox Name="lst_Find" Dock="Fill" BackColor="Azure" /></SplitterPanel></SplitContainer></TabPage></TabControl></SplitterPanel></SplitContainer></Panel><MenuStrip Name="ms_Left" Dock="Left" AutoSize="False" BackColor="ControlDarkDark" Font="Verdana, 9pt" LayoutStyle="VerticalStackWithOverflow" Size="23,900" TextDirection="Vertical90" Visible="False"><ToolStripMenuItem Name="ms_Toolbox" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" Size="23,100" Visible="False" Text="Toolbox" /><ToolStripMenuItem Name="ms_FormTree" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" Size="23,100" TextAlign="MiddleLeft" TextDirection="Vertical90" Visible="False" Text="Form Tree" /></MenuStrip><MenuStrip Name="ms_Right" Dock="Right" AutoSize="False" BackColor="ControlDarkDark" Font="Verdana, 9pt" LayoutStyle="VerticalStackWithOverflow" Size="23,900" TextDirection="Vertical90" Visible="False"><ToolStripMenuItem Name="ms_Properties" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" Size="23,100" TextAlign="MiddleLeft" TextDirection="Vertical270" Visible="False" Text="Properties" /><ToolStripMenuItem Name="ms_Events" AutoSize="False" BackColor="RoyalBlue" ForeColor="AliceBlue" ImageTransparentColor="White" Size="23,100" TextDirection="Vertical270" Visible="False" Text="Events" /></MenuStrip><MenuStrip Name="ToolStrip" ImageScalingSize="15,16" LayoutStyle="Flow" RenderMode="Professional" ShowItemToolTips="True" Text="ToolStrip1"><ToolStripButton Name="tsNewBtn" BackColor="Control" DisplayStyle="Image" ImageTransparentColor="White" Text="New" /><ToolStripButton Name="tsOpenbtn" DisplayStyle="Image" ImageTransparentColor="White" Text="ToolStripButton2" /><ToolStripButton Name="tsSavebtn" DisplayStyle="Image" Text="ToolStripButton4" /><ToolStripButton Name="tsSaveAsbtn" DisplayStyle="Image" Text="ToolStripButton5" /><ToolStripSeparator Name="ToolStripSeparator7" ForeColor="Brown" Margin="10, 0, 10, 0" /><ToolStripButton Name="tsUndoBtn" DisplayStyle="Image" Text="ToolStripButton6" /><ToolStripButton Name="tsRedoBtn" DisplayStyle="Image" Text="ToolStripButton7" /><ToolStripSeparator Name="ToolStripSeparator13" /><ToolStripButton Name="tsCutBtn" DisplayStyle="Image" Text="ToolStripButton8" /><ToolStripButton Name="tsCopyBtn" DisplayStyle="Image" Text="ToolStripButton9" /><ToolStripButton Name="tsPasteBtn" DisplayStyle="Image" Text="ToolStripButton10" /><ToolStripButton Name="tsSelectAllBtn" DisplayStyle="Image" ImageTransparentColor="White" Text="ToolStripButton12" /><ToolStripSeparator Name="ToolStripSeparator14" /><ToolStripButton Name="tsFindBtn" DisplayStyle="Image" Text="ToolStripButton13" /><ToolStripButton Name="tsReplaceBtn" DisplayStyle="Image" ImageTransparentColor="White" Text="ToolStripButton14" /><ToolStripButton Name="tsGoToLineBtn" DisplayStyle="Image" Text="ToolStripButton15" /><ToolStripButton Name="tsCollapseAllBtn" DisplayStyle="Image" Text="ToolStripButton16" /><ToolStripButton Name="tsExpandAllBtn" DisplayStyle="Image" ImageTransparentColor="White" Text="ToolStripButton17" /><ToolStripSeparator Name="tsMacroSep" /><ToolStripButton Name="tsRecordBtn" ImageTransparentColor="White" ToolTipText=" " /><ToolStripButton Name="tsPlayBtn" ToolTipText=" " /><ToolStripSeparator Name="ToolStripSeparator15" /><ToolStripButton Name="tsBookmark" ToolTipText="Bookmark | Ctrl+1" /><ToolStripButton Name="tsUnbookmark" ToolTipText="Unbookmark | Ctrl+2" /><ToolStripButton Name="tsNextBookmark" ToolTipText="Next Bookmark | Ctrl+3" /><ToolStripButton Name="tsPrevBookmark" ToolTipText="Previous Bookmark | Ctrl+4" /><ToolStripSeparator Name="ToolStripSeparator18" /><ToolStripButton Name="tsZoomIn" ToolTipText="Zoom In | Ctrl++" /><ToolStripButton Name="tsZoomOut" ToolTipText="Zoom Out | Ctrl+-" /><ToolStripButton Name="tsZoomNormal" ToolTipText="Zoom Normal | Ctrl+0" /><ToolStripSeparator Name="ToolStripSeparator9" Margin="10, 0, 10, 0" /><ToolStripButton Name="tsRenameBtn" DisplayStyle="Image" Text="ToolStripButton16" /><ToolStripButton Name="tsDeleteBtn" DisplayStyle="Image" Text="ToolStripButton17" /><ToolStripSeparator Name="ToolStripSeparator16" /><ToolStripButton Name="tsControlCopyBtn" DisplayStyle="Image" Text="ToolStripButton18" /><ToolStripButton Name="tsControlPasteBtn" DisplayStyle="Image" Text="ToolStripButton20" /><ToolStripSeparator Name="ToolStripSeparator17" /><ToolStripButton Name="tsMoveUpBtn" DisplayStyle="Image" Text="ToolStripButton21" /><ToolStripButton Name="tsMoveDownBtn" DisplayStyle="Image" Text="ToolStripButton22" /><ToolStripSeparator Name="ToolStripSeparator21" /><ToolStripButton Name="tsImportControl" ToolTipText="Import Control | Ctrl+Alt+I" /><ToolStripSeparator Name="ToolStripSeparator10" Margin="10, 0, 10, 0" /><ToolStripButton Name="tsToolBoxBtn" Checked="True" CheckState="Checked" DisplayStyle="Image" Text="Toolbox" /><ToolStripButton Name="tsFormTreeBtn" Checked="True" CheckState="Checked" DisplayStyle="Image" Text="Form Tree" /><ToolStripButton Name="tsPropertiesBtn" Checked="True" CheckState="Checked" DisplayStyle="Image" Text="Properties" /><ToolStripButton Name="tsEventsBtn" Checked="True" CheckState="Checked" DisplayStyle="Image" Text="Functions" /><ToolStripSeparator Name="ToolStripTSSeparator24" /><ToolStripButton Name="tsDarkMode" DisplayStyle="Image" ToolTipText="Dark Mode | Win+Ctrl+C" Text="ToolStripButton43" /><ToolStripSeparator Name="ToolStripSeparator110" Margin="10, 0, 10, 0" /><ToolStripButton Name="tsImportForm" ToolTipText="Import Form | Ctrl+I" /><ToolStripButton Name="tsFormless" ToolTipText="Generate Formless Script File | Ctrl+L" /><ToolStripButton Name="tsTermBtn" DisplayStyle="Image" ImageTransparentColor="White" Text="ToolStripButton28" /><ToolStripButton Name="tsGenerateBtn" DisplayStyle="Image" Text="ToolStripButton29" /><ToolStripButton Name="tsRunBtn" DisplayStyle="Image" Text="ToolStripButton30" /><ToolStripButton Name="tsDebug" ToolTipText="Debug Script File | Ctrl+F9" /><ToolStripButton Name="tsDebugAfterLoad" ToolTipText="Debug After Load | Ctrl+Alt+F9" /></MenuStrip><MenuStrip Name="MenuStrip" RenderMode="Professional"><ToolStripMenuItem Name="ts_File" DisplayStyle="Text" Text="&amp;File"><ToolStripMenuItem Name="New" BackgroundImageLayout="None" DisplayStyle="Text" ImageTransparentColor="White" ShortcutKeyDisplayString="Ctrl+N" ShortcutKeys="Ctrl+N" Text="&amp;New" /><ToolStripMenuItem Name="Open" BackgroundImageLayout="None" DisplayStyle="Text" ShortcutKeyDisplayString="Ctrl+O" ShortcutKeys="Ctrl+O" Text="&amp;Open" /><ToolStripMenuItem Name="Save" BackgroundImageLayout="None" DisplayStyle="Text" ShortcutKeyDisplayString="Ctrl+S" ShortcutKeys="Ctrl+S" Text="&amp;Save" /><ToolStripMenuItem Name="Save As" DisplayStyle="Text" ShortcutKeyDisplayString="Ctrl+Alt+S" ShortcutKeys="Ctrl+Alt+S" Text="S&amp;ave As" /><ToolStripSeparator Name="FileSep" /><ToolStripMenuItem Name="Exit" DisplayStyle="Text" ShortcutKeyDisplayString="Ctrl+Alt+X" ShortcutKeys="Ctrl+Alt+X" Text="E&amp;xit" /></ToolStripMenuItem><ToolStripMenuItem Name="ts_Edit" Text="&amp;Edit"><ToolStripMenuItem Name="Undo" BackgroundImageLayout="None" ShortcutKeyDisplayString="Ctrl+Z" Text="&amp;Undo" /><ToolStripMenuItem Name="Redo" ShortcutKeyDisplayString="Ctrl+Y" ShortcutKeys="Ctrl+Y" Text="Re&amp;do" /><ToolStripSeparator Name="EditSep4" /><ToolStripMenuItem Name="Cut" BackgroundImageLayout="None" ShortcutKeyDisplayString="Ctrl+X" Text="Cu&amp;t" /><ToolStripMenuItem Name="Copy" BackgroundImageLayout="None" ShortcutKeyDisplayString="Ctrl+C" Text="&amp;Copy" /><ToolStripMenuItem Name="Paste" BackgroundImageLayout="None" ShortcutKeyDisplayString="Ctrl+V" Text="&amp;Paste" /><ToolStripMenuItem Name="Select All" ShortcutKeyDisplayString="Ctrl+A" Text="Select &amp;All" /><ToolStripSeparator Name="EditSep5" /><ToolStripMenuItem Name="Find" BackgroundImageLayout="None" ShortcutKeyDisplayString="Ctrl+F" ShortcutKeys="Ctrl+F" Text="&amp;Find" /><ToolStripMenuItem Name="Replace" ShortcutKeyDisplayString="Ctrl+H" ShortcutKeys="Ctrl+H" Text="&amp;Replace" /><ToolStripMenuItem Name="Goto" ShortcutKeyDisplayString="Ctrl+G" ShortcutKeys="Ctrl+G" Text="&amp;Go To Line..." /><ToolStripSeparator Name="EditSep6" /><ToolStripMenuItem Name="Collapse All" ShortcutKeyDisplayString="F10" ShortcutKeys="F10" Text="Co&amp;llapse All" /><ToolStripMenuItem Name="Expand All" ShortcutKeyDisplayString="F11" ShortcutKeys="F11" Text="E&amp;xpand All" /><ToolStripSeparator Name="MacroSep" /><ToolStripMenuItem Name="mnuRecord" ShortcutKeyDisplayString="Ctrl+M" Text="R&amp;ecord Macro" /><ToolStripMenuItem Name="mnuPlay" ShortcutKeyDisplayString="Ctrl+E" Text="Play &amp;Macro" /><ToolStripSeparator Name="ToolStripBkM" /><ToolStripMenuItem Name="Bookmark" ShortcutKeyDisplayString="Ctrl+1" ShortcutKeys="Ctrl+1" Text="&amp;Bookmark" /><ToolStripMenuItem Name="Unbookmark" ShortcutKeyDisplayString="Ctrl+2" ShortcutKeys="Ctrl+2" Text="U&amp;nbookmark" /><ToolStripMenuItem Name="NextBookmark" ShortcutKeyDisplayString="Ctrl+3" ShortcutKeys="Ctrl+3" Text="Next Bookmar&amp;k" /><ToolStripMenuItem Name="PrevBookmark" ShortcutKeyDisplayString="Ctrl+4" ShortcutKeys="Ctrl+4" Text="&amp;Previous Bookmark" /><ToolStripSeparator Name="ToolStripSeparator20" /><ToolStripMenuItem Name="ZoomIn" ShortcutKeyDisplayString="Ctrl++" Text="Zoom &amp;In" /><ToolStripMenuItem Name="ZoomOut" ShortcutKeyDisplayString="Ctrl--" Text="Zoom &amp;Out" /><ToolStripMenuItem Name="ZoomNormal" ShortcutKeyDisplayString="Ctrl+0" ShortcutKeys="Ctrl+NumPad0" Text="Zoom Norma&amp;l" /></ToolStripMenuItem><ToolStripMenuItem Name="ts_Controls" Text="&amp;Controls"><ToolStripMenuItem Name="Rename" ShortcutKeyDisplayString="Ctrl+R" ShortcutKeys="Ctrl+R" Text="&amp;Rename" /><ToolStripMenuItem Name="Delete" ShortcutKeyDisplayString="Ctrl+D" ShortcutKeys="Ctrl+D" Text="&amp;Delete" /><ToolStripSeparator Name="EditSep1" /><ToolStripMenuItem Name="CopyNode" ShortcutKeyDisplayString="Ctrl+Alt+C" ShortcutKeys="Ctrl+Alt+C" Text="&amp;Copy Control" /><ToolStripMenuItem Name="PasteNode" ShortcutKeyDisplayString="Ctrl+Alt+V" ShortcutKeys="Ctrl+Alt+V" Text="&amp;Paste Control" /><ToolStripSeparator Name="EditSep2" /><ToolStripMenuItem Name="Move Up" ShortcutKeyDisplayString="F5" ShortcutKeys="F5" Text="Move &amp;Up" /><ToolStripMenuItem Name="Move Down" ShortcutKeyDisplayString="F6" ShortcutKeys="F6" Text="Move &amp;Down" /><ToolStripSeparator Name="ToolStripSeparator22" /><ToolStripMenuItem Name="ImportControl" ShortcutKeys="Ctrl+Alt+I" Text="&amp;Import Control" /></ToolStripMenuItem><ToolStripMenuItem Name="ts_View" Text="&amp;View"><ToolStripMenuItem Name="Toolbox" Checked="True" CheckState="Checked" ShortcutKeyDisplayString="F1" ShortcutKeys="F1" Text="&amp;Toolbox" /><ToolStripMenuItem Name="FormTree" Checked="True" CheckState="Checked" DisplayStyle="Text" ShortcutKeyDisplayString="F2" ShortcutKeys="F2" Text="&amp;Form Tree" /><ToolStripMenuItem Name="Properties" Checked="True" CheckState="Checked" DisplayStyle="Text" ShortcutKeyDisplayString="F3" ShortcutKeys="F3" Text="&amp;Properties" /><ToolStripMenuItem Name="Events" Checked="True" CheckState="Checked" ShortcutKeyDisplayString="F4" ShortcutKeys="F4" Text="F&amp;unctions" /><ToolStripSeparator Name="ToolStripViewSeparator23" /><ToolStripMenuItem Name="DarkMode" ShortcutKeyDisplayString="Win+Ctrl+C" Text="&amp;Dark Mode" /></ToolStripMenuItem><ToolStripMenuItem Name="ts_Tools" DisplayStyle="Text" Text="&amp;Tools"><ToolStripMenuItem Name="ImportForm" ShortcutKeyDisplayString="" ShortcutKeys="Ctrl+I" Text="&amp;Import Form" /><ToolStripMenuItem Name="GenerateFormLess" ShortcutKeys="Ctrl+L" Text="Generate &amp;Formless Script File" /><ToolStripMenuItem Name="functionsModule" BackgroundImageLayout="None" DisplayStyle="Text" ShortcutKeys="F7" Text="&amp;Load Functions Module in PowerShell" /><ToolStripMenuItem Name="Generate" BackgroundImageLayout="None" DisplayStyle="Text" ShortcutKeys="F8" Text="&amp;Generate Script File" /><ToolStripMenuItem Name="RunLast" BackgroundImageLayout="None" DisplayStyle="Text" ShortcutKeys="F9" Text="&amp;Run Script File" /><ToolStripMenuItem Name="LastDebug" ShortcutKeys="Ctrl+F9" Text="&amp;Debug Script File" /><ToolStripMenuItem Name="DebugAfterLoad" ShortcutKeys="Ctrl+Alt+F9" Text="Debug &amp;After Load" /></ToolStripMenuItem><ToolStripMenuItem Name="hBookmark" ShortcutKeys="Ctrl+NumPad1" Visible="False" /><ToolStripMenuItem Name="hUnbookmark" ShortcutKeys="Ctrl+NumPad2" Visible="False" /><ToolStripMenuItem Name="hNextBookmark" ShortcutKeys="Ctrl+NumPad3" Visible="False" /><ToolStripMenuItem Name="hPrevBookmark" ShortcutKeys="Ctrl+NumPad4" Visible="False" /></MenuStrip><StatusStrip Name="sta_Status" ImageScalingSize="15,15"><ToolStripStatusLabel Name="tsLeftTop" ImageTransparentColor="White" Text="tsLeftTop" /><ToolStripStatusLabel Name="tsHeightWidth" Text="tsHeightWidth" /><ToolStripStatusLabel Name="tsl_StatusLabel" Text="tsl_StatusLabel" /></StatusStrip></Form>
 "@
 #endregion VDS
 #region Images
+$tsDarkMode.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEASABIAAD/4QBuRXhpZgAATU0AKgAAAAgABQEyAAIAAAAUAAAASgMBAAUAAAABAAAAXlEQAAEAAAABAQAAAFERAAQAAAABAAALElESAAQAAAABAAALEgAAAAAyMDI0OjA2OjEzIDIzOjE3OjM1AAABhqAAALGP/9sAQwAIBgYHBgUIBwcHCQkICgwUDQwLCwwZEhMPFB0aHx4dGhwcICQuJyAiLCMcHCg3KSwwMTQ0NB8nOT04MjwuMzQy/9sAQwEJCQkMCwwYDQ0YMiEcITIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIy/8AAEQgAEAAQAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/aAAwDAQACEQMRAD8A8pu9ZsLe/uIP7EtSY5WTO1ADgkdNnH0p0WpWV7HPAukWkbNbTkOFQlSsTMD9wenrWZf29ldandXEesWQjlmd13JNnBJI/wCWdPs47OyeaZ9Xs5f9GnRY40m3MzRMoAzGB1YdTXMqcbXs7/M3c5X/AOGP/9k="))
 $tsDebug.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBsRXhpZgAATU0AKgAAAAgABQExAAIAAAARAAAASgMBAAUAAAABAAAAXFEQAAEAAAABAQAAAFERAAQAAAABAAAAAFESAAQAAAABAAAAAAAAAABBZG9iZSBJbWFnZVJlYWR5AAAAAYagAACvyP/bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/AO81jxU13PcpaO6W81q1tcwXCFWtn3EFiOm4qSAAfr0rJ8N6vd6TrtvbwyLL/aDeUPtkgRJAqHZggFkIOFA5B3ADsRu+LvC2oXOptqOmxG8W4K+db71VkZVwrAsQCuByCc5weRkDmPCnhy98RXw1C7trGfTopZbS5srqSVJoHIAc8IBvAII574+UjK+fyVfa3ZwclRVLvc//2Q=="))
 $tsDebugAfterLoad.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBsRXhpZgAATU0AKgAAAAgABQExAAIAAAARAAAASgMBAAUAAAABAAAAXFEQAAEAAAABAQAAAFERAAQAAAABAAAAAFESAAQAAAABAAAAAAAAAABBZG9iZSBJbWFnZVJlYWR5AAAAAYagAACvyP/bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/AO81jxU13PcpaO6W81q1tcwXCFWtn3EFiOm4qSAAfr0rI8N6xdaVr1vawypM1+wixdyhFdVQ7OQCyEHCgchtwA7EdB4q8KX11rA1Cxj+1xXDJ9pt96oyFQAGUkgEEDBGcg4PTOOGe3j8TSjSNOs5DfGVgySqUMGDh2kJyQB09c8Dnr5dR1IVLv5HnSU4z5pb9D//2Q=="))
 $tsFormless.Image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream][System.Convert]::FromBase64String("/9j/4AAQSkZJRgABAQEAYABgAAD/4QBsRXhpZgAATU0AKgAAAAgABQExAAIAAAARAAAASgMBAAUAAAABAAAAXFEQAAEAAAABAQAAAFERAAQAAAABAAAOxFESAAQAAAABAAAOxAAAAABBZG9iZSBJbWFnZVJlYWR5AAAAAYagAACvyP/bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIABAAEAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/AOxgsNSudRs1isLmK/DK0+p8FGUj52VwozkE4+c9eg7dI2n31hLBcHV7qULcQqyOWwwaRVI5cj+L0rJ17VtU0nT7S2a3mtRFZ7Y2Z1CzzqAApZXGFxk9QTzwcYPP/wDCR6lPLFHO90FEYkhMgAZ5FIMYCiU71LA84YkgDPcTh6f1fmindN+RpiKv1hqTVrLzP//Z"))
@@ -2395,8 +2739,8 @@ SOFTWARE.
         FileName:     Designer.ps1
         Modified:     Brandon Cunningham
         Created On:   1/15/2020
-        Last Updated: 6/5/2024
-        Version:      2.6.7
+        Last Updated: 6/13/2024
+        Version:      2.6.8
     ===========================================================================
 
     .DESCRIPTION
@@ -2788,6 +3132,14 @@ SOFTWARE.
         Major improvement to control positioning during drag and drop.
         Changes to Run and Debug Console handling. Buggy ontop code removed.
         
+    2.6.8 6/9/2024
+        Improvements to ConvertFrom-WPFXaml
+        Minor structure change to outputs / region nesting
+        Fixed problem with Send-KeyPress
+        New function Send-KeyDown
+        New function Send-KeyUp
+        Introduced 'Dark Mode', sort of. This is more of an OS hack.
+        
         
 BASIC MODIFICATIONS License
 Original available at https://www.pswinformscreator.com/ for deeper comparison.
@@ -2814,14 +3166,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
        
-#>
+#> 
 
     if ((Get-Module -ListAvailable powershell-designer).count -gt 1){
         import-module "$(path $(Get-Module -ListAvailable PowerShell-Designer)[0].path)\functions\functions.psm1"
     }
     else {
         import-module "$(path $(Get-Module -ListAvailable PowerShell-Designer).path)\functions\functions.psm1"
-    }                                                                                                                
+    }
+
+    Set-RegistryValue -Path 'HKCU:\SOFTWARE\Microsoft\ColorFiltering' -Name 'HotKeyEnabled' -Value 1
 
     $global:ControlBeingSelected = $false
     $global:control_track = @{}
@@ -4448,8 +4802,8 @@ function Wait ($duration){
         $AST = [System.Management.Automation.Language.Parser]::ParseFile($designerpath, [ref]$astTokens, [ref]$astErr)
         $functions = $ast.FindAll({ $args[0] -is [System.Management.Automation.Language.FunctionDefinitionAst] }, $true)
         if ($formless -eq $false){
-        $outstring = "#region VDS
-`$RunSpace = [RunspaceFactory]::CreateRunspacePool(); `$RunSpace.ApartmentState = `"STA`"; `$RunSpace.Open(); `$PowerShell = [powershell]::Create();`$PowerShell.RunspacePool = `$RunSpace; [void]`$PowerShell.AddScript({"
+        $outstring = "`$RunSpace = [RunspaceFactory]::CreateRunspacePool(); `$RunSpace.ApartmentState = `"STA`"; `$RunSpace.Open(); `$PowerShell = [powershell]::Create();`$PowerShell.RunspacePool = `$RunSpace; [void]`$PowerShell.AddScript({
+#region VDS"
         }
         
         foreach ($item in $lst_Functions.items){
@@ -6232,6 +6586,24 @@ $xaml""@
             $eventform.height = $height -40
             $eventform.width = $width
             }
+        })
+        
+        
+        function DarkMode {
+            Send-KeyDown (Get-VirtualKey 'LWIN')
+            Send-KeyDown (Get-VirtualKey 'LCONTROL')
+            Send-KeyDown (Get-VirtualKey 'C')
+            Send-KeyUp (Get-VirtualKey 'LWIN')
+            Send-KeyUp (Get-VirtualKey 'LCONTROL')
+            Send-KeyUp (Get-VirtualKey 'C')
+        }
+        
+        $DarkMode.add_Click({param($sender, $e);
+            DarkMode
+        })
+        
+        $tsDarkMode.add_Click({param($sender, $e);
+            DarkMode
         })
         
         
