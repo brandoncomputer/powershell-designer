@@ -81,8 +81,8 @@ SOFTWARE.
         FileName:     Designer.ps1
         Modified:     Brandon Cunningham
         Created On:   1/15/2020
-        Last Updated: 6/13/2024
-        Version:      2.6.8
+        Last Updated: 6/14/2024
+        Version:      2.6.9
     ===========================================================================
 
     .DESCRIPTION
@@ -481,6 +481,10 @@ SOFTWARE.
         New function Send-KeyDown
         New function Send-KeyUp
         Introduced 'Dark Mode', sort of. This is more of an OS hack.
+    
+    2.6.9 6/14/2024
+        Removed orphaned wait function.
+        Improved DarkMode function.
         
         
 BASIC MODIFICATIONS License
@@ -518,7 +522,8 @@ SOFTWARE.
     }
 
     Set-RegistryValue -Path 'HKCU:\SOFTWARE\Microsoft\ColorFiltering' -Name 'HotKeyEnabled' -Value 1
-
+    Set-RegistryValue -Path 'HKCU:\SOFTWARE\Microsoft\ColorFiltering' -Name 'FilterType' -Value 1
+    
     $global:ControlBeingSelected = $false
     $global:control_track = @{}
     
