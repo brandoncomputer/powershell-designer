@@ -441,7 +441,7 @@ function ConvertFrom-WinFormsXML {
 				$attrib.Value = [math]::round(($attrib.Value / 1)  * $ctscale)
 			}
 			if ($attribName -eq 'Size'){				
-				$n = $attrib.Value.split(',')
+				$n = $attrib.Value.split('[,;]')
 				$n[0] = [math]::round(($n[0]/1) * $ctscale)
 				$n[1] = [math]::round(($n[1]/1) * $ctscale)
 				if ("$($n[0]),$($n[1])" -ne ",") {
@@ -449,7 +449,7 @@ function ConvertFrom-WinFormsXML {
 				}
 			}
 			if ($attribName -eq 'Location'){
-				$n = $attrib.Value.split(',')
+				$n = $attrib.Value.split('[,;]')
 				$n[0] = [math]::round(($n[0]/1) * $ctscale)
 				$n[1] = [math]::round(($n[1]/1) * $ctscale)
 				if ("$($n[0]),$($n[1])" -ne ",") {
@@ -457,7 +457,7 @@ function ConvertFrom-WinFormsXML {
 				}
 			}
 			if ($attribName -eq 'MaximumSize'){
-				$n = $attrib.Value.split(',')
+				$n = $attrib.Value.split('[,;]')
 				$n[0] = [math]::round(($n[0]/1) * $ctscale)
 				$n[1] = [math]::round(($n[1]/1) * $ctscale)
 				if ("$($n[0]),$($n[1])" -ne ",") {
@@ -465,7 +465,7 @@ function ConvertFrom-WinFormsXML {
 				}
 			}
 			if ($attribName -eq 'MinimumSize'){
-				$n = $attrib.Value.split(',')
+				$n = $attrib.Value.split('[,;]')
 				$n[0] = [math]::round(($n[0]/1) * $ctscale)
 				$n[1] = [math]::round(($n[1]/1) * $ctscale)
 				if ("$($n[0]),$($n[1])" -ne ",") {
@@ -473,7 +473,7 @@ function ConvertFrom-WinFormsXML {
 				}
 			}
 			if ($attribName -eq 'ImageScalingSize'){
-				$n = $attrib.Value.split(',')
+				$n = $attrib.Value.split('[,;]')
 				$n[0] = [math]::round(($n[0]/1) * $ctscale)
 				$n[1] = [math]::round(($n[1]/1) * $ctscale)
 				if ("$($n[0]),$($n[1])" -ne ",") {
@@ -482,7 +482,7 @@ function ConvertFrom-WinFormsXML {
 			}
 			
 			if ($attribName -eq 'TileSize'){
-				$n = $attrib.Value.split(',')
+				$n = $attrib.Value.split('[,;]')
 				$n[0] = [math]::round(($n[0]/1) * $ctscale)
 				$n[1] = [math]::round(($n[1]/1) * $ctscale)
 				if ("$($n[0]),$($n[1])" -ne ",") {
@@ -3240,7 +3240,7 @@ SOFTWARE.
                     }
                     if ($null -ne $($newControl.$($_.ToString()))){
                         if ($_.ToString() -eq 'Size'){
-                            $n = $_.Value.split(',')
+                            $n = $_.Value.split('[,;]')
                             $n[0] = [math]::Round(($n[0]/1) * $ctscale)
                             $n[1] = [math]::Round(($n[1]/1) * $ctscale)
                             if ("$($n[0]),$($n[1])" -ne ",") {
@@ -3248,7 +3248,7 @@ SOFTWARE.
                             }
                         }
                         if ($_.ToString() -eq 'Location'){
-                            $n = $_.Value.split(',')
+                            $n = $_.Value.split('[,;]')
                             $n[0] = [math]::Round(($n[0]/1) * $ctscale)
                             $n[1] = [math]::Round(($n[1]/1) * $ctscale)
                             if ("$($n[0]),$($n[1])" -ne ",") {
@@ -3256,7 +3256,7 @@ SOFTWARE.
                             }
                         }
                         if ($_.ToString() -eq 'MaximumSize'){
-                            $n = $_.Value.split(',')
+                            $n = $_.Value.split('[,;]')
                             $n[0] = [math]::Round(($n[0]/1) * $ctscale)
                             $n[1] = [math]::Round(($n[1]/1) * $ctscale)
                             if ("$($n[0]),$($n[1])" -ne ",") {
@@ -3264,7 +3264,7 @@ SOFTWARE.
                             }
                         }
                         if ($_.ToString() -eq 'MinimumSize'){
-                            $n = $_.Value.split(',')
+                            $n = $_.Value.split('[,;]')
                             $n[0] = [math]::Round(($n[0]/1) * $ctscale)
                             $n[1] = [math]::Round(($n[1]/1) * $ctscale)
                             if ("$($n[0]),$($n[1])" -ne ",") {
@@ -3272,7 +3272,7 @@ SOFTWARE.
                             }
                         }
                         if ($_.ToString() -eq 'ImageScalingSize'){
-                            $n = $_.Value.split(',')
+                            $n = $_.Value.split('[,;]')
                             $n[0] = [math]::Round(($n[0]/1) * $ctscale)
                             $n[1] = [math]::Round(($n[1]/1) * $ctscale)
                             if ("$($n[0]),$($n[1])" -ne ",") {
@@ -4187,7 +4187,7 @@ add-type -path $(Get-Character 34)$key$(Get-Character 34)
                 $nodes = $xml.SelectNodes('//*')
                 foreach ($node in $nodes) {
                     if ($node.Size){
-                        $n = ($node.Size).split(',')
+                        $n = ($node.Size).split('[,;]')
                         $n[0] = [math]::round(($n[0]/1) / $ctscale)
                         $n[1] = [math]::round(($n[1]/1) / $ctscale)
                         if ("$($n[0]),$($n[1])" -ne ",") {
@@ -4195,7 +4195,7 @@ add-type -path $(Get-Character 34)$key$(Get-Character 34)
                         }
                     }
                     if ($node.Location){
-                        $n = ($node.Location).split(',')
+                        $n = ($node.Location).split('[,;]')
                         $n[0] = [math]::round(($n[0]/1) / $ctscale)
                         $n[1] = [math]::round(($n[1]/1) / $ctscale)
                         if ("$($n[0]),$($n[1])" -ne ",") {
@@ -4203,7 +4203,7 @@ add-type -path $(Get-Character 34)$key$(Get-Character 34)
                         }
                     }
                     if ($node.MaximumSize){
-                        $n = ($node.MaximumSize).split(',')
+                        $n = ($node.MaximumSize).split('[,;]')
                         $n[0] = [math]::round(($n[0]/1) / $ctscale)
                         $n[1] = [math]::round(($n[1]/1) / $ctscale)
                         if ("$($n[0]),$($n[1])" -ne ",") {
@@ -4211,7 +4211,7 @@ add-type -path $(Get-Character 34)$key$(Get-Character 34)
                         }
                     }
                     if ($node.MinimumSize){
-                        $n = ($node.MinimumSize).split(',')
+                        $n = ($node.MinimumSize).split('[,;]')
                         $n[0] = [math]::round(($n[0]/1) / $ctscale)
                         $n[1] = [math]::round(($n[1]/1) / $ctscale)
                         if ("$($n[0]),$($n[1])" -ne ",") {
@@ -4219,7 +4219,7 @@ add-type -path $(Get-Character 34)$key$(Get-Character 34)
                         }
                     }
                     if ($node.ImageScalingSize){
-                        $n = ($node.ImageScalingSize).split(',')
+                        $n = ($node.ImageScalingSize).split('[,;]')
                         $n[0] = [math]::round(($n[0]/1) / $ctscale)
                         $n[1] = [math]::round(($n[1]/1) / $ctscale)
                         if ("$($n[0]),$($n[1])" -ne ",") {
