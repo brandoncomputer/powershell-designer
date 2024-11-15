@@ -81,8 +81,8 @@ SOFTWARE.
         FileName:     Designer.ps1
         Modified:     Brandon Cunningham
         Created On:   1/15/2020
-        Last Updated: 6/14/2024
-        Version:      2.6.9
+        Last Updated: 11/14/2024
+        Version:      2.7.0
     ===========================================================================
 
     .DESCRIPTION
@@ -486,6 +486,9 @@ SOFTWARE.
         Removed orphaned wait function.
         Improved DarkMode function.
         
+    2.7.0 11/14/2024
+        Fixed #26 - list seperator localization bug.
+        
         
 BASIC MODIFICATIONS License
 Original available at https://www.pswinformscreator.com/ for deeper comparison.
@@ -526,6 +529,7 @@ SOFTWARE.
     
     $global:ControlBeingSelected = $false
     $global:control_track = @{}
+    $global:listSep = [cultureinfo]::CurrentCulture.TextInfo.ListSeparator
     
     function Convert-XmlToTreeView {
         param(
@@ -582,7 +586,7 @@ SOFTWARE.
                     }
                     if ($null -ne $($newControl.$($_.ToString()))){
                         if ($_.ToString() -eq 'Size'){
-                            $n = $_.Value.split(',')
+                            $n = $_.Value.split($listsep)
                             $n[0] = [math]::Round(($n[0]/1) * $ctscale)
                             $n[1] = [math]::Round(($n[1]/1) * $ctscale)
                             if ("$($n[0]),$($n[1])" -ne ",") {
@@ -590,7 +594,7 @@ SOFTWARE.
                             }
                         }
                         if ($_.ToString() -eq 'Location'){
-                            $n = $_.Value.split(',')
+                            $n = $_.Value.split($listsep)
                             $n[0] = [math]::Round(($n[0]/1) * $ctscale)
                             $n[1] = [math]::Round(($n[1]/1) * $ctscale)
                             if ("$($n[0]),$($n[1])" -ne ",") {
@@ -598,7 +602,7 @@ SOFTWARE.
                             }
                         }
                         if ($_.ToString() -eq 'MaximumSize'){
-                            $n = $_.Value.split(',')
+                            $n = $_.Value.split($listsep)
                             $n[0] = [math]::Round(($n[0]/1) * $ctscale)
                             $n[1] = [math]::Round(($n[1]/1) * $ctscale)
                             if ("$($n[0]),$($n[1])" -ne ",") {
@@ -606,7 +610,7 @@ SOFTWARE.
                             }
                         }
                         if ($_.ToString() -eq 'MinimumSize'){
-                            $n = $_.Value.split(',')
+                            $n = $_.Value.split($listsep)
                             $n[0] = [math]::Round(($n[0]/1) * $ctscale)
                             $n[1] = [math]::Round(($n[1]/1) * $ctscale)
                             if ("$($n[0]),$($n[1])" -ne ",") {
@@ -614,7 +618,7 @@ SOFTWARE.
                             }
                         }
                         if ($_.ToString() -eq 'ImageScalingSize'){
-                            $n = $_.Value.split(',')
+                            $n = $_.Value.split($listsep)
                             $n[0] = [math]::Round(($n[0]/1) * $ctscale)
                             $n[1] = [math]::Round(($n[1]/1) * $ctscale)
                             if ("$($n[0]),$($n[1])" -ne ",") {
@@ -1529,7 +1533,7 @@ add-type -path $(Get-Character 34)$key$(Get-Character 34)
                 $nodes = $xml.SelectNodes('//*')
                 foreach ($node in $nodes) {
                     if ($node.Size){
-                        $n = ($node.Size).split(',')
+                        $n = ($node.Size).split($listsep)
                         $n[0] = [math]::round(($n[0]/1) / $ctscale)
                         $n[1] = [math]::round(($n[1]/1) / $ctscale)
                         if ("$($n[0]),$($n[1])" -ne ",") {
@@ -1537,7 +1541,7 @@ add-type -path $(Get-Character 34)$key$(Get-Character 34)
                         }
                     }
                     if ($node.Location){
-                        $n = ($node.Location).split(',')
+                        $n = ($node.Location).split($listsep)
                         $n[0] = [math]::round(($n[0]/1) / $ctscale)
                         $n[1] = [math]::round(($n[1]/1) / $ctscale)
                         if ("$($n[0]),$($n[1])" -ne ",") {
@@ -1545,7 +1549,7 @@ add-type -path $(Get-Character 34)$key$(Get-Character 34)
                         }
                     }
                     if ($node.MaximumSize){
-                        $n = ($node.MaximumSize).split(',')
+                        $n = ($node.MaximumSize).split($listsep)
                         $n[0] = [math]::round(($n[0]/1) / $ctscale)
                         $n[1] = [math]::round(($n[1]/1) / $ctscale)
                         if ("$($n[0]),$($n[1])" -ne ",") {
@@ -1553,7 +1557,7 @@ add-type -path $(Get-Character 34)$key$(Get-Character 34)
                         }
                     }
                     if ($node.MinimumSize){
-                        $n = ($node.MinimumSize).split(',')
+                        $n = ($node.MinimumSize).split($listsep)
                         $n[0] = [math]::round(($n[0]/1) / $ctscale)
                         $n[1] = [math]::round(($n[1]/1) / $ctscale)
                         if ("$($n[0]),$($n[1])" -ne ",") {
@@ -1561,7 +1565,7 @@ add-type -path $(Get-Character 34)$key$(Get-Character 34)
                         }
                     }
                     if ($node.ImageScalingSize){
-                        $n = ($node.ImageScalingSize).split(',')
+                        $n = ($node.ImageScalingSize).split($listsep)
                         $n[0] = [math]::round(($n[0]/1) / $ctscale)
                         $n[1] = [math]::round(($n[1]/1) / $ctscale)
                         if ("$($n[0]),$($n[1])" -ne ",") {
@@ -1773,19 +1777,6 @@ add-type -path $(Get-Character 34)$key$(Get-Character 34)
             Update-ErrorLog -ErrorRecord $_ -Message "Exception encountered during start of New Project."
         }
     }
-    
-function Wait ($duration){
-    $waitTimer = New-Timer 1
-    $waitTimer.Add_Tick({
-        $script:numtime = $script:numTime + 1
-        if ($numtime -lt $duration){
-            [System.Windows.Forms.Application]::DoEvents()
-        }
-        else{
-            $waitTimer.Dispose()
-        }
-    })
-}
     
     function OpenProjectClick ([string]$fileName){
         if ($fileName -eq ''){
