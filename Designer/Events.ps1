@@ -81,8 +81,8 @@ SOFTWARE.
         FileName:     Designer.ps1
         Modified:     Brandon Cunningham
         Created On:   1/15/2020
-        Last Updated: 11/14/2024
-        Version:      2.7.0
+        Last Updated: 11/15/2024
+        Version:      2.7.1
     ===========================================================================
 
     .DESCRIPTION
@@ -488,6 +488,11 @@ SOFTWARE.
         
     2.7.0 11/14/2024
         Fixed #26 - list seperator localization bug.
+        This release was removed due to catastrophic bugs (compiler errors/pipline)
+       
+    2.7.1 11/15/2024
+        Fixed #26 (2nd attempt) - list seperator localization bug.
+        
         
         
 BASIC MODIFICATIONS License
@@ -529,7 +534,6 @@ SOFTWARE.
     
     $global:ControlBeingSelected = $false
     $global:control_track = @{}
-    $global:listSep = [cultureinfo]::CurrentCulture.TextInfo.ListSeparator
     
     function Convert-XmlToTreeView {
         param(
@@ -589,40 +593,40 @@ SOFTWARE.
                             $n = $_.Value.split($listsep)
                             $n[0] = [math]::Round(($n[0]/1) * $ctscale)
                             $n[1] = [math]::Round(($n[1]/1) * $ctscale)
-                            if ("$($n[0]),$($n[1])" -ne ",") {
-                                $_.Value = "$($n[0]),$($n[1])"
+                            if ("$($n[0]),$($n[1])" -ne $listsep) {
+                            $_.Value = "$($n[0])$($listsep)$($n[1])"
                             }
                         }
                         if ($_.ToString() -eq 'Location'){
                             $n = $_.Value.split($listsep)
                             $n[0] = [math]::Round(($n[0]/1) * $ctscale)
                             $n[1] = [math]::Round(($n[1]/1) * $ctscale)
-                            if ("$($n[0]),$($n[1])" -ne ",") {
-                                $_.Value = "$($n[0]),$($n[1])"
+                            if ("$($n[0]),$($n[1])" -ne $listsep) {
+                                $_.Value = "$($n[0])$($listsep)$($n[1])"
                             }
                         }
                         if ($_.ToString() -eq 'MaximumSize'){
                             $n = $_.Value.split($listsep)
                             $n[0] = [math]::Round(($n[0]/1) * $ctscale)
                             $n[1] = [math]::Round(($n[1]/1) * $ctscale)
-                            if ("$($n[0]),$($n[1])" -ne ",") {
-                                $_.Value = "$($n[0]),$($n[1])"
+                            if ("$($n[0]),$($n[1])" -ne $listsep) {
+                                $_.Value = "$($n[0])$($listsep)$($n[1])"
                             }
                         }
                         if ($_.ToString() -eq 'MinimumSize'){
                             $n = $_.Value.split($listsep)
                             $n[0] = [math]::Round(($n[0]/1) * $ctscale)
                             $n[1] = [math]::Round(($n[1]/1) * $ctscale)
-                            if ("$($n[0]),$($n[1])" -ne ",") {
-                                $_.Value = "$($n[0]),$($n[1])"
+                            if ("$($n[0]),$($n[1])" -ne $listsep) {
+                                $_.Value = "$($n[0])$($listsep)$($n[1])"
                             }
                         }
                         if ($_.ToString() -eq 'ImageScalingSize'){
                             $n = $_.Value.split($listsep)
                             $n[0] = [math]::Round(($n[0]/1) * $ctscale)
                             $n[1] = [math]::Round(($n[1]/1) * $ctscale)
-                            if ("$($n[0]),$($n[1])" -ne ",") {
-                                $_.Value = "$($n[0]),$($n[1])"
+                            if ("$($n[0]),$($n[1])" -ne $listsep) {
+                                $_.Value = "$($n[0])$($listsep)$($n[1])"
                             }
                         }
                         if ( $($newControl.$($_.ToString())).GetType().Name -eq 'Boolean' ) {
