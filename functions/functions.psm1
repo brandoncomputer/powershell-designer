@@ -2073,52 +2073,52 @@ function ConvertFrom-WinFormsXML {
 				$attrib.Value = [math]::round(($attrib.Value / 1)  * $ctscale)
 			}
 			if ($attribName -eq 'Size'){				
-				$n = $attrib.Value.split(',')
+				$n = $attrib.Value.split($listsep)
 				$n[0] = [math]::round(($n[0]/1) * $ctscale)
 				$n[1] = [math]::round(($n[1]/1) * $ctscale)
-				if ("$($n[0]),$($n[1])" -ne ",") {
-					$attrib.Value = "$($n[0]),$($n[1])"
+				if ("$($n[0]),$($n[1])" -ne $listsep) {
+					$attrib.Value = "$($n[0])$($listsep)$($n[1])"
 				}
 			}
 			if ($attribName -eq 'Location'){
-				$n = $attrib.Value.split(',')
+				$n = $attrib.Value.split($listsep)
 				$n[0] = [math]::round(($n[0]/1) * $ctscale)
 				$n[1] = [math]::round(($n[1]/1) * $ctscale)
-				if ("$($n[0]),$($n[1])" -ne ",") {
-					$attrib.Value = "$($n[0]),$($n[1])"
+				if ("$($n[0]),$($n[1])" -ne $listsep) {
+					$attrib.Value = "$($n[0])$($listsep)$($n[1])"
 				}
 			}
 			if ($attribName -eq 'MaximumSize'){
-				$n = $attrib.Value.split(',')
+				$n = $attrib.Value.split($listsep)
 				$n[0] = [math]::round(($n[0]/1) * $ctscale)
 				$n[1] = [math]::round(($n[1]/1) * $ctscale)
-				if ("$($n[0]),$($n[1])" -ne ",") {
-					$attrib.Value = "$($n[0]),$($n[1])"
+				if ("$($n[0]),$($n[1])" -ne $listsep) {
+					$attrib.Value = "$($n[0])$($listsep)$($n[1])"
 				}
 			}
 			if ($attribName -eq 'MinimumSize'){
-				$n = $attrib.Value.split(',')
+				$n = $attrib.Value.split($listsep)
 				$n[0] = [math]::round(($n[0]/1) * $ctscale)
 				$n[1] = [math]::round(($n[1]/1) * $ctscale)
-				if ("$($n[0]),$($n[1])" -ne ",") {
-					$attrib.Value = "$($n[0]),$($n[1])"
+				if ("$($n[0]),$($n[1])" -ne $listsep) {
+					$attrib.Value = "$($n[0])$($listsep)$($n[1])"
 				}
 			}
 			if ($attribName -eq 'ImageScalingSize'){
-				$n = $attrib.Value.split(',')
+				$n = $attrib.Value.split($listsep)
 				$n[0] = [math]::round(($n[0]/1) * $ctscale)
 				$n[1] = [math]::round(($n[1]/1) * $ctscale)
-				if ("$($n[0]),$($n[1])" -ne ",") {
-					$attrib.Value = "$($n[0]),$($n[1])"
+				if ("$($n[0]),$($n[1])" -ne $listsep) {
+					$attrib.Value = "$($n[0])$($listsep)$($n[1])"
 				}
 			}
 			
 			if ($attribName -eq 'TileSize'){
-				$n = $attrib.Value.split(',')
+				$n = $attrib.Value.split($listsep)
 				$n[0] = [math]::round(($n[0]/1) * $ctscale)
 				$n[1] = [math]::round(($n[1]/1) * $ctscale)
-				if ("$($n[0]),$($n[1])" -ne ",") {
-					$attrib.Value = "$($n[0]),$($n[1])"
+				if ("$($n[0]),$($n[1])" -ne $listsep) {
+					$attrib.Value = "$($n[0])$($listsep)$($n[1])"
 				}
 			}
 
@@ -4369,7 +4369,7 @@ function Get-PowerShellDesignerVersion {
 	.EXAMPLE
 		$PSDVersion = Get-PowerShellDesignerVersion
 #>
-	return '2.6.9'
+	return '2.7.1'
 }
 
 function Get-PowerShellVersion {
@@ -9071,6 +9071,7 @@ public class Window
 }
 "@
 $global:ctscale = 1
+$global:listsep = [cultureinfo]::CurrentCulture.TextInfo.ListSeparator
 }
 
 function Set-WebServerResponse {
