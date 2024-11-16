@@ -2076,7 +2076,7 @@ function ConvertFrom-WinFormsXML {
 				$n = $attrib.Value.split($listsep)
 				$n[0] = [math]::round(($n[0]/1) * $ctscale)
 				$n[1] = [math]::round(($n[1]/1) * $ctscale)
-				if ("$($n[0]),$($n[1])" -ne $listsep) {
+				if ("$($n[0])$($listsep)$($n[1])" -ne $listsep) {
 					$attrib.Value = "$($n[0])$($listsep)$($n[1])"
 				}
 			}
@@ -2084,7 +2084,7 @@ function ConvertFrom-WinFormsXML {
 				$n = $attrib.Value.split($listsep)
 				$n[0] = [math]::round(($n[0]/1) * $ctscale)
 				$n[1] = [math]::round(($n[1]/1) * $ctscale)
-				if ("$($n[0]),$($n[1])" -ne $listsep) {
+				if ("$($n[0])$($listsep)$($n[1])" -ne $listsep) {
 					$attrib.Value = "$($n[0])$($listsep)$($n[1])"
 				}
 			}
@@ -2092,7 +2092,7 @@ function ConvertFrom-WinFormsXML {
 				$n = $attrib.Value.split($listsep)
 				$n[0] = [math]::round(($n[0]/1) * $ctscale)
 				$n[1] = [math]::round(($n[1]/1) * $ctscale)
-				if ("$($n[0]),$($n[1])" -ne $listsep) {
+				if ("$($n[0])$($listsep)$($n[1])" -ne $listsep) {
 					$attrib.Value = "$($n[0])$($listsep)$($n[1])"
 				}
 			}
@@ -2100,7 +2100,7 @@ function ConvertFrom-WinFormsXML {
 				$n = $attrib.Value.split($listsep)
 				$n[0] = [math]::round(($n[0]/1) * $ctscale)
 				$n[1] = [math]::round(($n[1]/1) * $ctscale)
-				if ("$($n[0]),$($n[1])" -ne $listsep) {
+				if ("$($n[0])$($listsep)$($n[1])" -ne $listsep) {
 					$attrib.Value = "$($n[0])$($listsep)$($n[1])"
 				}
 			}
@@ -2108,7 +2108,7 @@ function ConvertFrom-WinFormsXML {
 				$n = $attrib.Value.split($listsep)
 				$n[0] = [math]::round(($n[0]/1) * $ctscale)
 				$n[1] = [math]::round(($n[1]/1) * $ctscale)
-				if ("$($n[0]),$($n[1])" -ne $listsep) {
+				if ("$($n[0])$($listsep)$($n[1])" -ne $listsep) {
 					$attrib.Value = "$($n[0])$($listsep)$($n[1])"
 				}
 			}
@@ -2117,7 +2117,7 @@ function ConvertFrom-WinFormsXML {
 				$n = $attrib.Value.split($listsep)
 				$n[0] = [math]::round(($n[0]/1) * $ctscale)
 				$n[1] = [math]::round(($n[1]/1) * $ctscale)
-				if ("$($n[0]),$($n[1])" -ne $listsep) {
+				if ("$($n[0])$($listsep)$($n[1])" -ne $listsep) {
 					$attrib.Value = "$($n[0])$($listsep)$($n[1])"
 				}
 			}
@@ -4369,7 +4369,7 @@ function Get-PowerShellDesignerVersion {
 	.EXAMPLE
 		$PSDVersion = Get-PowerShellDesignerVersion
 #>
-	return '2.7.1'
+	return '2.7.2'
 }
 
 function Get-PowerShellVersion {
