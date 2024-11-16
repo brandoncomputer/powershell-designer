@@ -81,8 +81,8 @@ SOFTWARE.
         FileName:     Designer.ps1
         Modified:     Brandon Cunningham
         Created On:   1/15/2020
-        Last Updated: 11/15/2024
-        Version:      2.7.1
+        Last Updated: 11/16/2024
+        Version:      2.7.2
     ===========================================================================
 
     .DESCRIPTION
@@ -493,7 +493,10 @@ SOFTWARE.
     2.7.1 11/15/2024
         Fixed #26 (2nd attempt) - list seperator localization bug.
         
-        
+    2.7.2 11/16/2024
+        Fixed #26 (3rd attempt) - list seperator localization bug.
+        (Partially) Fixed #27 - exceptions.txt output directory
+            May not output to correct directory if a file is not properly engaged or if an error happens before this opportunity. wontfix
         
 BASIC MODIFICATIONS License
 Original available at https://www.pswinformscreator.com/ for deeper comparison.
@@ -593,7 +596,7 @@ SOFTWARE.
                             $n = $_.Value.split($listsep)
                             $n[0] = [math]::Round(($n[0]/1) * $ctscale)
                             $n[1] = [math]::Round(($n[1]/1) * $ctscale)
-                            if ("$($n[0]),$($n[1])" -ne $listsep) {
+                            if ("$($n[0])$($listsep)$($n[1])" -ne $listsep) {
                             $_.Value = "$($n[0])$($listsep)$($n[1])"
                             }
                         }
@@ -601,7 +604,7 @@ SOFTWARE.
                             $n = $_.Value.split($listsep)
                             $n[0] = [math]::Round(($n[0]/1) * $ctscale)
                             $n[1] = [math]::Round(($n[1]/1) * $ctscale)
-                            if ("$($n[0]),$($n[1])" -ne $listsep) {
+                            if ("$($n[0])$($listsep)$($n[1])" -ne $listsep) {
                                 $_.Value = "$($n[0])$($listsep)$($n[1])"
                             }
                         }
@@ -609,7 +612,7 @@ SOFTWARE.
                             $n = $_.Value.split($listsep)
                             $n[0] = [math]::Round(($n[0]/1) * $ctscale)
                             $n[1] = [math]::Round(($n[1]/1) * $ctscale)
-                            if ("$($n[0]),$($n[1])" -ne $listsep) {
+                            if ("$($n[0])$($listsep)$($n[1])" -ne $listsep) {
                                 $_.Value = "$($n[0])$($listsep)$($n[1])"
                             }
                         }
@@ -617,7 +620,7 @@ SOFTWARE.
                             $n = $_.Value.split($listsep)
                             $n[0] = [math]::Round(($n[0]/1) * $ctscale)
                             $n[1] = [math]::Round(($n[1]/1) * $ctscale)
-                            if ("$($n[0]),$($n[1])" -ne $listsep) {
+                            if ("$($n[0])$($listsep)$($n[1])" -ne $listsep) {
                                 $_.Value = "$($n[0])$($listsep)$($n[1])"
                             }
                         }
@@ -625,7 +628,7 @@ SOFTWARE.
                             $n = $_.Value.split($listsep)
                             $n[0] = [math]::Round(($n[0]/1) * $ctscale)
                             $n[1] = [math]::Round(($n[1]/1) * $ctscale)
-                            if ("$($n[0]),$($n[1])" -ne $listsep) {
+                            if ("$($n[0])$($listsep)$($n[1])" -ne $listsep) {
                                 $_.Value = "$($n[0])$($listsep)$($n[1])"
                             }
                         }
@@ -1540,40 +1543,40 @@ add-type -path $(Get-Character 34)$key$(Get-Character 34)
                         $n = ($node.Size).split($listsep)
                         $n[0] = [math]::round(($n[0]/1) / $ctscale)
                         $n[1] = [math]::round(($n[1]/1) / $ctscale)
-                        if ("$($n[0]),$($n[1])" -ne ",") {
-                            $node.Size = "$($n[0]),$($n[1])"
+                        if ("$($n[0])$($listsep)$($n[1])" -ne $listsep) {
+                            $node.Size = "$($n[0])$($listsep)$($n[1])"
                         }
                     }
                     if ($node.Location){
                         $n = ($node.Location).split($listsep)
                         $n[0] = [math]::round(($n[0]/1) / $ctscale)
                         $n[1] = [math]::round(($n[1]/1) / $ctscale)
-                        if ("$($n[0]),$($n[1])" -ne ",") {
-                            $node.Location = "$($n[0]),$($n[1])"
+                        if ("$($n[0])$($listsep)$($n[1])" -ne $listsep) {
+                            $node.Location = "$($n[0])$($listsep)$($n[1])"
                         }
                     }
                     if ($node.MaximumSize){
                         $n = ($node.MaximumSize).split($listsep)
                         $n[0] = [math]::round(($n[0]/1) / $ctscale)
                         $n[1] = [math]::round(($n[1]/1) / $ctscale)
-                        if ("$($n[0]),$($n[1])" -ne ",") {
-                            $node.MaximumSize = "$($n[0]),$($n[1])"
+                        if ("$($n[0])$($listsep)$($n[1])" -ne $listsep) {
+                            $node.MaximumSize = "$($n[0])$($listsep)$($n[1])"
                         }
                     }
                     if ($node.MinimumSize){
                         $n = ($node.MinimumSize).split($listsep)
                         $n[0] = [math]::round(($n[0]/1) / $ctscale)
                         $n[1] = [math]::round(($n[1]/1) / $ctscale)
-                        if ("$($n[0]),$($n[1])" -ne ",") {
-                            $node.MinimumSize = "$($n[0]),$($n[1])"
+                        if ("$($n[0])$($listsep)$($n[1])" -ne $listsep) {
+                            $node.MinimumSize = "$($n[0])$($listsep)$($n[1])"
                         }
                     }
                     if ($node.ImageScalingSize){
                         $n = ($node.ImageScalingSize).split($listsep)
                         $n[0] = [math]::round(($n[0]/1) / $ctscale)
                         $n[1] = [math]::round(($n[1]/1) / $ctscale)
-                        if ("$($n[0]),$($n[1])" -ne ",") {
-                            $node.ImageScalingSize = "$($n[0]),$($n[1])"
+                        if ("$($n[0])$($listsep)$($n[1])" -ne $listsep) {
+                            $node.ImageScalingSize = "$($n[0])$($listsep)$($n[1])"
                         }
                     }
                     
@@ -1601,6 +1604,7 @@ add-type -path $(Get-Character 34)$key$(Get-Character 34)
                     else {
                         New-Item -ItemType directory -Path $generationPath
                     }
+                    Set-CurrentDirectory $generationPath
                     $utf8 = [System.Text.Encoding]::UTF8
                     $FastText.SaveToFile("$generationPath\Events.ps1",$utf8)
                     Assert-List $lst_Find SaveFile "$generationPath\Finds.txt"
@@ -1806,6 +1810,7 @@ add-type -path $(Get-Character 34)$key$(Get-Character 34)
             $projectName = $Script:refs['tpg_Form1'].Text
             $global:projectDirName = $fileName
             $generationPath = "$(Split-Path -Path $global:projectDirName)\$($projectName -replace "\..*$")"
+            Set-CurrentDirectory $generationPath
             if (Test-Path "$generationPath\controls.xml") {
                 $script:importedControls = Import-Clixml -path "$generationPath\controls.xml"
                 
@@ -2133,6 +2138,7 @@ add-type -path $(Get-Character 34)$key$(Get-Character 34)
             return
         }
         $generationPath = "$(Split-Path -Path $global:projectDirName)\$($projectName -replace "\..*$")"
+        Set-CurrentDirectory $generationPath
         if ((Get-Module -ListAvailable powershell-designer).count -gt 1){
             $designerpath = "$(path $(Get-Module -ListAvailable PowerShell-Designer)[0].path)\functions\functions.psm1"
         }
@@ -2937,6 +2943,7 @@ $($FastText.Text)
             return
         }
         $generationPath = "$(Split-Path -Path $global:projectDirName)\$($projectName -replace "\..*$")"
+        Set-CurrentDirectory $generationPath
         if ((Get-Module -ListAvailable powershell-designer).count -gt 1){
             $designerpath = "$(path $(Get-Module -ListAvailable PowerShell-Designer)[0].path)\functions\functions.psm1"
         }
@@ -3139,6 +3146,7 @@ Set-PSDebug -Trace 2"
                 else {
                     New-Item -ItemType directory -Path $generationPath
                 }
+                Set-CurrentDirectory $generationPath
                 $file = "`"$($generationPath)\$($projectName -replace "fbs$","ps1")`""
                 if ((get-host).version.major -eq 7) {
                 start-process -filepath pwsh.exe -argumentlist '-ep bypass','-sta',"-command `$host.UI.RawUI.WindowTitle = `'Windows PowerShell - PowerShell Designer Run Window`';. `'$file`'"
@@ -3895,6 +3903,7 @@ $xaml""@
                 return
             }
             $generationPath = "$(Split-Path -Path $global:projectDirName)\$($projectName -replace "\..*$")"
+            Set-CurrentDirectory $generationPath
             $dllFile = Show-OpenFileDialog -Filter "Dynamic Link Library|*.dll"
             if ($dllFile -ne '') {
                 $select = add-type -path $dllFile -PassThru | Out-GridView -PassThru
