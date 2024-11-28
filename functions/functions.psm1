@@ -2454,7 +2454,7 @@ function ConvertFrom-WinFormsXML {
 								}
 							}
 							default {
-								$newControl.$attribName = $value
+								try{$newControl.$attribName = $value}catch{}
 							}
 						}
 					}
