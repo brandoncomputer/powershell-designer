@@ -81,8 +81,8 @@ SOFTWARE.
         FileName:     Designer.ps1
         Modified:     Brandon Cunningham
         Created On:   1/15/2020
-        Last Updated: 6/14/2024
-        Version:      2.6.9
+        Last Updated: 5/5/2025
+        Version:      2.7.5
     ===========================================================================
 
     .DESCRIPTION
@@ -485,6 +485,13 @@ SOFTWARE.
     2.6.9 6/14/2024
         Removed orphaned wait function.
         Improved DarkMode function.
+    
+    2.7.0 - 2.7.4 Various dates between 6/14/2024 and 5/4/2025
+        Attempted to fix localization issues with varying success
+        
+    2.7.5 5/5/2025
+        Fixed #30 I found an error here. Thake a lokk tnx
+        Fixed #31 [int] instead of [System.IntPtr] correction
         
         
 BASIC MODIFICATIONS License

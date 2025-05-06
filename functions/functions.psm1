@@ -1891,7 +1891,7 @@ function Close-Window {
     param (
         [Parameter(Mandatory,
 			ValueFromPipeline)]
-        [int]$Handle
+        [System.IntPtr]$Handle
 	)
 	New-SendMessage $Handle 0x0112 0xF060 0
 }
@@ -1927,7 +1927,7 @@ function Compress-Window {
     param (
         [Parameter(Mandatory,
 			ValueFromPipeline)]
-        [int]$Handle
+        [System.IntPtr]$Handle
 	)
 	[vds]::ShowWindow($Handle, "SW_MINIMIZE")
 }
@@ -2727,7 +2727,7 @@ function Expand-Window {
     param (
         [Parameter(Mandatory,
 			ValueFromPipeline)]
-        [int]$Handle
+        [System.IntPtr]$Handle
 	)
 	[vds]::ShowWindow($Handle, "SW_MAXIMIZE")
 }
@@ -3107,7 +3107,7 @@ function Get-ChildWindow {
     param (
         [Parameter(Mandatory,
 			ValueFromPipeline)]
-        [int]$Handle
+        [System.IntPtr]$Handle
 	)
 	return [vds]::GetWindow($Handle, 5)
 }
@@ -4369,7 +4369,7 @@ function Get-PowerShellDesignerVersion {
 	.EXAMPLE
 		$PSDVersion = Get-PowerShellDesignerVersion
 #>
-	return '2.7.3'
+	return '2.7.5'
 }
 
 function Get-PowerShellVersion {
@@ -5480,7 +5480,7 @@ function Get-WindowClass {
     param (
         [Parameter(Mandatory,
 			ValueFromPipeline)]
-        [int]$Handle
+        [System.IntPtr]$Handle
 	)
     $stringbuilt = New-Object System.Text.StringBuilder 256
     $that = [vds]::GetClassName($Handle, $stringbuilt, 256)
@@ -5613,7 +5613,7 @@ function Get-WindowParent {
     param (
         [Parameter(Mandatory,
 			ValueFromPipeline)]
-        [int]$Handle
+        [System.IntPtr]$Handle
 	)
 	return [vds]::GetParent($Handle)
 }
@@ -5652,7 +5652,7 @@ function Get-WindowPosition {
     param (
         [Parameter(Mandatory,
 			ValueFromPipeline)]
-        [int]$Handle
+        [System.IntPtr]$Handle
 	)
 	$return = [PSCustomObject] | Select-Object -Property Top, Left, Width, Height
     $Rect = New-Object RECT
@@ -5720,7 +5720,7 @@ function Get-WindowSibling {
     param (
         [Parameter(Mandatory,
 			ValueFromPipeline)]
-        [int]$Handle
+        [System.IntPtr]$Handle
 	)
 	return [vds]::GetWindow($Handle, 2)
 }
@@ -5782,7 +5782,7 @@ function Get-WindowText {
     param (
         [Parameter(Mandatory,
 			ValueFromPipeline)]
-        [int]$Handle
+        [System.IntPtr]$Handle
 	)
     $strbld = [vds]::GetWindowTextLength($Handle)
     $stringbuilt = New-Object System.Text.StringBuilder $strbld+1
@@ -5917,7 +5917,7 @@ function Hide-Window {
     param (
         [Parameter(Mandatory,
 			ValueFromPipeline)]
-        [int]$Handle
+        [System.IntPtr]$Handle
 	)
 	[vds]::ShowWindow($Handle, "SW_HIDE")
 }
@@ -6183,7 +6183,7 @@ function Move-Window {
     param (
         [Parameter(Mandatory,
 			ValueFromPipeline)]
-        [int]$Handle,
+        [System.IntPtr]$Handle,
 		[Parameter(Mandatory)]
 		[int]$Left,
 		[Parameter(Mandatory)]
@@ -7927,7 +7927,7 @@ function Send-ClickToWindow {
     param (
         [Parameter(Mandatory,
 			ValueFromPipeline)]
-        [int]$Handle,
+        [System.IntPtr]$Handle,
 		[Parameter(Mandatory)]
 		[int]$x,
 		[Parameter(Mandatory)]
@@ -8073,7 +8073,7 @@ b
     param (
         [Parameter(Mandatory,
 			ValueFromPipeline)]
-        [int]$Handle,
+        [System.IntPtr]$Handle,
 		[Parameter(Mandatory)]
 		[int]$x,
 		[Parameter(Mandatory)]
@@ -8208,7 +8208,7 @@ function Send-Window {
     param (
         [Parameter(Mandatory,
 			ValueFromPipeline)]
-        [int]$Handle,
+        [System.IntPtr]$Handle,
 		[string]$String
 	)
 	Set-ActiveWindow $Handle
@@ -8247,7 +8247,7 @@ function Set-ActiveWindow {
     param (
         [Parameter(Mandatory,
 			ValueFromPipeline)]
-        [int]$Handle
+        [System.IntPtr]$Handle
 	)
 	[vds]::SetForegroundWindow($Handle)
 }
@@ -8495,7 +8495,7 @@ function Set-FlashWindow {
     param (
         [Parameter(Mandatory,
 			ValueFromPipeline)]
-        [int]$Handle
+        [System.IntPtr]$Handle
 	)
 	[Window]::FlashWindow($Handle,150,10)
 }
@@ -9168,7 +9168,7 @@ function Set-WindowNotOnTop {
     param (
         [Parameter(Mandatory,
 			ValueFromPipeline)]
-        [int]$Handle
+        [System.IntPtr]$Handle
 	)
 	[vds]::SetWindowPos($Handle, -2, (Get-WindowPosition $Handle).Left, (Get-WindowPosition $Handle).Top, (Get-WindowPosition $Handle).Width, (Get-WindowPosition $Handle).Height, 0x0040) | out-null
 }
@@ -9204,7 +9204,7 @@ function Set-WindowOnTop {
     param (
         [Parameter(Mandatory,
 			ValueFromPipeline)]
-        [int]$Handle
+        [System.IntPtr]$Handle
 	)
 	[vds]::SetWindowPos($Handle, -1, (Get-WindowPosition $Handle).Left, (Get-WindowPosition $Handle).Top, (Get-WindowPosition $Handle).Width, (Get-WindowPosition $Handle).Height, 0x0040) | out-null
 }
@@ -9284,7 +9284,7 @@ function Set-WindowText {
     param (
         [Parameter(Mandatory,
 			ValueFromPipeline)]
-        [int]$Handle,
+        [System.IntPtr]$Handle,
 		[string]$Text
 	)
 	[vds]::SetWindowText($Handle,$Text)
@@ -9743,7 +9743,7 @@ function Show-OpenFileDialog {
 	$filedlg.ShowDialog() | Out-Null
 	return $filedlg.FileName
 }
-<#
+
 function Show-PageSetupDialog {
 <#
 	.SYNOPSIS
@@ -9928,7 +9928,7 @@ function Show-Window {
     param (
         [Parameter(Mandatory,
 			ValueFromPipeline)]
-        [int]$Handle
+        [System.IntPtr]$Handle
 	)
 	[vds]::ShowWindow($Handle, "SW_SHOW_NORMAL")
 }
