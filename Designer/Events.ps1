@@ -81,8 +81,8 @@ SOFTWARE.
         FileName:     Designer.ps1
         Modified:     Brandon Cunningham
         Created On:   1/15/2020
-        Last Updated: 5/5/2025
-        Version:      2.7.5
+        Last Updated: 5/8/2025
+        Version:      2.7.6
     ===========================================================================
 
     .DESCRIPTION
@@ -492,7 +492,9 @@ SOFTWARE.
     2.7.5 5/5/2025
         Fixed #30 I found an error here. Thake a lokk tnx
         Fixed #31 [int] instead of [System.IntPtr] correction
-        
+   
+    2.7.6 5/8/2025
+        Fixed Debugging not working in powershell 7+ #29
         
 BASIC MODIFICATIONS License
 Original available at https://www.pswinformscreator.com/ for deeper comparison.
@@ -3106,7 +3108,7 @@ Set-PSDebug -Trace 2"
 
             $file = "`"$($generationPath)\LastDebug.ps1`""
                 if ((get-host).version.major -eq 7) {
-                    start-process -filepath pwsh.exe -argumentlist -argumentlist '-ep bypass','-sta','-noexit',"-command `$host.UI.RawUI.WindowTitle = `'Windows PowerShell - PowerShell Designer Debug Window`';. `'$file`'"
+                    start-process -filepath pwsh.exe -argumentlist '-ep bypass','-sta','-noexit',"-command `$host.UI.RawUI.WindowTitle = `'Windows PowerShell - PowerShell Designer Debug Window`';. `'$file`'"
                 }
                 else {
                     start-process -filepath powershell.exe -argumentlist '-ep bypass','-sta','-noexit',"-command `$host.UI.RawUI.WindowTitle = `'Windows PowerShell - PowerShell Designer Debug Window`';. `'$file`'"
