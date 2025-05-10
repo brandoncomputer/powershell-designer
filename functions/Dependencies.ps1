@@ -8,6 +8,9 @@ $functionTimer.Add_Tick({
 	if ($script:debugging -eq $true) {
 		$functionTimer.Interval = 60000
 	}
+	if ($lst_Functions.GetItemChecked($lst_Functions.Items.IndexOf("Add-Hotkey")) -eq $True) {
+		$lst_Functions.SetItemChecked($lst_Functions.Items.IndexOf("Add-CommonControl"), $true)
+	}
 	if ($lst_Functions.GetItemChecked($lst_Functions.Items.IndexOf("Set-WindowNotOnTop")) -eq $True) {
 		$lst_Functions.SetItemChecked($lst_Functions.Items.IndexOf("Get-WindowPosition"), $true)
 	}

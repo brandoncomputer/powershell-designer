@@ -81,8 +81,8 @@ SOFTWARE.
         FileName:     Designer.ps1
         Modified:     Brandon Cunningham
         Created On:   1/15/2020
-        Last Updated: 5/8/2025
-        Version:      2.7.6
+        Last Updated: 5/9/2025
+        Version:      2.7.7
     ===========================================================================
 
     .DESCRIPTION
@@ -492,9 +492,17 @@ SOFTWARE.
     2.7.5 5/5/2025
         Fixed #30 I found an error here. Thake a lokk tnx
         Fixed #31 [int] instead of [System.IntPtr] correction
-   
+        
     2.7.6 5/8/2025
         Fixed Debugging not working in powershell 7+ #29
+        
+    2.7.7 5/9/2026
+        Fixed #37 Recent change broke module load. Bad publish
+        Fixed #36 Hotkey Issue [string]$ModifierVirtualKeys
+        Fixed #35 Add-CommonControl dependency needed for Add-Hotkey
+        Partial fix of #34 Add alias's for VDS (DialogShell) compatibility
+        Fixed #32 Problem loading values that are notated by % after saving, attibutes like 'Opacity'
+        
         
 BASIC MODIFICATIONS License
 Original available at https://www.pswinformscreator.com/ for deeper comparison.
@@ -590,6 +598,10 @@ SOFTWARE.
                         $objRef.Changes[$controlName] = @{}
                     }
                     if ($null -ne $($newControl.$($_.ToString()))){
+                        if ($_.ToString() -eq 'Opacity'){
+                            $n = $_.Value.split('%')
+                            $_.Value = "$($n[0]/100)"
+                        }
                         if ($_.ToString() -eq 'Size'){
                             $n = $_.Value.split(',')
                             $n[0] = [math]::Round(($n[0]/1) * $ctscale)

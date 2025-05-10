@@ -536,7 +536,7 @@ function Add-Hotkey {
 		The use of this function REQUIRES the event to be caught by the 
 		hotkeyEvent function which processes the event by hotkey index.
 #>
-	[Alias("Hotkey-Add")]
+	[Alias("Hotkey-Add","Hotkey")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -544,7 +544,6 @@ function Add-Hotkey {
         [vdsForm]$Form,
 		[Parameter(Mandatory)]
         [int]$RegisterIndex,
-		[Parameter(Mandatory)]
 		[string]$ModifierVirtualKeys,
 		[Parameter(Mandatory)]
 		[string]$VirtualKey
@@ -4369,7 +4368,7 @@ function Get-PowerShellDesignerVersion {
 	.EXAMPLE
 		$PSDVersion = Get-PowerShellDesignerVersion
 #>
-	return '2.7.5'
+	return '2.7.7'
 }
 
 function Get-PowerShellVersion {
@@ -6748,6 +6747,7 @@ function New-Taskicon {
 	.OUTPUTS
 		System Windows Forms Taskicon
 #>
+	[Alias("taskicon")]
 	[CmdletBinding()]
     param (
 		[Parameter(Mandatory,
@@ -6797,6 +6797,7 @@ function New-Timer {
 	.OUTPUTS
 		System.Windows.Forms.Timer
 #>
+	[Alias("Timer")]
 	[CmdletBinding()]
     param (
         [Parameter(Mandatory,
@@ -9775,7 +9776,7 @@ function Show-PageSetupDialog {
 	
 	.OUTPUTS
 		String
-#	
+#>	
 	[Alias("Filedlg")]
 	[CmdletBinding()]
     param (
@@ -9789,7 +9790,7 @@ function Show-PageSetupDialog {
 	$filedlg.ShowDialog() | Out-Null
 	return $filedlg.FileName
 }
-#>
+
 
 function Show-SaveFileDialog {
 <#
