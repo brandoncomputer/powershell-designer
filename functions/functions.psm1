@@ -37,48 +37,48 @@ SOFTWARE.
 function Add-Alt {
 <#
     .SYNOPSIS
-		Sends the ALT key plus string. 
+        Sends the ALT key plus string.
 
-		ALIASES
-			Alt
-     
+    .ALIASES
+        Alt
+
     .DESCRIPTION
-		This function will prepend a the string parameter with the alt key
-		commonly specified by the '%' character.
-	
-	.PARAMETER TextValue
-		The text being passed to the Function
-	
-	.EXAMPLE
-		$altfs = "$(Add-Alt F) S"
-	
-	.EXAMPLE
-		$altfs = "$(Add-Alt -TextValue F) S"
-	
-	.EXAMPLE
-		$altfs = "$('F' | Add-Alt) S"
-	
-	.EXAMPLE
-		Send-Window (Get-Window notepad) "$(Add-Alt F) S"
-	
-	.INPUTS
-		TextValue as String
-	
-	.OUTPUTS
-		String
-		
-	.NOTES
-		Only useful with 'Send-Window'.
+        Prepends the string parameter with the ALT key symbol `%` for use in Send-Window sequences.
+
+    .PARAMETER TextValue
+        The text to be prefixed with ALT.
+
+    .EXAMPLE
+        $altfs = "$(Add-Alt F) S"
+
+    .EXAMPLE
+        $altfs = "$(Add-Alt -TextValue F) S"
+
+    .EXAMPLE
+        $altfs = "$('F' | Add-Alt) S"
+
+    .EXAMPLE
+        Send-Window (Get-Window notepad) "$(Add-Alt F) S"
+
+    .INPUTS
+        [string]
+
+    .OUTPUTS
+        [string]
+
+    .NOTES
+        Only useful with 'Send-Window'.
 #>
-	[Alias("Alt")]
-	[CmdletBinding()]
+    [Alias("Alt")]
+    [CmdletBinding()]
+    [OutputType([string])]
     param (
-        [Parameter(Mandatory,
-			ValueFromPipeline)]
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [ValidateNotNullOrEmpty()]
         [string]$TextValue
     )
 
-    return "%$TextValue"
+    Write-Output "%$TextValue"
 }
 
 function Add-CommonControl {
@@ -4368,7 +4368,7 @@ function Get-PowerShellDesignerVersion {
 	.EXAMPLE
 		$PSDVersion = Get-PowerShellDesignerVersion
 #>
-	return '2.7.7'
+	return '2.7.71'
 }
 
 function Get-PowerShellVersion {
@@ -10446,4 +10446,5 @@ function Write-InitializationFile {
 		}
 		$Items | Out-File $File -enc ascii
 	}
+
 }
