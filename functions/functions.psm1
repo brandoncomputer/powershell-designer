@@ -83,94 +83,98 @@ function Add-Alt {
 
 function Add-CommonControl {
 <#
-	.SYNOPSIS
-		Adds a common control to a vdsForm object
-	
-	
-		ALIASES
-			Dialog-Add
-		
+    .SYNOPSIS
+        Adds a common control to a vdsForm object
+
+    ALIASES
+        Dialog-Add
+
     .DESCRIPTION
-		This function adds a common control to a vdsForm object.
-	
-	.PARAMETER Form
-		The vdsForm to add the object to.
-	
-	.PARAMETER ControlType
-		The type of control to add to the vdsForm from the following set:
-		'Button','CheckBox','CheckedListBox','ComboBox', 'DataGrid',
-		'DataGridView','DateTimePicker','GroupBox','HScrollBar',
-		'Label','LinkLabel','ListBox','MaskedTextBox','MonthCalendar',
-		'NumericUpDown','Panel','PictureBox','ProgressBar','RadioButton',
-		'RichTextBox','TextBox','TrackBar','TreeView','VScrollBar',
-		'WebBrowser'
-	
-	.PARAMETER Top
-		The value of the Top property of the control.
-		
-	.PARAMETER Left
-		The value of the Left property of the control.
-		
-	.PARAMETER Width
-		The value of the Width property of the control.
-		
-	.PARAMETER Hieght
-		The value of the Height property of the control.
+        This function adds a common control to a vdsForm object.
 
-	.PARAMETER Text
-		The value of the Text property of the control.
-	
-	.EXAMPLE
-		$Button1 = Add-CommonControl $Form1 Button 60 30 200 25 "Execute"
+    .PARAMETER Form
+        The vdsForm to add the object to.
 
-	.EXAMPLE
-		$TextBox1 = Add-CommonControl -Form $Form1 -ControlType TextBox -Top 30 -Left 30 -Width 200 -Height 25 
+    .PARAMETER ControlType
+        The type of control to add to the vdsForm from the following set:
+        'Button','CheckBox','CheckedListBox','ComboBox', 'DataGrid',
+        'DataGridView','DateTimePicker','GroupBox','HScrollBar',
+        'Label','LinkLabel','ListBox','MaskedTextBox','MonthCalendar',
+        'NumericUpDown','Panel','PictureBox','ProgressBar','RadioButton',
+        'RichTextBox','TextBox','TrackBar','TreeView','VScrollBar',
+        'WebBrowser'
 
-	.EXAMPLE
-		$TextBox1 = $Form1 | Add-CommonControl -ControlType TextBox -Top 30 -Left 30 -Width 200 -Height 25 
-	
-	.INPUTS
-		Form as Object, ControlType as ValidatedString, Top as Int, Left as Int, Width as Int, Height as Int, Text as String
-	
-	.OUTPUTS
-		System Windows Forms (ControlType)
-	
-	.NOTES
-		Normally precedented by the New-Form command.
-	
+    .PARAMETER Top
+        The value of the Top property of the control.
+
+    .PARAMETER Left
+        The value of the Left property of the control.
+
+    .PARAMETER Width
+        The value of the Width property of the control.
+
+    .PARAMETER Height
+        The value of the Height property of the control.
+
+    .PARAMETER LabelText
+        The value of the Text property of the control.
+
+    .EXAMPLE
+        $Button1 = Add-CommonControl $Form1 Button 60 30 200 25 "Execute"
+
+    .EXAMPLE
+        $TextBox1 = Add-CommonControl -Form $Form1 -ControlType TextBox -Top 30 -Left 30 -Width 200 -Height 25 
+
+    .EXAMPLE
+        $TextBox1 = $Form1 | Add-CommonControl -ControlType TextBox -Top 30 -Left 30 -Width 200 -Height 25 
+
+    .INPUTS
+        Form as Object, ControlType as ValidatedString, Top as Int, Left as Int, Width as Int, Height as Int, LabelText as String
+
+    .OUTPUTS
+        System Windows Forms (ControlType)
+
+    .NOTES
+        Normally precedented by the New-Form command.
 #>
-	[Alias("Dialog-Add")]
-	[CmdletBinding()]
+    [Alias("Dialog-Add")]
+    [CmdletBinding()]
     param (
-        [Parameter(Mandatory,
-			ValueFromPipeline)]
+        [Parameter(Mandatory, ValueFromPipeline)]
         [object]$Form,
-		[Parameter(Mandatory)]
-		[ValidateSet('Button','CheckBox','CheckedListBox','ComboBox',
-		'DataGrid','DataGridView','DateTimePicker','GroupBox','HScrollBar',
-		'Label','LinkLabel','ListBox','MaskedTextBox','MonthCalendar',
-		'NumericUpDown','Panel','PictureBox','ProgressBar','RadioButton',
-		'RichTextBox','TextBox','TrackBar','TreeView','VScrollBar',
-		'WebBrowser')]
-		[string[]]$ControlType,
-		[Parameter(Mandatory)]
-		[int]$Top,
-		[Parameter(Mandatory)]
-		[int]$Left,
-		[Parameter(Mandatory)]
-		[int]$Width,
-		[Parameter(Mandatory)]
-		[int]$Height,
-		[string]$Text
+
+        [Parameter(Mandatory)]
+        [ValidateSet('Button','CheckBox','CheckedListBox','ComboBox',
+        'DataGrid','DataGridView','DateTimePicker','GroupBox','HScrollBar',
+        'Label','LinkLabel','ListBox','MaskedTextBox','MonthCalendar',
+        'NumericUpDown','Panel','PictureBox','ProgressBar','RadioButton',
+        'RichTextBox','TextBox','TrackBar','TreeView','VScrollBar',
+        'WebBrowser')]
+        [string]$ControlType,
+
+        [Parameter(Mandatory)]
+        [int]$Top,
+
+        [Parameter(Mandatory)]
+        [int]$Left,
+
+        [Parameter(Mandatory)]
+        [int]$Width,
+
+        [Parameter(Mandatory)]
+        [int]$Height,
+
+        [string]$LabelText
     )
-	$Control = New-Object System.Windows.Forms.$ControlType
-	$Control.Top = $Top * $ctscale
+
+    $Control = New-Object "System.Windows.Forms.$ControlType"
+    $Control.Top = $Top * $ctscale
     $Control.Left = $Left * $ctscale
     $Control.Width = $Width * $ctscale
     $Control.Height = $Height * $ctscale
-    $Control.Text = $Text
-	$Form.Controls.Add($Control)
-	return $Control
+    $Control.Text = $LabelText
+    $Form.Controls.Add($Control)
+    return $Control
 }
 
 function Add-ContextMenuStrip {
@@ -10448,3 +10452,4 @@ function Write-InitializationFile {
 	}
 
 }
+
