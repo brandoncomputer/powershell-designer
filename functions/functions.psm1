@@ -1385,469 +1385,381 @@ Butter"
         }
     }
 }
-
-					 
-  
+function Assert-WPF {
+<#
+    .SYNOPSIS
+		Transforms XAML string into a Windows Presentation Foundation window
 			 
-																	  
-			 
-																	  
-																   
-							   
-  
-				
-									 
+	.DESCRIPTION
+		This function transforms XAML string into a Windows Presentation 
+		Foundation window (ambiguous)
+		
+	.PARAMETER xaml
+		The source XAML string to transform
 	
-			 
-																   
-							   
-  
-				
-									 
- 
-		 
-				  
-  
-		 
-						
-
-		 
-					
-  
+	.EXAMPLE
+		Assert-WPF $xaml
 		
-				
- 
-		 
-																							   
-  
-				  
-		   
-					   
-					  
-			   
-  
-																																										 
-				   
-																							   
-									 
-																							
-  
-					 
- 
- 
+	.EXAMPLE
+		Assert-WPF -xaml $xaml
 
-							   
-  
-			 
-													
-			 
-													
-																  
-  
-					   
-															   
-									   
-													  
-															 
-															
-													 
-													   
-												  
-						  
-  
-					 
-									 
-  
-				
-									
-  
-			   
-								  
-
-				
-								   
-  
-				  
-							
- 
-				 
-						   
+	.EXAMPLE
+		$xaml | Assert-WPF
+		
+	.INPUTS
+		xaml as String
 	
+	.OUTPUTS
+		Windows.Markup.XamlReader and Global Variables for Controls within the window by Control Name
+#>
+	[CmdletBinding()]
+    param (
+		[Parameter(Mandatory,
+			ValueFromPipeline)]
+		[string]$xaml
+	)
+	$xaml = $xaml -replace "x:N", 'N' -replace 'd:DesignHeight="\d*?"', '' -replace 'x:Class=".*?"', '' -replace 'mc:Ignorable="d"', '' -replace 'd:DesignWidth="\d*?"', '' 
+	[xml]$xaml = $xaml
+	$presentation = [Windows.Markup.XamlReader]::Load((new-object System.Xml.XmlNodeReader $xaml))
+	$xaml.SelectNodes("//*[@Name]") | %{
+		Set-Variable -Name $_.Name.ToString() -Value $presentation.FindName($_.Name) -Scope global
+	}
+	return $presentation
+}
+
+function Assert-WPFAddControl {
+<#
+    .SYNOPSIS
+		Creates a control inside of a wpf container object
 			 
-																  
-  
-					   
-															   
-									   
-													  
-															 
-															
-													 
-													   
-												  
-						  
-  
-					 
-									 
-  
-				
-									
-  
-			   
-								  
-
-				
-								   
-  
-				  
-							
- 
-				 
-						   
- 
-		 
-																		 
-  
-		 
-																																 
-
-		 
-																													  
-  
+	.DESCRIPTION
+		This function creates a control inside of a wpf container object
 		
-																																	   
- 
-		 
-									  
-  
-				  
-		   
-					   
-					  
-															
-															  
-																	   
-																		
-															 
-																 
-															
-								
-						 
-						
-					 
-						
-				
-						
-			   
-						
-				
-						
-				  
-						
-				
-  
-														   
-						   
-																
-								   
-									  
-								   
-							
-						  
-				
- 
- 
+	.PARAMETER ControlType
+		The type of control to add from the following validated list:
+		Button, Calendar, CheckBox,ComboBox, 
+		ComboBoxItem, DatePicker, DocumentViewer, Expander, 
+		FlowDocumentReader, GroupBox, Hyperlink, Image, InkCanvas, 
+		Label, ListBox, ListBoxItem, Menu, MenuItem, PasswordBox, 
+		ProgressBar, RadioButton, RichTextBox, SrollViewer,
+		SinglePageViewer,Slider, TabControl, TabItem, Table, 
+		TextBlock, TextBox, ToolBar, ToolTip, TreeView, 
+		TreeViewItem, WebBrowser
+		
+	.PARAMETER Container
+		The container to add the control to
+		
+	.PARAMETER Text
+		The text to display on the control
+		
+	.PARAMETER Top
+		The top position for the control
 
-						   
-  
-			 
-												  
-			 
-												  
-																
-  
-				 
-						  
-  
-				  
-						   
- 
-				 
-						  
- 
-				
-														 
+	.PARAMETER Left
+		The left position for the control
+		
+	.PARAMETER Height
+		The height for the control
 	
-			 
-																
-  
-				 
-						  
-  
-				  
-						   
- 
-				 
-						  
- 
-				
-														 
- 
-		 
-														 
-  
-		 
-																					 
-
-		 
-																				
-  
-		
-																	
- 
-		 
-						   
-  
-				  
-		   
-					   
-					  
-				 
-						
-				  
-						
-				 
-						
-			   
-  
-		   
-		 
-																	 
-														  
-												   
-					   
-		   
-		   
-  
-								  
-					
- 
- 
-
-									 
-  
-			 
-														  
-			 
-														  
-																		
+	.PARAMETER Width
+		The width for the control
 	
-			 
-																		
- 
-						
-												   
-  
-				
-						 
-  
-		 
-											 
-  
-		 
-																	
-
-		 
-																			 
-  
+	.EXAMPLE
+		$Button1 = Assert-WPFAddControl 'Button' 'Grid1' 'Button1' 20 20 20 200
 		
-										
- 
-		 
-		
- 
-	   
-																		 
-  
-				  
-		   
-					   
-					  
-						
-						
-			   
-  
-									 
- 
- 
+	.EXAMPLE
+		$Button1 = Assert-WPFAddControl -ControlType 'Button' -Container 'Grid1' -Text 'Button1' -top 20 -left 20 -height 20 -width 200
 
-						   
-  
-			 
-																	 
-			 
-																	 
-																				   
+	.EXAMPLE
+		$Button1 = 'Button' | Assert-WPFAddControl -Container 'Grid1' -Text 'Button1' -top 20 -left 20 -height 20 -width 200
+		
+	.INPUTS
+		ControlType as ValidatedString, Container as Object, Text as String, Top as String, Left as String, Height as String, Width as String
 	
-			 
-																				   
- 
-				  
-					 
-  
-				  
-																	  
-								 
-  
-		 
-								  
-  
-		 
-													
+	.OUTPUTS
+		System.Windows.Controls.$ControlType
+#>
+	[CmdletBinding()]
+    param (
+		[Parameter(Mandatory,
+			ValueFromPipeline)]
+		[ValidateSet('Button', 'Calendar', 'CheckBox','ComboBox', 
+		'ComboBoxItem', 'DatePicker', 'DocumentViewer', 'Expander', 
+		'FlowDocumentReader', 'GroupBox', 'Hyperlink', 'Image', 'InkCanvas', 
+		'Label', 'ListBox', 'ListBoxItem', 'Menu', 'MenuItem', 'PasswordBox', 
+		'ProgressBar', 'RadioButton', 'RichTextBox', 'SrollViewer',
+		'SinglePageViewer','Slider', 'TabControl', 'TabItem', 'Table', 
+		'TextBlock', 'TextBox', 'ToolBar', 'ToolTip', 'TreeView', 
+		'TreeViewItem', 'WebBrowser')]
+		[string[]]$ControlType,
+		[Parameter(Mandatory)]
+		[object]$Container,
+		[Parameter(Mandatory)]
+		[string]$Text,
+		[Parameter(Mandatory)]
+		[string]$Top,
+		[Parameter(Mandatory)]
+		[string]$Left,
+		[Parameter(Mandatory)]
+		[string]$Height,
+		[Parameter(Mandatory)]
+		[string]$Width
+	)
+	$control = new-object System.Windows.Controls.$ControlType
+	$control.Content = "$Text"
+	$Container.Children.Insert($Container.Children.Count, $control)
+	$control.VerticalAlignment = "Top"
+	$control.HorizontalAlignment = "Left"
+	$control.Margin = "$Left,$Top,0,0"
+	$control.Height = "$Height"
+	$control.Width = "$Width"
+	return $control
+}
 
-		 
-											 
-  
+function Assert-WPFCreate {
+<#
+    .SYNOPSIS
+		Creates a Windows Presentation Foundation window
+			 
+	.DESCRIPTION
+		This function Creates a Windows Presentation Foundation window
 		
-									
- 
-		 
-								
-  
-				  
-		   
-					   
-					  
-				  
-						
-													 
-				   
-  
-									  
- 
- 
-
-								  
-  
-			 
-													
-			 
-													
-																  
-  
-					   
-															   
-									   
-													  
-															 
-															
-													 
-													   
-												  
-						  
-  
-					 
-									 
+	.PARAMETER Title
+		The title for the window
+		
+	.PARAMETER Height
+		The height for the window
 	
-			 
-																  
-  
-					   
-															   
-									   
-													  
-															 
-															
-													 
-													   
-												  
-						  
-  
-					 
-									 
- 
-		 
-													 
-  
-		 
-																			 
-
-		 
-																  
-  
-		
-													 
- 
-		 
-									  
-  
-				  
-		   
-					   
-					  
-															
-															  
-																	   
-																		
-															 
-																 
-															
-								
-						 
-						
-					
-  
-														   
-																
-				
- 
- 
-
-						   
-  
-			 
-																   
-			 
-																   
-																				 
+	.PARAMETER Width
+		The width for the window
 	
-			 
-																				 
- 
-				  
-					 
-  
-				  
-																	
-								 
-  
-		 
-								 
-  
-		 
-												 
-
-		 
-										   
-  
+	.PARAMETER Grid
+		A name property for the grid created within the window.
+	
+	.EXAMPLE
+		Assert-WPFCreate "Brandon's Window" "480" "800" "Grid1"
 		
-									
- 
-		 
-							  
-  
-				  
-		   
-					   
-					  
-				  
-						
-													 
-				   
-  
-									
- 
- 
+	.EXAMPLE
+		Assert-WPFCreate -title "Brandon's Window" -height "480" -width "800" -grid "Grid1"
+
+	.EXAMPLE
+		"Brandon's Window" | Assert-WPFCreate -height "480" -width "800" -grid "Grid1"
+		
+	.INPUTS
+		Title as String, Height as String, Width as String, Grid as String
+	
+	.OUTPUTS
+		Windows.Markup.XamlReader
+#>
+	[CmdletBinding()]
+    param (
+		[Parameter(Mandatory,
+			ValueFromPipeline)]
+		[string]$Title,
+		[Parameter(Mandatory)]
+		[string]$Height,
+		[Parameter(Mandatory)]
+		[string]$Width,
+		[Parameter(Mandatory)]
+		[string]$Grid
+	)
+	$xaml = @"
+		<Window
+				xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+				xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+				Title="$Title" Height="$Height" Width="$Width">
+				<Grid Name="$Grid">
+				</Grid>
+		</Window>
+"@
+		$MainWindow = (Assert-WPF $xaml)
+		return $MainWindow
+}
+
+function Assert-WPFGetControlByName {
+<#
+    .SYNOPSIS
+		Returns the control associated with the name specified. 
+			 
+	.DESCRIPTION
+		This function returns the control associated with the name specified. 
+	
+	.PARAMETER Presentation
+		The presentation window that contains the control
+		
+	.PARAMETER Name
+		The name of the control
+		
+	.EXAMPLE
+		Assert-WPFGetControlByName $Form1 "Button1"
+		
+	.EXAMPLE
+		Assert-WPFGetControlByName -presentation $Form1 -control "Button1"
+
+	.EXAMPLE
+		$Form1 | Assert-WPFGetControlByName -presentation $Form1 -control "Button1"
+		
+	.INPUTS
+		Presentation as Object, Name as String
+	
+	.OUTPUTS
+		Object
+	
+	.NOTES
+		Normally only useful with externally sourced XAML loaded by Assert-WPF.
+#>
+	[CmdletBinding()]
+    param (
+		[Parameter(Mandatory,
+			ValueFromPipeline)]
+		[object]$Presentation,
+		[Parameter(Mandatory)]
+		[string]$Name
+	)
+	return $Presentation.FindName($Name)
+}
+
+function Assert-WPFHAlign {
+<#
+    .SYNOPSIS
+		Horizontally aligns an object according to the specified parameter.
+			 
+	.DESCRIPTION
+		This function Horizontally aligns an object according to the specified parameter.
+	
+	.PARAMETER Object
+		The object to align
+		
+	.PARAMETER Halign
+		The position to horizontally align the control to. May be the value 
+		Left, Center, Right or Stretch.
+		
+	.EXAMPLE
+		Assert-WPFHalign $Button1 'Left'
+		
+	.EXAMPLE
+		Assert-WPFHalign -Object $Button1 -halign 'Center'
+
+	.EXAMPLE
+		$Button1 | Assert-WPFHalign -halign 'Right'
+		
+	.INPUTS
+		Object as Object, Halign as String
+	
+	.OUTPUTS
+		Format of Horizontal Alignment
+#>
+	[CmdletBinding()]
+    param (
+		[Parameter(Mandatory,
+			ValueFromPipeline)]
+		[object]$Object,
+		[Parameter(Mandatory)]
+		[ValidateSet('Left', 'Center', 'Right', 'Stretch')]
+		[string[]]$Halign
+	)
+	$Object.HorizontalAlignment = $Halign
+}
+
+function Assert-WPFInsertControl {
+<#
+    .SYNOPSIS
+		Inserts a control inside of a wpf container object
+			 
+	.DESCRIPTION
+		This function inserts a control inside of a wpf container object
+		
+	.PARAMETER ControlType
+		The type of control to add from the following validated list:
+		Button, Calendar, CheckBox,ComboBox, 
+		ComboBoxItem, DatePicker, DocumentViewer, Expander, 
+		FlowDocumentReader, GroupBox, Hyperlink, Image, InkCanvas, 
+		Label, ListBox, ListBoxItem, Menu, MenuItem, PasswordBox, 
+		ProgressBar, RadioButton, RichTextBox, SrollViewer,
+		SinglePageViewer,Slider, TabControl, TabItem, Table, 
+		TextBlock, TextBox, ToolBar, ToolTip, TreeView, 
+		TreeViewItem, WebBrowser
+		
+	.PARAMETER Container
+		The container to add the control to
+	
+	.EXAMPLE
+		$Button1 = Assert-WPFInsertControl 'Button' 'Grid1'
+		
+	.EXAMPLE
+		$Button1 = Assert-WPFInsertControl -ControlType 'Button' -Container 'Grid1'
+
+	.EXAMPLE
+		$Button1 = 'Button' | Assert-WPFInsertControl -Container 'Grid1'
+		
+	.INPUTS
+		ControlType as ValidatedString, Container as Object
+	
+	.OUTPUTS
+		System.Windows.Controls.$ControlType
+#>
+	[CmdletBinding()]
+    param (
+		[Parameter(Mandatory,
+			ValueFromPipeline)]
+		[ValidateSet('Button', 'Calendar', 'CheckBox','ComboBox', 
+		'ComboBoxItem', 'DatePicker', 'DocumentViewer', 'Expander', 
+		'FlowDocumentReader', 'GroupBox', 'Hyperlink', 'Image', 'InkCanvas', 
+		'Label', 'ListBox', 'ListBoxItem', 'Menu', 'MenuItem', 'PasswordBox', 
+		'ProgressBar', 'RadioButton', 'RichTextBox', 'SrollViewer',
+		'SinglePageViewer','Slider', 'TabControl', 'TabItem', 'Table', 
+		'TextBlock', 'TextBox', 'ToolBar', 'ToolTip', 'TreeView', 
+		'TreeViewItem', 'WebBrowser')]
+		[string[]]$ControlType,
+		[Parameter(Mandatory)]
+		[object]$Container
+	)
+	$control = new-object System.Windows.Controls.$ControlType
+	$Container.Children.Insert($Container.Children.Count, $control)
+	return $control
+}
+
+function Assert-WPFValign {
+<#
+    .SYNOPSIS
+		Vertically aligns an object according to the specified parameter.
+			 
+	.DESCRIPTION
+		This function vertically aligns an object according to the specified parameter.
+	
+	.PARAMETER Object
+		The object to align
+		
+	.PARAMETER Valign
+		The position to vertically align the control to. May be the value 
+		Top, Center, Bottom or Stretch.
+		
+	.EXAMPLE
+		Assert-WPFValign $Button1 'Top'
+		
+	.EXAMPLE
+		Assert-WPFValign -Object $Button1 -valign 'Top'
+
+	.EXAMPLE
+		$Button1 | Assert-WPFValign -valign 'Top'
+		
+	.INPUTS
+		Object as Object, Valign as String
+	
+	.OUTPUTS
+		Format of Vertical Alignment
+#>
+	[CmdletBinding()]
+    param (
+		[Parameter(Mandatory,
+			ValueFromPipeline)]
+		[object]$Object,
+		[Parameter(Mandatory)]
+		[ValidateSet('Top', 'Center', 'Bottom', 'Stretch')]
+		[string[]]$Valign
+	)
+	$Object.VerticalAlignment = $Valign
+}
 
 function Clear-Clipboard {
 <#
@@ -10492,6 +10404,7 @@ function Write-InitializationFile {
 	}
 
 }
+
 
 
 
