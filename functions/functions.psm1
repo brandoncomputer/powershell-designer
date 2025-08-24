@@ -281,486 +281,484 @@ function Add-ContextMenuStripItem {
         }
     }
 
-    if ($ShortCutKeys -ne "") {
-        $MenuRow.ShortCutKeys = $ShortCutKeys
-        $MenuRow.ShowShortCutKeys = $True
-    }
+if (-not [string]::IsNullOrWhiteSpace($ShortCutKeys)) {
+    $MenuRow.ShortCutKeys = $ShortCutKeys
+    $MenuRow.ShowShortCutKeys = $True
+}
 
     $MenuRow.Name = $Title
     $MenuRow.Text = $Title
-    $ContextMenuStrip.Items.add($MenuRow) | Out-Null
+    $null = $ContextMenuStrip.Items.add($MenuRow)
     return $MenuRow
 }
 
-function Add-ContextMenuStripSeperator {
+function Add-ContextMenuStripSeparator {
 <#
-	.SYNOPSIS
-		Adds a seperator in the rows of a context menu strip.
-		
+    .SYNOPSIS
+        Adds a separator to a context menu strip.
+
     .DESCRIPTION
-		This function will add a seperator in the rows of a context menu strip.
-	
-	.PARAMETER ContextMenuStrip
-		The ContextMenuStrip to add a seperator to.
-	
-	.EXAMPLE
-		$Sep1 = Add-ContextMenuStripSeperator $TaskIcon1ContextMenu
-	
-	.EXAMPLE
-		$Sep1 = Add-ContextMenuStripSeperator -ContextMenuStrip $TaskIcon1ContextMenu
-	
-	.EXAMPLE
-		$Sep1 = $TaskIcon1ContextMenu | Add-ContextMenuStripSeperator
+        Inserts a ToolStripSeparator into the specified ContextMenuStrip.
 
-	.INPUTS
-		ContextMenuStrip as System.Windows.Forms.ContextMenuStrip
+    .PARAMETER ContextMenuStrip
+        The ContextMenuStrip to modify.
 
-	.OUTPUTS
-		System.Windows.Forms.ToolStripSeparator
+    .EXAMPLE
+        $Sep1 = Add-ContextMenuStripSeparator $TaskIcon1ContextMenu
+
+    .EXAMPLE
+        $Sep1 = Add-ContextMenuStripSeparator -ContextMenuStrip $TaskIcon1ContextMenu
+
+    .EXAMPLE
+        $Sep1 = $TaskIcon1ContextMenu | Add-ContextMenuStripSeparator
+
+    .INPUTS
+        System.Windows.Forms.ContextMenuStrip
+
+    .OUTPUTS
+        System.Windows.Forms.ToolStripSeparator
 #>
-		[CmdletBinding()]
+    [CmdletBinding()]
     param (
-		[Parameter(Mandatory,
-			ValueFromPipeline)]
-		[System.Windows.Forms.ContextMenuStrip]$ContextMenuStrip
-	)
-	$item = new-object System.Windows.Forms.ToolStripSeparator
-	$ContextMenuStrip.Items.Add($item) | Out-Null
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [System.Windows.Forms.ContextMenuStrip]$ContextMenuStrip
+    )
+
+    $Separator = New-Object System.Windows.Forms.ToolStripSeparator
+    $null = $ContextMenuStrip.Items.Add($Separator)
+    return $Separator
 }
 
 function Add-CTRL {
 <#
     .SYNOPSIS
-		Sends the CTRL key plus string. Only useful with 'Send-Window'.
-		
-		ALIASES
-			Ctrl
-     
+        Sends the CTRL key plus string. Only useful with 'Send-Window'.
+
+    .ALIASES
+        Ctrl
+
     .DESCRIPTION
-		This function will prepend a the string parameter with the ctrl key
-		commonly specified by the '^' character.
-	
-	.PARAMETER TextValue
-		The text being passed to the Function
-	
-	.EXAMPLE
-		$ctrls = "$(Add-CTRL S)"
-	
-	.EXAMPLE
-		$ctrls = "$(Add-CTRL -TextValue S)"
-	
-	.EXAMPLE
-		$ctrls = "$('S' | Add-CTRL)"
-	
-	.EXAMPLE
-		Send-Window (Get-Window notepad) "$(Add-CTRL S)"
-	
-	.INPUTS
-		TextValue as String
-	
-	.OUTPUTS
-		String
+        This function will prepend the string parameter with the Ctrl key,
+        commonly specified by the '^' character.
+
+    .PARAMETER TextValue
+        The text being passed to the function.
+
+    .EXAMPLE
+        $ctrls = "$(Add-CTRL S)"
+
+    .EXAMPLE
+        $ctrls = "$(Add-CTRL -TextValue S)"
+
+    .EXAMPLE
+        $ctrls = "$('S' | Add-CTRL)"
+
+    .EXAMPLE
+        Send-Window (Get-Window notepad) "$(Add-CTRL S)"
+
+    .INPUTS
+        TextValue as String
+
+    .OUTPUTS
+        String
 #>
-	[Alias("Ctrl")]
-	[CmdletBinding()]
+    [Alias("Ctrl")]
+    [CmdletBinding()]
+    [OutputType([string])]
     param (
-        [Parameter(Mandatory,
-			ValueFromPipeline)]
+        [Parameter(Mandatory, ValueFromPipeline)]
         [string]$TextValue
     )
-
     return "^$TextValue"
 }
 
 function Add-ExcelWorkbook {
 <#
-	.SYNOPSIS
-		Adds a new excel workbook to a initialized excel object.
-		
+    .SYNOPSIS
+        Adds a new Excel workbook to an initialized Excel.Application object.
+
     .DESCRIPTION
-		This function will add a excel workbook to a initialized excel object.
-	
-	.PARAMETER Excel
-		The initialized excel object to add a workbook to.
-	
-	.EXAMPLE
-		$Workbook = Add-ExcelWorkbook $ExcelObject
-	
-	.EXAMPLE
-		$Workbook = Add-ExcelWorkbook -Excel $ExcelObject
+        This function adds a new workbook to an existing Excel COM object.
+        It assumes the object is properly initialized and exposes a Workbooks collection.
 
-	.EXAMPLE
-		$Workbook = $ExcelObject | Add-ExcelWorkbook
+    .PARAMETER Excel
+        The initialized Excel.Application COM object.
 
-	.INPUTS
-		$Excel as Excel.Application
-	
-	.OUTPUTS
-		Excel.Application.Workbook
+    .EXAMPLE
+        $Workbook = Add-ExcelWorkbook $ExcelObject
+
+    .EXAMPLE
+        $Workbook = Add-ExcelWorkbook -Excel $ExcelObject
+
+    .EXAMPLE
+        $Workbook = $ExcelObject | Add-ExcelWorkbook
+
+    .INPUTS
+        [Microsoft.Office.Interop.Excel.Application] via COM
+
+    .OUTPUTS
+        [Microsoft.Office.Interop.Excel.Workbook]
 #>
-	[CmdletBinding()]
+    [CmdletBinding()]
+    [OutputType([object])]  # You can refine this to [Microsoft.Office.Interop.Excel.Workbook] if strongly typed
     param (
-        [Parameter(Mandatory,
-			ValueFromPipeline)]
+        [Parameter(Mandatory, ValueFromPipeline)]
         [object]$Excel
-	)
-	return $Excel.Workbooks.add()
+    )
+
+    if (-not ($Excel -and $Excel.Workbooks)) {
+        throw "Invalid Excel object or missing Workbooks collection."
+    }
+
+    return $Excel.Workbooks.Add()
 }
 
 function Add-ExcelWorksheet {
 <#
-	.SYNOPSIS
-		Adds a new excel worksheet to an excel workbook
-		
+    .SYNOPSIS
+        Adds a new Excel worksheet to an Excel workbook.
+
     .DESCRIPTION
-		This function will add a excel worksheet to a excel workbook
-	
-	.PARAMETER Workbook
-		The workbook to add a worksheet to
-	
-	.EXAMPLE
-		$Worksheet = Add-ExcelWorksheet $Workbook
-	
-	.EXAMPLE
-		$Worksheet = Add-ExcelWorksheet -workbook $Workbook
+        This function adds a new worksheet to a valid Excel workbook object.
+        It assumes the workbook exposes a Worksheets collection.
 
-	.EXAMPLE
-		$Worksheet = $Workbook | Add-ExcelWorksheet
+    .PARAMETER Workbook
+        The Excel workbook COM object to which a worksheet will be added.
 
-	.INPUTS
-		$Excel as Excel.Application.Workbook
-	
-	.OUTPUTS
-		Excel.Application.Workbook.Worksheet
+    .EXAMPLE
+        $Worksheet = Add-ExcelWorksheet $Workbook
+
+    .EXAMPLE
+        $Worksheet = Add-ExcelWorksheet -Workbook $Workbook
+
+    .EXAMPLE
+        $Worksheet = $Workbook | Add-ExcelWorksheet
+
+    .INPUTS
+        [Microsoft.Office.Interop.Excel.Workbook]
+
+    .OUTPUTS
+        [Microsoft.Office.Interop.Excel.Worksheet]
 #>
-	[CmdletBinding()]
+    [CmdletBinding()]
+    [OutputType([object])]  # Can be refined to [Microsoft.Office.Interop.Excel.Worksheet] if strongly typed
     param (
-        [Parameter(Mandatory,
-			ValueFromPipeline)]
+        [Parameter(Mandatory, ValueFromPipeline)]
         [object]$Workbook
-	)
-	return $Workbook.Worksheets.Add()
+    )
+
+    if (-not ($Workbook -and $Workbook.Worksheets)) {
+        throw "Invalid Workbook object or missing Worksheets collection."
+    }
+
+    return $Workbook.Worksheets.Add()
 }
 
 function Add-Font {
 <#
     .SYNOPSIS
-		Installs a font from a font file
-			 
-	.DESCRIPTION
-		This function installs a font from a font file
+        Installs a font using Shell.Application COM method.
 
-	.PARAMETER Path
-		The path of the font file
-	
-	.EXAMPLE
-		Add-Font 'c:\temp\cgtr66w.ttf'
-		
-	.EXAMPLE 
-		Add-Font -path 'c:\temp\cgtr66w.ttf'
+    .DESCRIPTION
+        Uses the Windows Fonts shell namespace (0x14) to install a font file.
+        Silent copy with no progress dialog.
 
-	.EXAMPLE
-		'c:\temp\cgtr66w.ttf' | Add-Font
-		
-	.INPUTS
-		Path as String
+    .PARAMETER Path
+        The full path to the font file (.ttf, .otf, etc.).
+
+    .EXAMPLE
+        'C:\Temp\cgtr66w.ttf' | Add-Font
 #>
-	[CmdletBinding()]
+    [CmdletBinding()]
     param (
-		[Parameter(Mandatory,
-			ValueFromPipeline)]
-		[string]$Path
-	)
-	$shellapp =  New-Object -ComoObject Shell.Application
-	$Fonts = $shellapp.NameSpace(0x14)
-	$Fonts.CopyHere($Path)
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [string]$Path
+    )
+
+    $resolvedPath = (Resolve-Path $Path).Path
+
+    try {
+        $shellapp = New-Object -ComObject Shell.Application
+        $Fonts = $shellapp.NameSpace(0x14)
+        $Fonts.CopyHere($resolvedPath, 0x10)
+    } catch {
+        throw "Font installation failed via COM. Error: $_"
+    }
 }
 
 function Add-Hotkey {
 <#
     .SYNOPSIS
-		Registers a global hotkey to a form.
-		
-		ALIAS
-			Hotkey-Add
-			 
-	.DESCRIPTION
-		This function registers a hotkey to a form of type vdsForm
-	 
-	.PARAMETER Form
-		The form to register the hotkey to.
-		
-	.EXAMPLE
-		Add-Hotkey $Form1 1 ((Get-VirtualKey Alt)+(Get-VirtualKey Control)) (Get-VirtualKey v)
-		function hotkeyEvent {
-			[CmdletBinding()]
-			param (
-				[Parameter(Mandatory)]
-				[string]$Event
-			)
-			switch ($Event) {
-				'1' {
-					#Process event here
-				}
-			}
-		}
-	
-	.EXAMPLE
-		Add-Hotkey -form $Form1 -registerindex 1 -ModifierVirtualKeys $null -VirtualKey (Get-VirtualKey F1)
-		function hotkeyEvent {
-			[CmdletBinding()]
-			param (
-				[Parameter(Mandatory)]
-				[string]$Event
-			)
-			switch ($Event) {
-				'1' {
-					#Process event here
-				}
-			}
-		}
-		
-	.EXAMPLE
-		$Form1 | Add-Hotkey -registerindex 1 -ModifierVirtualKeys $null -VirtualKey (Get-VirtualKey F1)
-		function hotkeyEvent {
-			[CmdletBinding()]
-			param (
-				[Parameter(Mandatory)]
-				[string]$Event
-			)
-			switch ($Event) {
-				'1' {
-					#Process event here
-				}
-			}
-		}
-		
-	.INPUTS
-		Form as vdsForm, RegisterIndex as Integer, 
-		ModifierVirtualKeys[] as Hexidecimal, 
-		VirtualKey as Hexidecimal
-	
-	.OUTPUTS
-		Registered Event
-	
-	.NOTES
-		The use of this function REQUIRES the event to be caught by the 
-		hotkeyEvent function which processes the event by hotkey index.
+        Registers a global hotkey to a form.
+
+    .ALIAS
+        Hotkey-Add
+
+    .DESCRIPTION
+        This function registers a hotkey to a form of type vdsForm.
+
+    .PARAMETER Form
+        The form to register the hotkey to.
+
+    .EXAMPLE
+        Add-Hotkey $Form1 1 ((Get-VirtualKey Alt)+(Get-VirtualKey Control)) (Get-VirtualKey v)
+        function hotkeyEvent {
+            [CmdletBinding()]
+            param (
+                [Parameter(Mandatory)]
+                [string]$Event
+            )
+            switch ($Event) {
+                '1' {
+                    #Process event here
+                }
+            }
+        }
+
+    .EXAMPLE
+        Add-Hotkey -Form $Form1 -RegisterIndex 1 -ModifierVirtualKeys $null -VirtualKey (Get-VirtualKey F1)
+
+    .EXAMPLE
+        $Form1 | Add-Hotkey -RegisterIndex 1 -ModifierVirtualKeys $null -VirtualKey (Get-VirtualKey F1)
+
+    .INPUTS
+        Form as vdsForm, RegisterIndex as Integer,
+        ModifierVirtualKeys as UInt32,
+        VirtualKey as UInt32
+
+    .OUTPUTS
+        Registered Event
+
+    .NOTES
+        The use of this function REQUIRES the event to be caught by the
+        hotkeyEvent function which processes the event by hotkey index.
 #>
-	[Alias("Hotkey-Add","Hotkey")]
-	[CmdletBinding()]
+    [Alias("Hotkey-Add", "Hotkey")]
+    [CmdletBinding()]
     param (
-        [Parameter(Mandatory,
-			ValueFromPipeline)]
+        [Parameter(Mandatory, ValueFromPipeline)]
         [vdsForm]$Form,
-		[Parameter(Mandatory)]
+
+        [Parameter(Mandatory)]
         [int]$RegisterIndex,
-		[string]$ModifierVirtualKeys,
-		[Parameter(Mandatory)]
-		[string]$VirtualKey
-	)
-	[vdsForm]::RegisterHotKey($Form.handle,$RegisterIndex,$ModifierVirtualKeys,$VirtualKey) | out-null
-	if ($global:hotkeyobject -ne $true) {
-		$hotkey = Add-CommonControl -Form $Form -ControlType 'label' -top 0 -left 0 -width 0 -height 0
-		$hotkey.Name = 'hotkey'
-		$hotkey.add_TextChanged({
-			if ($this.text -ne ""){
-				hotkeyEvent $this.text
-			}
-			$this.text = ""
-		})
-		$global:hotkeyobject = $true
-	}
+
+        [uint32]$ModifierVirtualKeys,
+
+        [Parameter(Mandatory)]
+        [uint32]$VirtualKey
+    )
+
+    [vdsForm]::RegisterHotKey($Form.handle, $RegisterIndex, $ModifierVirtualKeys, $VirtualKey) | Out-Null
+
+    if ($global:hotkeyobject -ne $true) {
+        $hotkey = Add-CommonControl -Form $Form -ControlType 'label' -top 0 -left 0 -width 0 -height 0
+        $hotkey.Name = 'hotkey'
+        $hotkey.add_TextChanged({
+            if ($this.text -ne "") {
+                hotkeyEvent $this.text
+            }
+            $this.text = ""
+        })
+        $global:hotkeyobject = $true
+    }
 }
 
 function Add-MenuColumn {
 <#
-	.SYNOPSIS
-		Adds a Menu column header to an existing MenuStrip control.
-		
+    .SYNOPSIS
+        Adds a Menu column header to an existing MenuStrip control.
+
     .DESCRIPTION
-		This function will add a menu column header tool strip menu item to an 
-		existing menustrip control.
-	
-	.PARAMETER MenuStrip
-		The menustrip to add a column header to.
-	
-	.PARAMETER Title
-		The title to apply to the column header.
-	
-	.EXAMPLE
-		$FileColumn = Add-MenuColumn $MenuStrip1 "&File"
-		
-	.EXAMPLE
-		$FileColumn = Add-MenuColumn -MenuStrip $MenuStrip1 -Title "&File"
-		
-	.EXAMPLE
-		$FileColumn = $MenuStrip1 | Add-MenuColumn -Title "&File"
+        This function will add a menu column header tool strip menu item to an 
+        existing MenuStrip control.
 
-	.INPUTS
-		MenuStrip as System Windows Forms MenuStrip, Title as String
+    .PARAMETER MenuStrip
+        The MenuStrip to add a column header to.
 
-	.OUTPUTS
-		System Windows Forms ToolStripMenuItem
+    .PARAMETER Title
+        The title to apply to the column header.
+
+    .EXAMPLE
+        $FileColumn = Add-MenuColumn $MenuStrip1 "&File"
+
+    .EXAMPLE
+        $FileColumn = Add-MenuColumn -MenuStrip $MenuStrip1 -Title "&File"
+
+    .EXAMPLE
+        $FileColumn = $MenuStrip1 | Add-MenuColumn -Title "&File"
+
+    .INPUTS
+        MenuStrip as System.Windows.Forms.MenuStrip, Title as String
+
+    .OUTPUTS
+        System.Windows.Forms.ToolStripMenuItem
 #>
-	[CmdletBinding()]
+    [CmdletBinding()]
+    [OutputType([System.Windows.Forms.ToolStripMenuItem])]
     param (
-		[Parameter(Mandatory,
-			ValueFromPipeline)]
-		[System.Windows.Forms.MenuStrip]$MenuStrip,
-		[string]$Title
-	)
-	$MenuColumn = new-object System.Windows.Forms.ToolStripMenuItem
-	$MenuColumn.Name = $Title
-	$MenuColumn.Text = $Title
-	$MenuStrip.Items.add($MenuColumn) | Out-Null
-	return $MenuColumn
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [System.Windows.Forms.MenuStrip]$MenuStrip,
+        [string]$Title
+    )
+
+    $MenuColumn = New-Object System.Windows.Forms.ToolStripMenuItem
+    $MenuColumn.Name = $Title
+    $MenuColumn.Text = $Title
+    $MenuStrip.Items.Add($MenuColumn) | Out-Null
+    return $MenuColumn
 }
 
-function Add-MenuColumnSeperator {
+function Add-MenuColumnSeparator {
 <#
-	.SYNOPSIS
-		Adds a seperator in the rows of a menu column.
-		
+    .SYNOPSIS
+        Adds a separator in the rows of a menu column.
+
     .DESCRIPTION
-		This function will add a seperator in the rows of a menu column.
-	
-	.PARAMETER MenuColumn
-		The MenuColumn to add a seperator to.
-	
-	.EXAMPLE
-		$Sep1 = Add-MenuColumnSeperator $FileMenu
-	
-	.EXAMPLE
-		$Sep1 = Add-MenuColumnSeperator -MenuColumn $FileMenu
-	
-	.EXAMPLE
-		$Sep1 = $FileMenu | Add-MenuColumnSeperator
+        This function adds a ToolStripSeparator to the DropDownItems of a ToolStripMenuItem.
 
-	.INPUTS
-		MenuColumn as System Windows Forms MenuStripItem
+    .PARAMETER MenuColumn
+        The ToolStripMenuItem to add a separator to.
 
-	.OUTPUTS
-		System.Windows.Forms.ToolStripSeparator
+    .EXAMPLE
+        $Sep1 = Add-MenuColumnSeparator $FileMenu
+
+    .EXAMPLE
+        $Sep1 = Add-MenuColumnSeparator -MenuColumn $FileMenu
+
+    .EXAMPLE
+        $Sep1 = $FileMenu | Add-MenuColumnSeparator
+
+    .INPUTS
+        System.Windows.Forms.ToolStripMenuItem
+
+    .OUTPUTS
+        System.Windows.Forms.ToolStripSeparator
 #>
-		[CmdletBinding()]
+    [CmdletBinding()]
+    [OutputType([System.Windows.Forms.ToolStripSeparator])]
     param (
-		[Parameter(Mandatory,
-			ValueFromPipeline)]
-		[System.Windows.Forms.ToolStripMenuItem]$MenuColumn
-		
-	)
-	$item = new-object System.Windows.Forms.ToolStripSeparator
-	$MenuColumn.DropDownItems.Add($item) | Out-Null
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [System.Windows.Forms.ToolStripMenuItem]$MenuColumn
+    )
+
+    $item = New-Object System.Windows.Forms.ToolStripSeparator
+    $null = $MenuColumn.DropDownItems.Add($item)
+    return $item
 }
 
 function Add-MenuRow {
 <#
-	.SYNOPSIS
-		Adds a Menu row to an existing menu column header or context menu.
-		
+    .SYNOPSIS
+        Adds a menu row item to an existing menu column or context menu.
+
     .DESCRIPTION
-		This function will add a menu column header tool strip menu item to an 
-		existing menustrip control or context menu.
-	
-	.PARAMETER MenuStrip
-		The menustrip to add a column header to.
-	
-	.PARAMETER Title
-		The title to apply to the column header.
-	
-	.PARAMETER Image
-		The image from file or stream to apply to the menu row item.
+        This function adds a ToolStripMenuItem to the DropDownItems of a ToolStripMenuItem
+        or ContextMenuStrip, optionally with an image and shortcut key.
 
-	.PARAMETER ShortCutKeys
-		The ShortCutKey to apply to the menu row item.
+    .PARAMETER MenuColumn
+        The ToolStripMenuItem or ContextMenuStrip to add the row to.
 
-	.EXAMPLE
-		$FileMenuRow1 = Add-MenuRow $FileMenu "&New"
-	
-	.EXAMPLE
-		$FileMenuSubRow1 = Add-MenuRow $FileMenuRow1 "&Text File"
-	
-	.EXAMPLE
-		$FileMenuRow1 = Add-MenuRow $FileMenu "&New" -Image "c:\images\new.png" -ShortCutKeys "Ctrl+N"
+    .PARAMETER Title
+        The display text for the menu row.
 
-	.EXAMPLE
-		$FileMenuRow1 = Add-MenuRow -MenuColumn $FileMenu -Title "&New" -Image "c:\images\new.png" -ShortCutKeys "Ctrl+N"
-		
-	.EXAMPLE
-		$FileMenuRow1 = $FileMenu | Add-MenuRow -Title "&New" -Image "c:\images\new.png" -ShortCutKeys "Ctrl+N"
-		
-	.INPUTS
-		MenuStrip as System Windows Forms MenuStrip, Title as String
+    .PARAMETER Image
+        The image path or stream source to apply to the menu row item.
 
-	.OUTPUTS
-		System Windows Forms ToolStripMenuItem
+    .PARAMETER ShortCutKeys
+        The shortcut key combination to assign to the menu row item.
+
+    .EXAMPLE
+        $FileMenuRow1 = Add-MenuRow $FileMenu "&New"
+
+    .EXAMPLE
+        $FileMenuSubRow1 = Add-MenuRow $FileMenuRow1 "&Text File"
+
+    .EXAMPLE
+        $FileMenuRow1 = Add-MenuRow $FileMenu "&New" -Image "c:\images\new.png" -ShortCutKeys "Ctrl+N"
+
+    .EXAMPLE
+        $FileMenuRow1 = Add-MenuRow -MenuColumn $FileMenu -Title "&New" -Image "c:\images\new.png" -ShortCutKeys "Ctrl+N"
+
+    .EXAMPLE
+        $FileMenuRow1 = $FileMenu | Add-MenuRow -Title "&New" -Image "c:\images\new.png" -ShortCutKeys "Ctrl+N"
+
+    .INPUTS
+        System.Windows.Forms.ToolStripMenuItem, String
+
+    .OUTPUTS
+        System.Windows.Forms.ToolStripMenuItem
 #>
-	[CmdletBinding()]
+    [CmdletBinding()]
+    [OutputType([System.Windows.Forms.ToolStripMenuItem])]
     param (
-		[Parameter(Mandatory,
-			ValueFromPipeline)]
-		[System.Windows.Forms.ToolStripMenuItem]$MenuColumn,
-		[string]$Title,
-		[string]$Image,
-		[string]$ShortCutKeys
-	)
-	
-	$MenuRow = New-Object System.Windows.Forms.ToolStripMenuItem
-	if ($Image -ne ""){
-		if ((Get-SubString $Image 0 2) -eq 'ht') {
-			$MenuRow.Image = Get-ImageFromStream $Image
-		}
-		else{
-			$MenuRow.Image = Get-ImageFromFile $Image
-		}
-	}
-	if ($ShortCutKeys -ne ""){
-		$MenuRow.ShortCutKeys = $ShortCutKeys
-		$MenuRow.ShowShortCutKeys = $True
-	}
-	$MenuRow.Name = $Title
-	$MenuRow.Text = $Title
-	$MenuColumn.DropDownItems.Add($MenuRow) | Out-Null
-	return $MenuRow
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [System.Windows.Forms.ToolStripMenuItem]$MenuColumn,
+
+        [string]$Title,
+        [string]$Image,
+        [string]$ShortCutKeys
+    )
+
+    $MenuRow = New-Object System.Windows.Forms.ToolStripMenuItem
+
+    if ($Image -ne "") {
+        if ((Get-SubString $Image 0 2) -eq 'ht') {
+            $MenuRow.Image = Get-ImageFromStream $Image
+        } else {
+            $MenuRow.Image = Get-ImageFromFile $Image
+        }
+    }
+
+    if ($ShortCutKeys -ne "") {
+        $MenuRow.ShortCutKeys = $ShortCutKeys
+        $MenuRow.ShowShortCutKeys = $true
+    }
+
+    $MenuRow.Name = $Title
+    $MenuRow.Text = $Title
+    $null = $MenuColumn.DropDownItems.Add($MenuRow)
+
+    return $MenuRow
 }
 
 function Add-MenuStrip {
 <#
-	.SYNOPSIS
-		Adds a MenuStrip control to an existing form.
-		
+    .SYNOPSIS
+        Adds a MenuStrip control to an existing form.
+
     .DESCRIPTION
-		This function will add a MenuStrip control to a specified existing form.
-	
-	.PARAMETER Form
-		The form to add a MenuStrip to.
-	
-	.EXAMPLE
-		$MenuStrip1 = Add-MenuStrip $Form1
-		
-	.EXAMPLE
-		$MenuStrip1 = Add-MenuStrip -Form $Form1
-		
-	.EXAMPLE
-		$MenuStrip1 = $Form1 | Add-MenuStrip
+        This function adds a MenuStrip control to a specified form and sets its image scaling size.
 
-	.INPUTS
-		Form as Object
+    .PARAMETER Form
+        The form to add a MenuStrip to.
 
-	.OUTPUTS
-		System Windows Forms MenuStrip
+    .EXAMPLE
+        $MenuStrip1 = Add-MenuStrip $Form1
+
+    .EXAMPLE
+        $MenuStrip1 = Add-MenuStrip -Form $Form1
+
+    .EXAMPLE
+        $MenuStrip1 = $Form1 | Add-MenuStrip
+
+    .INPUTS
+        System.Windows.Forms.Form
+
+    .OUTPUTS
+        System.Windows.Forms.MenuStrip
 #>
-	[CmdletBinding()]
+    [CmdletBinding()]
+    [OutputType([System.Windows.Forms.MenuStrip])]
     param (
-		[Parameter(Mandatory,
-			ValueFromPipeline)]
-		[object]$Form
-	)
-	$MenuStrip = new-object System.Windows.Forms.MenuStrip
-	$MenuStrip.imagescalingsize = new-object System.Drawing.Size([int]($ctscale * 16),[int]($ctscale * 16))
-	$Form.Controls.Add($MenuStrip)
-	return $MenuStrip
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [object]$Form
+    )
+
+    $MenuStrip = New-Object System.Windows.Forms.MenuStrip
+    $MenuStrip.ImageScalingSize = New-Object System.Drawing.Size([int]($ctscale * 16), [int]($ctscale * 16))
+    $null = $Form.Controls.Add($MenuStrip)
+
+    return $MenuStrip
 }
 
 function Add-Shift {
@@ -772,7 +770,7 @@ function Add-Shift {
 			Shift
      
     .DESCRIPTION
-		This function will prepend a the string parameter with the shift key
+		This function will prepend the string parameter with the shift key
 		commonly specified by the '+' character.
 	
 	.PARAMETER TextValue
@@ -811,293 +809,328 @@ function Add-Shift {
 
 function Add-StatusStrip {
 <#
-	.SYNOPSIS
-		Creates a StatusStrip control
-		
+    .SYNOPSIS
+        Creates a StatusStrip control and adds it to a form-like container.
+
     .DESCRIPTION
-		This function creates a StatusStrip control to be added to a form.
-	
-	.PARAMETER Form
-		The vdsForm to add the StatusStrip to.
+        This function creates a System.Windows.Forms.StatusStrip control and adds it to the specified form or compatible UI container.
+        It also adds a default ToolStripStatusLabel to the strip for immediate use.
 
-	.EXAMPLE
-		$StatusStrip1 = Add-StatusStrip $Form1
-		$StatusStrip1.items[0].Text = "Ready"
-		
-	.EXAMPLE
-		$StatusStrip1 = Add-StatusStrip -Form $Form1
-		$StatusStrip1.items[0].Text = "Ready"	
-		
-	.EXAMPLE
-		$StatusStrip1 = $Form1 | Add-StatusStrip
-		$StatusStrip1.items[0].Text = "Ready"	
+    .PARAMETER Form
+        The form or UI container object to which the StatusStrip will be added.
+        Must expose a .Controls property compatible with Windows Forms.
 
-	.INPUTS
-		Form as Object
+    .EXAMPLE
+        $StatusStrip1 = Add-StatusStrip $Form1
+        $StatusStrip1.Items[0].Text = "Ready"
 
-	.OUTPUTS
-		System Windows Forms StatusStrip with System Windows Forms ToolStripStatusLabel as a child object.	
+    .EXAMPLE
+        $StatusStrip1 = Add-StatusStrip -Form $Form1
+        $StatusStrip1.Items[0].Text = "Ready"
+
+    .EXAMPLE
+        $StatusStrip1 = $Form1 | Add-StatusStrip
+        $StatusStrip1.Items[0].Text = "Ready"
+
+    .INPUTS
+        [object] - Must expose a .Controls property compatible with Windows Forms.
+
+    .OUTPUTS
+        System.Windows.Forms.StatusStrip containing a ToolStripStatusLabel.
+
+    .NOTES
+        Primarily intended for use with System.Windows.Forms.Form or vdsForm containers.
 #>
-	[CmdletBinding()]
+    [CmdletBinding()]
     param (
-		[Parameter(Mandatory,
-			ValueFromPipeline)]
-		[object]$Form
-	)
-	$statusstrip = new-object System.Windows.Forms.StatusStrip
-	$Form.controls.add($statusstrip)
-	$ToolStripStatusLabel = New-Object System.Windows.Forms.ToolStripStatusLabel
-	$statusstrip.Items.AddRange($ToolStripStatusLabel)
-	return $statusstrip
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [object]$Form
+    )
+
+    # Validate that the input object has a .Controls property
+    if (-not ($Form.PSObject.Properties['Controls'])) {
+        throw "Input object must expose a .Controls property compatible with Windows Forms."
+    }
+
+    $statusstrip = New-Object System.Windows.Forms.StatusStrip
+    $Form.Controls.Add($statusstrip)
+
+    $ToolStripStatusLabel = New-Object System.Windows.Forms.ToolStripStatusLabel
+    $statusstrip.Items.Add($ToolStripStatusLabel)
+
+    return $statusstrip
 }
 
-function Add-Tab() {
+function Add-Tab {
 <#
     .SYNOPSIS
-		Sends the tab key 
+        Returns the tab key character for use in SendKeys-style input.
 
-		ALIASES
-			Tab
-     
+    .ALIASES
+        Tab
+
     .DESCRIPTION
-		This function sends the tab key
-		
-	.EXAMPLE
-		Send-Window (Get-Window notepad) Add-Tab
-	
-	.OUTPUTS
-		String
-		
-	.NOTES
-		Only useful with 'Send-Window'.
-#>	
-	[Alias("Tab")]
-	param()
-    return "`t" 
+        This function returns the tab key character (`t), which can be used with Send-Window to simulate a tab key press.
+
+    .EXAMPLE
+        Send-Window (Get-Window notepad) (Add-Tab)
+
+    .OUTPUTS
+        String
+
+    .NOTES
+        Only useful with 'Send-Window'.
+#>
+    [Alias("Tab")]
+    param()
+    return "`t"
 }
 
 function Add-ToolStrip {
 <#
-	.SYNOPSIS
-		Adds a ToolStrip to an existing Form.
-		
+    .SYNOPSIS
+        Adds a ToolStrip to an existing form or compatible UI container.
+
     .DESCRIPTION
-		This function adds a ToolStrip to an existing Form.
-	
-	.PARAMETER Form
-		The Form to add the ToolStrip to.
-	
-	.EXAMPLE
-		$ToolStrip1 = Add-ToolStrip $Form1
-	
-	.EXAMPLE
-		$ToolStrip1 = Add-ToolStrip -Form $Form1
+        Creates a System.Windows.Forms.ToolStrip, applies DPI-aware scaling,
+        and adds it to the specified form or container. Compatible with both
+        native Windows Forms and vdsForm abstractions.
 
-	.EXAMPLE
-		$ToolStrip1 = $Form1 | Add-ToolStrip
-		
-	.INPUTS
-		Form as Object
+    .PARAMETER Form
+        The form or container object to which the ToolStrip will be added.
 
-	.OUTPUTS
-		System Windows Forms ToolStrip
+    .EXAMPLE
+        $ToolStrip1 = Add-ToolStrip $Form1
+
+    .EXAMPLE
+        $ToolStrip1 = Add-ToolStrip -Form $Form1
+
+    .EXAMPLE
+        $ToolStrip1 = $Form1 | Add-ToolStrip
+
+    .INPUTS
+        [object]
+
+    .OUTPUTS
+        System.Windows.Forms.ToolStrip
 #>
-		[CmdletBinding()]
+    [CmdletBinding()]
     param (
-		[Parameter(Mandatory,
-			ValueFromPipeline)]
-		[object]$Form
-	)
-	$ToolStrip = New-Object System.Windows.Forms.ToolStrip
-	$ToolStrip.imagescalingsize = new-object System.Drawing.Size([int]($ctscale * 16),[int]($ctscale * 16))
-	$ToolStrip.Height = $ToolStrip.Height * $ctscale
-	$Form.Controls.Add($ToolStrip)
-	return $ToolStrip
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [object]$Form
+    )
+
+    $ToolStrip = New-Object System.Windows.Forms.ToolStrip
+    $ToolStrip.ImageScalingSize = New-Object System.Drawing.Size(
+        [int]($ctscale * 16),
+        [int]($ctscale * 16)
+    )
+    $ToolStrip.Height = [int]($ToolStrip.Height * $ctscale)
+
+    $Form.Controls.Add($ToolStrip)
+    return $ToolStrip
 }
 
 function Add-ToolStripItem {
 <#
-	.SYNOPSIS
-		Adds a ToolStripItem to an existing ToolStrip.
-		
+    .SYNOPSIS
+        Adds a ToolStripButton to an existing ToolStrip.
+
     .DESCRIPTION
-		This function adds a ToolStripItem to an existing ToolStrip.
-	
-	.PARAMETER Form
-		The Form to add the ToolStrip to.
-	
-	.EXAMPLE
-		$ToolStripItem1 = Add-ToolStripItem 
-	
-	.EXAMPLE
-		$ToolStrip1 = Add-ToolStrip -Form $Form1
+        This function adds a ToolStripButton to a specified ToolStrip.
+        The button is configured with name, image, tooltip, and visible text.
+        It must be referenced by name or index from the parent ToolStrip after creation.
 
-	.EXAMPLE
-		$ToolStrip1 = $Form1 | Add-ToolStrip
-		
-	.INPUTS
-		ToolStrip as System.Windows.Forms.ToolStrip, Name as String, Image as String, ToolTipText as String, VisibleText as String
+    .PARAMETER ToolStrip
+        The ToolStrip control to which the button will be added.
 
-	.NOTES
-		This function does not return an output because after a ToolStripButton
-		is initialized it must be referenced by name or index by the parent 
-		ToolStrip object, this is why Name is required. If it where to be 
-		returned from this function it would have to be as global, which is 
-		outside of style. This is a problem with non-standard behavior of the 
-		ToolStrip object and would need fixed by the Microsoft.NET team.
-		.Example
-			$ToolStrip1.Items["Undo"].Add_Click({Write-Host "Process Undo"})
+    .PARAMETER Name
+        The internal name of the ToolStripButton. Required for later reference.
+
+    .PARAMETER Image
+        The image path or URL to assign to the button.
+
+    .PARAMETER ToolTipText
+        The tooltip text displayed when hovering over the button.
+
+    .PARAMETER VisibleText
+        The text label shown on the button.
+
+    .EXAMPLE
+        $ToolStrip1 = Add-ToolStrip -Form $Form1
+        Add-ToolStripItem -ToolStrip $ToolStrip1 -Name "Undo" -Image "undo.png" -ToolTipText "Undo last action" -VisibleText "Undo"
+
+    .EXAMPLE
+        $ToolStrip1.Items["Undo"].Add_Click({ Write-Host "Process Undo" })
+
+    .INPUTS
+        System.Windows.Forms.ToolStrip, String
+
+    .OUTPUTS
+        None
+
+    .NOTES
+        This function does not return the ToolStripButton object because it must be referenced by name or index from the parent ToolStrip.
+        Returning it would require global exposure, which is outside of style.
+        This limitation stems from non-standard behavior in the ToolStrip object and would need to be addressed by the Microsoft.NET team.
 #>
-	[CmdletBinding()]
+    [CmdletBinding()]
     param (
-		[Parameter(Mandatory,
-			ValueFromPipeline)]
-		[System.Windows.Forms.ToolStrip]$ToolStrip,
-		[Parameter(Mandatory)]
-		[string]$Name,
-		[string]$Image,
-		[string]$ToolTipText,
-		[string]$VisibleText
-	)
-    $btn = new-object System.Windows.Forms.ToolStripButton
-	$btn.text = $VisibleText
-	$btn.Name = $Name
-	if ((Get-Substring $Image 0 2) -eq 'ht') {
-		$btn.image = Get-ImageFromStream $Image
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [System.Windows.Forms.ToolStrip]$ToolStrip,
+
+        [Parameter(Mandatory)]
+        [string]$Name,
+
+        [string]$Image,
+        [string]$ToolTipText,
+        [string]$VisibleText
+    )
+
+    $btn = New-Object System.Windows.Forms.ToolStripButton
+    $btn.Text = $VisibleText
+    $btn.Name = $Name
+
+    if ((Get-Substring $Image 0 2) -eq 'ht') {
+        $btn.Image = Get-ImageFromStream $Image
+    } else {
+        $btn.Image = Get-ImageFromFile $Image
     }
-	else {
-    $btn.image = Get-ImageFromFile $Image
-    }
-	$btn.ToolTipText = $ToolTipText
-	$ToolStrip.Items.Add($btn)
+
+    $btn.ToolTipText = $ToolTipText
+    $ToolStrip.Items.Add($btn)
 }
 
-function Add-ToolStripSeperator {
+function Add-ToolStripSeparator {
 <#
-	.SYNOPSIS
-		Adds a seperator in the items of a tool strip.
-		
+    .SYNOPSIS
+        Adds a separator to the items of a ToolStrip.
+
     .DESCRIPTION
-		This function will add a seperator in the items of a tool strip.
-	
-	.PARAMETER ToolStrip
-		The ToolStrip to add a seperator to.
-	
-	.EXAMPLE
-		$Sep1 = Add-ContextMenuStripSeperator $TaskIcon1ContextMenu
-	
-	.EXAMPLE
-		$Sep1 = Add-ContextMenuStripSeperator -ContextMenuStrip $TaskIcon1ContextMenu
-	
-	.EXAMPLE
-		$Sep1 = $TaskIcon1ContextMenu | Add-ContextMenuStripSeperator
+        This function adds a ToolStripSeparator to the specified ToolStrip.
 
-	.INPUTS
-		ContextMenuStrip as System.Windows.Forms.ContextMenuStrip
+    .PARAMETER ToolStrip
+        The ToolStrip control to which the separator will be added.
 
-	.OUTPUTS
-		System.Windows.Forms.ToolStripSeparator
+    .EXAMPLE
+        $Sep1 = Add-ToolStripSeparator $ToolStrip1
+
+    .EXAMPLE
+        $Sep1 = Add-ToolStripSeparator -ToolStrip $ToolStrip1
+
+    .EXAMPLE
+        $Sep1 = $ToolStrip1 | Add-ToolStripSeparator
+
+    .INPUTS
+        System.Windows.Forms.ToolStrip
+
+    .OUTPUTS
+        System.Windows.Forms.ToolStripSeparator
 #>
-		[CmdletBinding()]
+    [CmdletBinding()]
     param (
-		[Parameter(Mandatory,
-			ValueFromPipeline)]
-		[System.Windows.Forms.ToolStrip]$ToolStrip
-	)
-	$item = new-object System.Windows.Forms.ToolStripSeparator
-	$ToolStrip.Items.Add($item) | Out-Null
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [System.Windows.Forms.ToolStrip]$ToolStrip
+    )
+
+    $item = New-Object System.Windows.Forms.ToolStripSeparator
+    $ToolStrip.Items.Add($item) | Out-Null
 }
 
 function Add-WPFControl {
 <#
     .SYNOPSIS
-		Creates a control inside of a wpf container object
-			 
-	.DESCRIPTION
-		This function creates a control inside of a wpf container object
-		
-	.PARAMETER ControlType
-		The type of control to add from the following validated list:
-		Button, Calendar, CheckBox,ComboBox, 
-		ComboBoxItem, DatePicker, DocumentViewer, Expander, 
-		FlowDocumentReader, GroupBox, Hyperlink, Image, InkCanvas, 
-		Label, ListBox, ListBoxItem, Menu, MenuItem, PasswordBox, 
-		ProgressBar, RadioButton, RichTextBox, SrollViewer,
-		SinglePageViewer,Slider, TabControl, TabItem, Table, 
-		TextBlock, TextBox, ToolBar, ToolTip, TreeView, 
-		TreeViewItem, WebBrowser
-		
-	.PARAMETER Container
-		The container to add the control to
-		
-	.PARAMETER Text
-		The text to display on the control
-		
-	.PARAMETER Top
-		The top position for the control
+        Creates a control inside a WPF container object.
 
-	.PARAMETER Left
-		The left position for the control
-		
-	.PARAMETER Height
-		The height for the control
-	
-	.PARAMETER Width
-		The width for the control
-	
-	.EXAMPLE
-		$Button1 = Add-WPFControl 'Button' 'Grid1' 'Button1' 20 20 20 200
-		
-	.EXAMPLE
-		$Button1 = Add-WPFControl -ControlType 'Button' -Container 'Grid1' -Text 'Button1' -top 20 -left 20 -height 20 -width 200
+    .DESCRIPTION
+        This function creates a WPF control of the specified type and inserts it into the given container.
+        Positioning and sizing are applied via Margin, Height, and Width.
 
-	.EXAMPLE
-		$Button1 = 'Button' | Add-WPFControl -Container 'Grid1' -Text 'Button1' -top 20 -left 20 -height 20 -width 200
-		
-	.INPUTS
-		ControlType as ValidatedString, Container as Object, Text as String, Top as String, Left as String, Height as String, Width as String
-	
-	.OUTPUTS
-		System.Windows.Controls.$ControlType
+    .PARAMETER ControlType
+        The type of control to add. Must be one of the validated types:
+        Button, Calendar, CheckBox, ComboBox, ComboBoxItem, DatePicker, DocumentViewer, Expander,
+        FlowDocumentReader, GroupBox, Hyperlink, Image, InkCanvas, Label, ListBox, ListBoxItem,
+        Menu, MenuItem, PasswordBox, ProgressBar, RadioButton, RichTextBox, ScrollViewer,
+        SinglePageViewer, Slider, TabControl, TabItem, Table, TextBlock, TextBox, ToolBar,
+        ToolTip, TreeView, TreeViewItem, WebBrowser
+
+    .PARAMETER Container
+        The WPF container to which the control will be added.
+
+    .PARAMETER Text
+        The text to display on the control.
+
+    .PARAMETER Top
+        The top position for the control.
+
+    .PARAMETER Left
+        The left position for the control.
+
+    .PARAMETER Height
+        The height of the control.
+
+    .PARAMETER Width
+        The width of the control.
+
+    .EXAMPLE
+        $Button1 = Add-WPFControl 'Button' $Grid1 'Button1' 20 20 20 200
+
+    .EXAMPLE
+        $Button1 = Add-WPFControl -ControlType 'Button' -Container $Grid1 -Text 'Button1' -Top 20 -Left 20 -Height 20 -Width 200
+
+    .EXAMPLE
+        $Button1 = 'Button' | Add-WPFControl -Container $Grid1 -Text 'Button1' -Top 20 -Left 20 -Height 20 -Width 200
+
+    .INPUTS
+        ControlType as ValidatedString, Container as Object, Text as String, Top as String, Left as String, Height as String, Width as String
+
+    .OUTPUTS
+        System.Windows.Controls.$ControlType
 #>
-	[Alias("Assert-WPFAddControl")]
-	[CmdletBinding()]
+    [Alias("Assert-WPFAddControl")]
+    [CmdletBinding()]
     param (
-		[Parameter(Mandatory,
-			ValueFromPipeline)]
-		[ValidateSet('Button', 'Calendar', 'CheckBox','ComboBox', 
-		'ComboBoxItem', 'DatePicker', 'DocumentViewer', 'Expander', 
-		'FlowDocumentReader', 'GroupBox', 'Hyperlink', 'Image', 'InkCanvas', 
-		'Label', 'ListBox', 'ListBoxItem', 'Menu', 'MenuItem', 'PasswordBox', 
-		'ProgressBar', 'RadioButton', 'RichTextBox', 'SrollViewer',
-		'SinglePageViewer','Slider', 'TabControl', 'TabItem', 'Table', 
-		'TextBlock', 'TextBox', 'ToolBar', 'ToolTip', 'TreeView', 
-		'TreeViewItem', 'WebBrowser')]
-		[string[]]$ControlType,
-		[Parameter(Mandatory)]
-		[object]$Container,
-		[Parameter(Mandatory)]
-		[string]$Text,
-		[Parameter(Mandatory)]
-		[string]$Top,
-		[Parameter(Mandatory)]
-		[string]$Left,
-		[Parameter(Mandatory)]
-		[string]$Height,
-		[Parameter(Mandatory)]
-		[string]$Width
-	)
-	$control = new-object System.Windows.Controls.$ControlType
-	$control.Content = "$Text"
-	$Container.Children.Insert($Container.Children.Count, $control)
-	$control.VerticalAlignment = "Top"
-	$control.HorizontalAlignment = "Left"
-	$control.Margin = "$Left,$Top,0,0"
-	$control.Height = "$Height"
-	$control.Width = "$Width"
-	return $control
-}
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [ValidateSet('Button', 'Calendar', 'CheckBox', 'ComboBox',
+        'ComboBoxItem', 'DatePicker', 'DocumentViewer', 'Expander',
+        'FlowDocumentReader', 'GroupBox', 'Hyperlink', 'Image', 'InkCanvas',
+        'Label', 'ListBox', 'ListBoxItem', 'Menu', 'MenuItem', 'PasswordBox',
+        'ProgressBar', 'RadioButton', 'RichTextBox', 'ScrollViewer',
+        'SinglePageViewer', 'Slider', 'TabControl', 'TabItem', 'Table',
+        'TextBlock', 'TextBox', 'ToolBar', 'ToolTip', 'TreeView',
+        'TreeViewItem', 'WebBrowser')]
+        [string]$ControlType,
 
+        [Parameter(Mandatory)]
+        [object]$Container,
+
+        [Parameter(Mandatory)]
+        [string]$Text,
+
+        [Parameter(Mandatory)]
+        [string]$Top,
+
+        [Parameter(Mandatory)]
+        [string]$Left,
+
+        [Parameter(Mandatory)]
+        [string]$Height,
+
+        [Parameter(Mandatory)]
+        [string]$Width
+    )
+
+    $control = New-Object "System.Windows.Controls.$ControlType"
+    $control.Content = $Text
+    $Container.Children.Insert($Container.Children.Count, $control)
+    $control.VerticalAlignment = "Top"
+    $control.HorizontalAlignment = "Left"
+    $control.Margin = "$Left,$Top,0,0"
+    $control.Height = $Height
+    $control.Width = $Width
+
+    return $control
+}
 function Assert-List {
 <#
     .SYNOPSIS
@@ -5090,11 +5123,11 @@ function Get-VirtualKey {
 	.OUTPUTS
 		Hex
 #>
-	[Alias("VKey")]
-	[CmdletBinding()]
-    param (
-        [Parameter(Mandatory,
-			ValueFromPipeline)]
+[Alias("VKey")]
+[CmdletBinding()]
+[OutputType([uint32])]
+param (
+    [Parameter(Mandatory, ValueFromPipeline)]
 		[ValidateSet('None', 'Alt', 'Control', 'Shift', 'WinKey', 'LBUTTON', 
 		'RBUTTON', 'CANCEL', 'MBUTTON', 'XBUTTON1', 'XBUTTON2', 'BACK', 'TAB',
 		'CLEAR', 'RETURN', 'SHIFT', 'CONTROL', 'MENU', 'PAUSE', 'CAPITAL', 
@@ -5120,7 +5153,7 @@ function Get-VirtualKey {
 		'OEM_4', 'OEM_5', 'OEM_6', 'OEM_7', 'OEM_8', 'OEM_102', 'PROCESSKEY', 
 		'PACKET', 'ATTN', 'CRSEL', 'EXSEL', 'EREOF', 'PLAY', 'ZOOM', 'NONAME', 
 		'PA1', 'OEM_CLEAR')]
-		[string[]]$VirtualKey
+		[string]$VirtualKey
     )
     switch($VirtualKey) {
         None{return 0}
@@ -10459,5 +10492,6 @@ function Write-InitializationFile {
 	}
 
 }
+
 
 
