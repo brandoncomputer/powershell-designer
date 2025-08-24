@@ -179,110 +179,117 @@ function Add-CommonControl {
 
 function Add-ContextMenuStrip {
 <#
-	.SYNOPSIS
-		Adds a ContextMenuStrip control to an existing object.
-		
+    .SYNOPSIS
+        Adds a ContextMenuStrip control to an existing object.
+
     .DESCRIPTION
-		This function will add a ContextMenuStrip control to a specified existing object.
-	
-	.PARAMETER Object
-		The object to add a ContextMenuStrip to.
-	
-	.EXAMPLE
-		$CMenuStrip1 = Add-ContextMenuStrip $Form1
-		
-	.EXAMPLE
-		$ContextMenuStrip1 = Add-MenuStrip -object $Taskicon1
-		
-	.EXAMPLE
-		$CMenuStrip1 = $Form1 | Add-MenuStrip
-		
-	.EXAMPLE
+        This function will add a ContextMenuStrip control to a specified existing object.
 
-	.INPUTS
-		Object as Object
+    .PARAMETER Object
+        The object to add a ContextMenuStrip to.
 
-	.OUTPUTS
-		System Windows Forms ContextMenuStrip
+    .EXAMPLE
+        $CMenuStrip1 = Add-ContextMenuStrip $Form1
+
+    .EXAMPLE
+        $ContextMenuStrip1 = Add-ContextMenuStrip -Object $Taskicon1
+
+    .EXAMPLE
+        $CMenuStrip1 = $Form1 | Add-ContextMenuStrip
+
+    .INPUTS
+        Object as Object
+
+    .OUTPUTS
+        System.Windows.Forms.ContextMenuStrip
 #>
-	[CmdletBinding()]
+    [CmdletBinding()]
     param (
-		[Parameter(Mandatory,
-			ValueFromPipeline)]
-		[object]$Object
-	)
-	$MenuStrip = new-object System.Windows.Forms.ContextMenuStrip
-	$MenuStrip.imagescalingsize = new-object System.Drawing.Size([int]($ctscale * 16),[int]($ctscale * 16))
-	$Object.ContextMenuStrip = $MenuStrip
-	return $MenuStrip
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [object]$Object
+    )
+
+    if (-not ($Object -is [System.Windows.Forms.Control])) {
+        throw "Object must be a Windows Forms control with a ContextMenuStrip property."
+    }
+
+    $MenuStrip = New-Object System.Windows.Forms.ContextMenuStrip
+    $MenuStrip.ImageScalingSize = New-Object System.Drawing.Size([int]($ctscale * 16), [int]($ctscale * 16))
+    $Object.ContextMenuStrip = $MenuStrip
+    return $MenuStrip
 }
 
-function Add-ContextMenuStripItem{
+function Add-ContextMenuStripItem {
 <#
-	.SYNOPSIS
-		Adds an item to a context menu strip.
-		
+    .SYNOPSIS
+        Adds an item to a context menu strip.
+
     .DESCRIPTION
-		This function will add an item to an existing context menu strip.
-	
-	.PARAMETER ContextMenuStrip
-		The ContextMenuStrip to add an item to.
-	
-	.PARAMETER Title
-		The title to apply to the item.
-		
-	.PARAMETER Image
-		The image from file or stream to apply to the menu row item.
+        This function will add an item to an existing context menu strip.
 
-	.PARAMETER ShortCutKeys
-		The ShortCutKey to apply to the menu row item.
+    .PARAMETER ContextMenuStrip
+        The ContextMenuStrip to add an item to.
 
-	.EXAMPLE
-		$ContextMenuStripRow1 = Add-ContextMenuStripItem $ContextMenuStrip1 "&New"
-	
-	.EXAMPLE
-		$ContextMenuStripRow1 = Add-ContextMenuStripItem $ContextMenuStrip1 "&New" -Image "c:\images\new.png" -ShortCutKeys "Ctrl+N"
+    .PARAMETER Title
+        The title to apply to the item.
 
-	.EXAMPLE
-		$ContextMenuStripRow1 = Add-ContextMenuStripItem -ContextMenuStrip $ContextMenuStrip1 -Title "&New" -Image "c:\images\new.png" -ShortCutKeys "Ctrl+N"
+    .PARAMETER Image
+        The image from file or stream to apply to the menu row item.
 
-	.EXAMPLE
-		$ContextMenuStripRow1 = $ContextMenuStrip1 | Add-ContextMenuStripItem -Title "&New" -Image "c:\images\new.png" -ShortCutKeys "Ctrl+N"
-		
-	.INPUTS
-		ContextMenuStrip as System Windows Forms ContextMenuStrip, Title as String, Image as String, ShortCutKeys as String
+    .PARAMETER ShortCutKeys
+        The ShortCutKey to apply to the menu row item.
 
-	.OUTPUTS
-		System Windows Forms ToolStripMenuItem
+    .EXAMPLE
+        $ContextMenuStripRow1 = Add-ContextMenuStripItem $ContextMenuStrip1 "&New"
+
+    .EXAMPLE
+        $ContextMenuStripRow1 = Add-ContextMenuStripItem $ContextMenuStrip1 "&New" -Image "c:\images\new.png" -ShortCutKeys "Ctrl+N"
+
+    .EXAMPLE
+        $ContextMenuStripRow1 = Add-ContextMenuStripItem -ContextMenuStrip $ContextMenuStrip1 -Title "&New" -Image "c:\images\new.png" -ShortCutKeys "Ctrl+N"
+
+    .EXAMPLE
+        $ContextMenuStripRow1 = $ContextMenuStrip1 | Add-ContextMenuStripItem -Title "&New" -Image "c:\images\new.png" -ShortCutKeys "Ctrl+N"
+
+    .INPUTS
+        ContextMenuStrip as System Windows Forms ContextMenuStrip, Title as String, Image as String, ShortCutKeys as String
+
+    .OUTPUTS
+        System Windows Forms ToolStripMenuItem
 #>
 
-	[CmdletBinding()]
+    [CmdletBinding()]
     param (
-		[Parameter(Mandatory,
-			ValueFromPipeline)]
-		[System.Windows.Forms.ContextMenuStrip]$ContextMenuStrip,
-		[string]$Title,
-		[string]$Image,
-		[string]$ShortCutKeys
-	)
-	
-	$MenuRow = New-Object System.Windows.Forms.ToolStripMenuItem
-	if ($Image -ne ""){
-		if ((Get-SubString $Image 0 2) -eq 'ht') {
-			$MenuRow.Image = Get-ImageFromStream $Image
-		}
-		else{
-			$MenuRow.Image = Get-ImageFromFile $Image
-		}
-	}
-	if ($ShortCutKeys -ne ""){
-		$MenuRow.ShortCutKeys = $ShortCutKeys
-		$MenuRow.ShowShortCutKeys = $True
-	}
-	$MenuRow.Name = $Title
-	$MenuRow.Text = $Title
-	$ContextMenuStrip.Items.add($MenuRow) | Out-Null
-	return $MenuRow
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [System.Windows.Forms.ContextMenuStrip]$ContextMenuStrip,
+        [string]$Title,
+        [string]$Image,
+        [string]$ShortCutKeys
+    )
+
+    $MenuRow = New-Object System.Windows.Forms.ToolStripMenuItem
+
+    if ($Image -ne "") {
+        try {
+            $MenuRow.Image = if ((Get-SubString $Image 0 2) -eq 'ht') {
+                Get-ImageFromStream $Image
+            } else {
+                Get-ImageFromFile $Image
+            }
+        } catch {
+            Write-Warning "Image load failed for '$Image'. Continuing without image."
+        }
+    }
+
+    if ($ShortCutKeys -ne "") {
+        $MenuRow.ShortCutKeys = $ShortCutKeys
+        $MenuRow.ShowShortCutKeys = $True
+    }
+
+    $MenuRow.Name = $Title
+    $MenuRow.Text = $Title
+    $ContextMenuStrip.Items.add($MenuRow) | Out-Null
+    return $MenuRow
 }
 
 function Add-ContextMenuStripSeperator {
@@ -10452,4 +10459,5 @@ function Write-InitializationFile {
 	}
 
 }
+
 
