@@ -1257,7 +1257,7 @@ Butter"
 	[Alias("List")]
 	[CmdletBinding()]
     param (
-		[Parameter(ValueFromPipeline)]
+		[Parameter(Mandatory)]
 		[object]$List,
         [Parameter(Mandatory)]
 		[ValidateSet('Add', 'Append', 'Assign', 'Clear', 'Create', 'Copy',
@@ -1265,7 +1265,7 @@ Butter"
 		'Dropfiles', 'Filelist', 'Folderlist', 'Fontlist', 'Loadfile', 
 		'Loadtext', 'Modules', 'Regkeys', 'Regvals', 'Savefile', 'Tasklist',
 		'Winlist')]
-        [string[]]$Assertion,
+        [string]$Assertion,
 		[string]$Parameter
 	)
     switch ($Assertion) {
@@ -1317,7 +1317,7 @@ Butter"
         dropfiles {
             if ($Parameter.Data.GetDataPresent([Windows.Forms.DataFormats]::FileDrop)) {
                 foreach ($filename in $Parameter.Data.GetData([Windows.Forms.DataFormats]::FileDrop)) {
-                    list add $List $filename
+                    Assert-List $List Add $filename
                 }
             }
         }#  list dropfiles $List1 $_
@@ -1385,506 +1385,548 @@ Butter"
         }
     }
 }
+
 function Assert-WPF {
 <#
     .SYNOPSIS
-		Transforms XAML string into a Windows Presentation Foundation window
-			 
-	.DESCRIPTION
-		This function transforms XAML string into a Windows Presentation 
-		Foundation window (ambiguous)
-		
-	.PARAMETER xaml
-		The source XAML string to transform
-	
-	.EXAMPLE
-		Assert-WPF $xaml
-		
-	.EXAMPLE
-		Assert-WPF -xaml $xaml
+        Transforms a XAML string into a Windows Presentation Foundation window.
 
-	.EXAMPLE
-		$xaml | Assert-WPF
-		
-	.INPUTS
-		xaml as String
-	
-	.OUTPUTS
-		Windows.Markup.XamlReader and Global Variables for Controls within the window by Control Name
+    .DESCRIPTION
+        This function parses and loads a XAML string into a live WPF window object.
+        It strips design-time attributes and exposes named controls as global variables
+        for direct access and manipulation.
+
+    .PARAMETER xaml
+        The source XAML string to transform.
+
+    .EXAMPLE
+        Assert-WPF $xaml
+
+    .EXAMPLE
+        Assert-WPF -xaml $xaml
+
+    .EXAMPLE
+        $xaml | Assert-WPF
+
+    .INPUTS
+        String
+
+    .OUTPUTS
+        System.Windows.Window (or root element from XAML)
+        Named controls are exposed as global variables by their x:Name.
 #>
-	[CmdletBinding()]
+    [CmdletBinding()]
     param (
-		[Parameter(Mandatory,
-			ValueFromPipeline)]
-		[string]$xaml
-	)
-	$xaml = $xaml -replace "x:N", 'N' -replace 'd:DesignHeight="\d*?"', '' -replace 'x:Class=".*?"', '' -replace 'mc:Ignorable="d"', '' -replace 'd:DesignWidth="\d*?"', '' 
-	[xml]$xaml = $xaml
-	$presentation = [Windows.Markup.XamlReader]::Load((new-object System.Xml.XmlNodeReader $xaml))
-	$xaml.SelectNodes("//*[@Name]") | %{
-		Set-Variable -Name $_.Name.ToString() -Value $presentation.FindName($_.Name) -Scope global
-	}
-	return $presentation
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [string]$xaml
+    )
+
+    # Strip design-time and ambiguous attributes
+    $xaml = $xaml -replace 'x:N', 'N' `
+                  -replace 'd:DesignHeight="\d*?"', '' `
+                  -replace 'd:DesignWidth="\d*?"', '' `
+                  -replace 'x:Class=".*?"', '' `
+                  -replace 'mc:Ignorable="d"', ''
+
+    # Parse and load the XAML
+    [xml]$xaml = $xaml
+    $presentation = [Windows.Markup.XamlReader]::Load(
+        (New-Object System.Xml.XmlNodeReader $xaml)
+    )
+
+    # Expose named controls as global variables
+    $xaml.SelectNodes("//*[@Name]") | ForEach-Object {
+        Set-Variable -Name $_.Name.ToString() `
+                     -Value $presentation.FindName($_.Name) `
+                     -Scope Global
+    }
+
+    return $presentation
 }
 
 function Assert-WPFAddControl {
 <#
     .SYNOPSIS
-		Creates a control inside of a wpf container object
-			 
-	.DESCRIPTION
-		This function creates a control inside of a wpf container object
-		
-	.PARAMETER ControlType
-		The type of control to add from the following validated list:
-		Button, Calendar, CheckBox,ComboBox, 
-		ComboBoxItem, DatePicker, DocumentViewer, Expander, 
-		FlowDocumentReader, GroupBox, Hyperlink, Image, InkCanvas, 
-		Label, ListBox, ListBoxItem, Menu, MenuItem, PasswordBox, 
-		ProgressBar, RadioButton, RichTextBox, SrollViewer,
-		SinglePageViewer,Slider, TabControl, TabItem, Table, 
-		TextBlock, TextBox, ToolBar, ToolTip, TreeView, 
-		TreeViewItem, WebBrowser
-		
-	.PARAMETER Container
-		The container to add the control to
-		
-	.PARAMETER Text
-		The text to display on the control
-		
-	.PARAMETER Top
-		The top position for the control
+        Dynamically creates and inserts a WPF control into a container.
 
-	.PARAMETER Left
-		The left position for the control
-		
-	.PARAMETER Height
-		The height for the control
-	
-	.PARAMETER Width
-		The width for the control
-	
-	.EXAMPLE
-		$Button1 = Assert-WPFAddControl 'Button' 'Grid1' 'Button1' 20 20 20 200
-		
-	.EXAMPLE
-		$Button1 = Assert-WPFAddControl -ControlType 'Button' -Container 'Grid1' -Text 'Button1' -top 20 -left 20 -height 20 -width 200
+    .DESCRIPTION
+        Instantiates a validated WPF control type, sets its content and layout properties,
+        and injects it into the specified container. Supports dynamic UI generation in PowerShell-driven WPF apps.
 
-	.EXAMPLE
-		$Button1 = 'Button' | Assert-WPFAddControl -Container 'Grid1' -Text 'Button1' -top 20 -left 20 -height 20 -width 200
-		
-	.INPUTS
-		ControlType as ValidatedString, Container as Object, Text as String, Top as String, Left as String, Height as String, Width as String
-	
-	.OUTPUTS
-		System.Windows.Controls.$ControlType
+    .PARAMETER ControlType
+        The type of control to create. Must be one of the validated WPF control types.
+
+    .PARAMETER Container
+        The WPF container (e.g., Grid, StackPanel) to insert the control into.
+
+    .PARAMETER Text
+        The text or content to display on the control.
+
+    .PARAMETER Top
+        The top margin (Y offset) of the control.
+
+    .PARAMETER Left
+        The left margin (X offset) of the control.
+
+    .PARAMETER Height
+        The height of the control.
+
+    .PARAMETER Width
+        The width of the control.
+
+    .EXAMPLE
+        $Button1 = Assert-WPFAddControl 'Button' $Grid1 'Click Me' 20 20 30 100
+
+    .INPUTS
+        String, Object
+
+    .OUTPUTS
+        System.Windows.Controls.Control
 #>
-	[CmdletBinding()]
+    [CmdletBinding()]
     param (
-		[Parameter(Mandatory,
-			ValueFromPipeline)]
-		[ValidateSet('Button', 'Calendar', 'CheckBox','ComboBox', 
-		'ComboBoxItem', 'DatePicker', 'DocumentViewer', 'Expander', 
-		'FlowDocumentReader', 'GroupBox', 'Hyperlink', 'Image', 'InkCanvas', 
-		'Label', 'ListBox', 'ListBoxItem', 'Menu', 'MenuItem', 'PasswordBox', 
-		'ProgressBar', 'RadioButton', 'RichTextBox', 'SrollViewer',
-		'SinglePageViewer','Slider', 'TabControl', 'TabItem', 'Table', 
-		'TextBlock', 'TextBox', 'ToolBar', 'ToolTip', 'TreeView', 
-		'TreeViewItem', 'WebBrowser')]
-		[string[]]$ControlType,
-		[Parameter(Mandatory)]
-		[object]$Container,
-		[Parameter(Mandatory)]
-		[string]$Text,
-		[Parameter(Mandatory)]
-		[string]$Top,
-		[Parameter(Mandatory)]
-		[string]$Left,
-		[Parameter(Mandatory)]
-		[string]$Height,
-		[Parameter(Mandatory)]
-		[string]$Width
-	)
-	$control = new-object System.Windows.Controls.$ControlType
-	$control.Content = "$Text"
-	$Container.Children.Insert($Container.Children.Count, $control)
-	$control.VerticalAlignment = "Top"
-	$control.HorizontalAlignment = "Left"
-	$control.Margin = "$Left,$Top,0,0"
-	$control.Height = "$Height"
-	$control.Width = "$Width"
-	return $control
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [ValidateSet('Button', 'Calendar', 'CheckBox', 'ComboBox',
+            'ComboBoxItem', 'DatePicker', 'DocumentViewer', 'Expander',
+            'FlowDocumentReader', 'GroupBox', 'Hyperlink', 'Image', 'InkCanvas',
+            'Label', 'ListBox', 'ListBoxItem', 'Menu', 'MenuItem', 'PasswordBox',
+            'ProgressBar', 'RadioButton', 'RichTextBox', 'ScrollViewer',
+            'SinglePageViewer', 'Slider', 'TabControl', 'TabItem', 'Table',
+            'TextBlock', 'TextBox', 'ToolBar', 'ToolTip', 'TreeView',
+            'TreeViewItem', 'WebBrowser')]
+        [string]$ControlType,
+
+        [Parameter(Mandatory)]
+        [System.Windows.Controls.Panel]$Container,
+
+        [Parameter(Mandatory)]
+        [string]$Text,
+
+        [Parameter(Mandatory)]
+        [int]$Top,
+
+        [Parameter(Mandatory)]
+        [int]$Left,
+
+        [Parameter(Mandatory)]
+        [int]$Height,
+
+        [Parameter(Mandatory)]
+        [int]$Width
+    )
+
+    # Instantiate control
+    $control = New-Object "System.Windows.Controls.$ControlType"
+
+    # Set content or text depending on control type
+    if ($control -is [System.Windows.Controls.ContentControl]) {
+        $control.Content = $Text
+    } elseif ($control -is [System.Windows.Controls.TextBox]) {
+        $control.Text = $Text
+    }
+
+    # Layout properties
+    $control.VerticalAlignment = 'Top'
+    $control.HorizontalAlignment = 'Left'
+    $control.Margin = [System.Windows.Thickness]::new($Left, $Top, 0, 0)
+    $control.Height = $Height
+    $control.Width = $Width
+
+    # Inject into container using original Insert logic
+    $Container.Children.Add($Container.Children.Count, $control)
+
+    return $control
 }
 
 function Assert-WPFCreate {
 <#
     .SYNOPSIS
-		Creates a Windows Presentation Foundation window
-			 
-	.DESCRIPTION
-		This function Creates a Windows Presentation Foundation window
-		
-	.PARAMETER Title
-		The title for the window
-		
-	.PARAMETER Height
-		The height for the window
-	
-	.PARAMETER Width
-		The width for the window
-	
-	.PARAMETER Grid
-		A name property for the grid created within the window.
-	
-	.EXAMPLE
-		Assert-WPFCreate "Brandon's Window" "480" "800" "Grid1"
-		
-	.EXAMPLE
-		Assert-WPFCreate -title "Brandon's Window" -height "480" -width "800" -grid "Grid1"
+        Creates a Windows Presentation Foundation window with a named grid container.
 
-	.EXAMPLE
-		"Brandon's Window" | Assert-WPFCreate -height "480" -width "800" -grid "Grid1"
-		
-	.INPUTS
-		Title as String, Height as String, Width as String, Grid as String
-	
-	.OUTPUTS
-		Windows.Markup.XamlReader
+    .DESCRIPTION
+        Dynamically constructs a WPF window using XAML markup, embedding a grid with a specified name.
+        Returns the instantiated window object for further manipulation or control injection.
+
+    .PARAMETER Title
+        The title of the window.
+
+    .PARAMETER Height
+        The height of the window in pixels.
+
+    .PARAMETER Width
+        The width of the window in pixels.
+
+    .PARAMETER Grid
+        The name of the grid container within the window.
+
+    .EXAMPLE
+        Assert-WPFCreate "Brandon's Window" 480 800 "Grid1"
+
+    .EXAMPLE
+        Assert-WPFCreate -Title "Brandon's Window" -Height 480 -Width 800 -Grid "Grid1"
+
+    .EXAMPLE
+        "Brandon's Window" | Assert-WPFCreate -Height 480 -Width 800 -Grid "Grid1"
+
+    .INPUTS
+        String, Int
+
+    .OUTPUTS
+        System.Windows.Window
 #>
-	[CmdletBinding()]
+    [CmdletBinding()]
     param (
-		[Parameter(Mandatory,
-			ValueFromPipeline)]
-		[string]$Title,
-		[Parameter(Mandatory)]
-		[string]$Height,
-		[Parameter(Mandatory)]
-		[string]$Width,
-		[Parameter(Mandatory)]
-		[string]$Grid
-	)
-	$xaml = @"
-		<Window
-				xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-				xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-				Title="$Title" Height="$Height" Width="$Width">
-				<Grid Name="$Grid">
-				</Grid>
-		</Window>
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [string]$Title,
+
+        [Parameter(Mandatory)]
+        [int]$Height,
+
+        [Parameter(Mandatory)]
+        [int]$Width,
+
+        [Parameter(Mandatory)]
+        [string]$Grid
+    )
+
+    $xaml = @"
+<Window
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="$Title" Height="$Height" Width="$Width">
+    <Grid Name="$Grid">
+    </Grid>
+</Window>
 "@
-		$MainWindow = (Assert-WPF $xaml)
-		return $MainWindow
+
+    $MainWindow = Assert-WPF $xaml
+    return $MainWindow
 }
 
 function Assert-WPFGetControlByName {
 <#
     .SYNOPSIS
-		Returns the control associated with the name specified. 
-			 
-	.DESCRIPTION
-		This function returns the control associated with the name specified. 
-	
-	.PARAMETER Presentation
-		The presentation window that contains the control
-		
-	.PARAMETER Name
-		The name of the control
-		
-	.EXAMPLE
-		Assert-WPFGetControlByName $Form1 "Button1"
-		
-	.EXAMPLE
-		Assert-WPFGetControlByName -presentation $Form1 -control "Button1"
+        Retrieves a named control from a WPF presentation object.
 
-	.EXAMPLE
-		$Form1 | Assert-WPFGetControlByName -presentation $Form1 -control "Button1"
-		
-	.INPUTS
-		Presentation as Object, Name as String
-	
-	.OUTPUTS
-		Object
-	
-	.NOTES
-		Normally only useful with externally sourced XAML loaded by Assert-WPF.
+    .DESCRIPTION
+        This function returns the control associated with the specified name
+        from a WPF window or container previously loaded via Assert-WPF.
+
+    .PARAMETER Presentation
+        The WPF window or container object that contains the control.
+
+    .PARAMETER Name
+        The x:Name of the control to retrieve.
+
+    .EXAMPLE
+        Assert-WPFGetControlByName $Form1 "Button1"
+
+    .EXAMPLE
+        Assert-WPFGetControlByName -Presentation $Form1 -Name "Button1"
+
+    .EXAMPLE
+        $Form1 | Assert-WPFGetControlByName -Name "Button1"
+
+    .INPUTS
+        System.Object, System.String
+
+    .OUTPUTS
+        System.Object (the control instance)
+
+    .NOTES
+        Most useful when working with externally sourced XAML loaded via Assert-WPF.
 #>
-	[CmdletBinding()]
+    [CmdletBinding()]
     param (
-		[Parameter(Mandatory,
-			ValueFromPipeline)]
-		[object]$Presentation,
-		[Parameter(Mandatory)]
-		[string]$Name
-	)
-	return $Presentation.FindName($Name)
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [object]$Presentation,
+
+        [Parameter(Mandatory)]
+        [string]$Name
+    )
+
+    return $Presentation.FindName($Name)
 }
 
 function Assert-WPFHAlign {
 <#
     .SYNOPSIS
-		Horizontally aligns an object according to the specified parameter.
-			 
-	.DESCRIPTION
-		This function Horizontally aligns an object according to the specified parameter.
-	
-	.PARAMETER Object
-		The object to align
-		
-	.PARAMETER Halign
-		The position to horizontally align the control to. May be the value 
-		Left, Center, Right or Stretch.
-		
-	.EXAMPLE
-		Assert-WPFHalign $Button1 'Left'
-		
-	.EXAMPLE
-		Assert-WPFHalign -Object $Button1 -halign 'Center'
+        Horizontally aligns a WPF control to the specified alignment.
 
-	.EXAMPLE
-		$Button1 | Assert-WPFHalign -halign 'Right'
-		
-	.INPUTS
-		Object as Object, Halign as String
-	
-	.OUTPUTS
-		Format of Horizontal Alignment
+    .DESCRIPTION
+        Sets the HorizontalAlignment property of a WPF control to one of the valid alignment options:
+        Left, Center, Right, or Stretch.
+
+    .PARAMETER Object
+        The WPF control to align.
+
+    .PARAMETER Halign
+        The horizontal alignment value to apply.
+
+    .EXAMPLE
+        Assert-WPFHAlign $Button1 'Left'
+
+    .EXAMPLE
+        Assert-WPFHAlign -Object $Button1 -Halign 'Center'
+
+    .EXAMPLE
+        $Button1 | Assert-WPFHAlign -Halign 'Right'
+
+    .INPUTS
+        System.Object, System.String
+
+    .OUTPUTS
+        System.String (alignment value applied)
 #>
-	[CmdletBinding()]
+    [CmdletBinding()]
     param (
-		[Parameter(Mandatory,
-			ValueFromPipeline)]
-		[object]$Object,
-		[Parameter(Mandatory)]
-		[ValidateSet('Left', 'Center', 'Right', 'Stretch')]
-		[string[]]$Halign
-	)
-	$Object.HorizontalAlignment = $Halign
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [object]$Object,
+
+        [Parameter(Mandatory)]
+        [ValidateSet('Left', 'Center', 'Right', 'Stretch')]
+        [string]$Halign
+    )
+
+    $Object.HorizontalAlignment = $Halign
+    return $Halign
 }
 
 function Assert-WPFInsertControl {
 <#
     .SYNOPSIS
-		Inserts a control inside of a wpf container object
-			 
-	.DESCRIPTION
-		This function inserts a control inside of a wpf container object
-		
-	.PARAMETER ControlType
-		The type of control to add from the following validated list:
-		Button, Calendar, CheckBox,ComboBox, 
-		ComboBoxItem, DatePicker, DocumentViewer, Expander, 
-		FlowDocumentReader, GroupBox, Hyperlink, Image, InkCanvas, 
-		Label, ListBox, ListBoxItem, Menu, MenuItem, PasswordBox, 
-		ProgressBar, RadioButton, RichTextBox, SrollViewer,
-		SinglePageViewer,Slider, TabControl, TabItem, Table, 
-		TextBlock, TextBox, ToolBar, ToolTip, TreeView, 
-		TreeViewItem, WebBrowser
-		
-	.PARAMETER Container
-		The container to add the control to
-	
-	.EXAMPLE
-		$Button1 = Assert-WPFInsertControl 'Button' 'Grid1'
-		
-	.EXAMPLE
-		$Button1 = Assert-WPFInsertControl -ControlType 'Button' -Container 'Grid1'
+        Inserts a WPF control into a container object.
 
-	.EXAMPLE
-		$Button1 = 'Button' | Assert-WPFInsertControl -Container 'Grid1'
-		
-	.INPUTS
-		ControlType as ValidatedString, Container as Object
-	
-	.OUTPUTS
-		System.Windows.Controls.$ControlType
+    .DESCRIPTION
+        Instantiates a validated WPF control type and inserts it into the specified container.
+        Useful for dynamic UI composition in PowerShell-driven WPF applications.
+
+    .PARAMETER ControlType
+        The type of control to create. Must be one of the validated WPF control types.
+
+    .PARAMETER Container
+        The WPF container (e.g., Grid, StackPanel) to insert the control into.
+
+    .EXAMPLE
+        $Button1 = Assert-WPFInsertControl 'Button' $Grid1
+
+    .EXAMPLE
+        $Button1 = Assert-WPFInsertControl -ControlType 'Button' -Container $Grid1
+
+    .EXAMPLE
+        'Button' | Assert-WPFInsertControl -Container $Grid1
+
+    .INPUTS
+        System.String, System.Object
+
+    .OUTPUTS
+        System.Windows.Controls.Control
 #>
-	[CmdletBinding()]
+    [CmdletBinding()]
     param (
-		[Parameter(Mandatory,
-			ValueFromPipeline)]
-		[ValidateSet('Button', 'Calendar', 'CheckBox','ComboBox', 
-		'ComboBoxItem', 'DatePicker', 'DocumentViewer', 'Expander', 
-		'FlowDocumentReader', 'GroupBox', 'Hyperlink', 'Image', 'InkCanvas', 
-		'Label', 'ListBox', 'ListBoxItem', 'Menu', 'MenuItem', 'PasswordBox', 
-		'ProgressBar', 'RadioButton', 'RichTextBox', 'SrollViewer',
-		'SinglePageViewer','Slider', 'TabControl', 'TabItem', 'Table', 
-		'TextBlock', 'TextBox', 'ToolBar', 'ToolTip', 'TreeView', 
-		'TreeViewItem', 'WebBrowser')]
-		[string[]]$ControlType,
-		[Parameter(Mandatory)]
-		[object]$Container
-	)
-	$control = new-object System.Windows.Controls.$ControlType
-	$Container.Children.Insert($Container.Children.Count, $control)
-	return $control
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [ValidateSet('Button', 'Calendar', 'CheckBox', 'ComboBox',
+            'ComboBoxItem', 'DatePicker', 'DocumentViewer', 'Expander',
+            'FlowDocumentReader', 'GroupBox', 'Hyperlink', 'Image', 'InkCanvas',
+            'Label', 'ListBox', 'ListBoxItem', 'Menu', 'MenuItem', 'PasswordBox',
+            'ProgressBar', 'RadioButton', 'RichTextBox', 'ScrollViewer',
+            'SinglePageViewer', 'Slider', 'TabControl', 'TabItem', 'Table',
+            'TextBlock', 'TextBox', 'ToolBar', 'ToolTip', 'TreeView',
+            'TreeViewItem', 'WebBrowser')]
+        [string]$ControlType,
+
+        [Parameter(Mandatory)]
+        [System.Windows.Controls.Panel]$Container
+    )
+
+    $control = New-Object "System.Windows.Controls.$ControlType"
+    $Container.Children.Insert($Container.Children.Count, $control)
+    return $control
 }
 
 function Assert-WPFValign {
 <#
     .SYNOPSIS
-		Vertically aligns an object according to the specified parameter.
-			 
-	.DESCRIPTION
-		This function vertically aligns an object according to the specified parameter.
-	
-	.PARAMETER Object
-		The object to align
-		
-	.PARAMETER Valign
-		The position to vertically align the control to. May be the value 
-		Top, Center, Bottom or Stretch.
-		
-	.EXAMPLE
-		Assert-WPFValign $Button1 'Top'
-		
-	.EXAMPLE
-		Assert-WPFValign -Object $Button1 -valign 'Top'
+        Vertically aligns a WPF control to the specified alignment.
 
-	.EXAMPLE
-		$Button1 | Assert-WPFValign -valign 'Top'
-		
-	.INPUTS
-		Object as Object, Valign as String
-	
-	.OUTPUTS
-		Format of Vertical Alignment
+    .DESCRIPTION
+        Sets the VerticalAlignment property of a WPF control to one of the valid alignment options:
+        Top, Center, Bottom, or Stretch.
+
+    .PARAMETER Object
+        The WPF control to align.
+
+    .PARAMETER Valign
+        The vertical alignment value to apply.
+
+    .EXAMPLE
+        Assert-WPFValign $Button1 'Top'
+
+    .EXAMPLE
+        Assert-WPFValign -Object $Button1 -Valign 'Center'
+
+    .EXAMPLE
+        $Button1 | Assert-WPFValign -Valign 'Bottom'
+
+    .INPUTS
+        System.Object, System.String
+
+    .OUTPUTS
+        System.String (alignment value applied)
 #>
-	[CmdletBinding()]
+    [CmdletBinding()]
     param (
-		[Parameter(Mandatory,
-			ValueFromPipeline)]
-		[object]$Object,
-		[Parameter(Mandatory)]
-		[ValidateSet('Top', 'Center', 'Bottom', 'Stretch')]
-		[string[]]$Valign
-	)
-	$Object.VerticalAlignment = $Valign
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [object]$Object,
+
+        [Parameter(Mandatory)]
+        [ValidateSet('Top', 'Center', 'Bottom', 'Stretch')]
+        [string]$Valign
+    )
+
+    $Object.VerticalAlignment = $Valign
+    return $Valign
 }
 
 function Clear-Clipboard {
 <#
     .SYNOPSIS
-    Clears the text from the clipboard.
+        Clears the text and data content from the Windows clipboard.
 
-		ALIASES
-			Clipboard-Clear
-     
     .DESCRIPTION
-    This function will clear the value from the Text portion of the clipboard.
-	
-	.EXAMPLE
-	Clear-Clipboard
+        Uses the .NET Clipboard API to clear all formats from the clipboard, including text, images, and file drops.
+        This method is more robust than shell-based approaches and avoids external dependencies.
+
+    .ALIASES
+        Clipboard-Clear
+
+    .EXAMPLE
+        Clear-Clipboard
+
+    .INPUTS
+        None
+
+    .OUTPUTS
+        None
 #>
-	[Alias("Clipboard-Clear")]
-	param()
-	echo $null | clip
+    [Alias("Clipboard-Clear")]
+    param()
+
+    [System.Windows.Forms.Clipboard]::Clear()
 }
 
 function Close-DataSourceName {
 <#
-	.SYNOPSIS
-		Closes the connection to a data source name in the ODBC object 
-		referenced.
-		     
+    .SYNOPSIS
+        Closes the connection to a Data Source Name (DSN) via an ODBC object.
+
     .DESCRIPTION
-		This function closes the connection to a Data Source Name (DSN) that an 
-		ODBC Object to connected to. The ODBC Object is the parameter for this 
-		command.
+        This function closes an active ODBC connection represented by the provided object.
+        Typically used to release resources after querying or interacting with a DSN.
+        The object is usually returned from Initialize-ODBC or similar connection logic.
 
-	.PARAMETER ODBCObject
-		The ODBCObject, usually the return object from the Initialize-ODBC command.
+    .PARAMETER ODBCObject
+        The ODBC connection object to close.
 
-	.EXAMPLE
-		Close-DataSourceName $database
-	
-	.EXAMPLE
-		Close-DataSourceName -ODBCObject $database
-	
-	.EXAMPLE
-		$database | Close-DataSourceName
-		
-	.INPUTS
-		System Data ODBC ODBCConnection
+    .EXAMPLE
+        Close-DataSourceName $database
+
+    .EXAMPLE
+        Close-DataSourceName -ODBCObject $database
+
+    .EXAMPLE
+        $database | Close-DataSourceName
+
+    .INPUTS
+        System.Data.Odbc.OdbcConnection
+
+    .OUTPUTS
+        None
 #>
-	[CmdletBinding()]
+    [CmdletBinding()]
     param (
-        [Parameter(Mandatory,
-			ValueFromPipeline)]
-        [object]$ODBCObject
-	)
-	$ODBCObject.Close()
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [System.Data.Odbc.OdbcConnection]$ODBCObject
+    )
+
+    $ODBCObject.Close()
 }
 
 function Close-Window {
 <#
     .SYNOPSIS
-		Closes a window
+        Sends a close command to a window via its handle.
 
-		ALIASES
-			Window-Close
-			 
-	.DESCRIPTION
-		This function closes a window
+    .DESCRIPTION
+        This function closes a window by sending a WM_SYSCOMMAND message with the SC_CLOSE parameter.
+        It requires a valid window handle, typically retrieved via Get-WindowExists or similar logic.
 
-	.PARAMETER Handle
-		The handle of the window
+    .ALIASES
+        Window-Close
 
-	.EXAMPLE
-		Close-Window (Get-WindowExists "Untitled - Notepad")
+    .PARAMETER Handle
+        The window handle (IntPtr) to target for closure.
 
-	.EXAMPLE
-		Close-Window -handle (Get-WindowExists "Untitled - Notepad")
-		
-	.EXAMPLE
-		(Get-WindowExists "Untitled - Notepad") | Close-Window
-		
-	.INPUTS
-		Handle as Handle
+    .EXAMPLE
+        Close-Window (Get-WindowExists "Untitled - Notepad")
+
+    .EXAMPLE
+        Close-Window -Handle (Get-WindowExists "Untitled - Notepad")
+
+    .EXAMPLE
+        (Get-WindowExists "Untitled - Notepad") | Close-Window
+
+    .INPUTS
+        System.IntPtr
+
+    .OUTPUTS
+        None
 #>
-	[Alias("Window-Close")]
-	[CmdletBinding()]
+    [Alias("Window-Close")]
+    [CmdletBinding()]
     param (
-        [Parameter(Mandatory,
-			ValueFromPipeline)]
+        [Parameter(Mandatory, ValueFromPipeline)]
         [System.IntPtr]$Handle
-	)
-	New-SendMessage $Handle 0x0112 0xF060 0
+    )
+
+    # WM_SYSCOMMAND = 0x0112, SC_CLOSE = 0xF060
+    New-SendMessage $Handle 0x0112 0xF060 0
 }
 
-function Compress-Window {
+function Set-WindowMinimized {
 <#
     .SYNOPSIS
-		Minimizes a window
+        Minimizes a window via its handle.
 
-		ALIASES
-			Window-Iconize
-			 
-	.DESCRIPTION
-		This function minimizes a window
+    .DESCRIPTION
+        Sends a ShowWindow command with the SW_MINIMIZE flag to the specified window handle.
+        This function is purpose-built for minimizing windows and aliased for intuitive usage.
 
-	.PARAMETER Handle
-		The handle of the window
+    .ALIASES
+        Minimize-Window
+        Window-Iconize
+		Compress-Window
 
-	.EXAMPLE
-		Compress-Window (Get-WindowExists "Untitled - Notepad")
+    .PARAMETER Handle
+        The window handle (IntPtr) to minimize.
 
-	.EXAMPLE
-		Compress-Window -handle (Get-WindowExists "Untitled - Notepad")
-		
-	.EXAMPLE
-		(Get-WindowExists "Untitled - Notepad") | Compress-Window
-		
-	.INPUTS
-		Handle as Handle
+    .EXAMPLE
+        Set-WindowStateMinimize -Handle $h
+
+    .EXAMPLE
+        Minimize-Window -Handle $h
+
+    .EXAMPLE
+        Window-Iconize -Handle $h
 #>
-	[Alias("Window-Iconize")]
-	[CmdletBinding()]
+    [Alias("Minimize-Window", "Window-Iconize")]
+    [CmdletBinding()]
     param (
-        [Parameter(Mandatory,
-			ValueFromPipeline)]
+        [Parameter(Mandatory)]
         [System.IntPtr]$Handle
-	)
-	[vds]::ShowWindow($Handle, "SW_MINIMIZE")
+    )
+
+    [vds]::ShowWindow($Handle, "SW_MINIMIZE")
 }
 
 function ConvertFrom-WinFormsXML {
@@ -2579,168 +2621,172 @@ function ConvertTo-String {
 
 function Copy-File {
 <#
-	.SYNOPSIS
-		Copies a file to a destination
+    .SYNOPSIS
+        Copies a file to a destination
 
-		ALIASES
-			File-Copy
-		
+    .ALIASES
+        File-Copy
+     
     .DESCRIPTION
-		This function copies a file to a destination
-	
-	.PARAMETER Path
-		Path to copy the file from
-		
-	.PARAMETER Destination
-		The destination to copy the file to
-	
-	.EXAMPLE
-		Copy-File 'c:\temp\temp.txt' 'c:\temp\rename.txt'
-	
-	.EXAMPLE
-		Copy-File -Path 'c:\temp\temp.txt' -Destination 'c:\temp\rename.txt'
-	
-	.EXAMPLE
-		'c:\temp\temp.txt' | Copy-File -Destination 'c:\temp\rename.txt'
-		
-	.INPUTS
-		Path as String, Destination as String
+        This function copies a file to a destination
+    
+    .PARAMETER Path
+        Path to copy the file from
+        
+    .PARAMETER Destination
+        The destination to copy the file to
+    
+    .EXAMPLE
+        Copy-File 'c:\temp\temp.txt' 'c:\temp\rename.txt'
+    
+    .EXAMPLE
+        Copy-File -Path 'c:\temp\temp.txt' -Destination 'c:\temp\rename.txt'
+    
+    .EXAMPLE
+        'c:\temp\temp.txt' | Copy-File -Destination 'c:\temp\rename.txt'
+    
+    .INPUTS
+        System.String (Path), System.String (Destination)
 #>
-	[Alias("File-Copy")]
-	[CmdletBinding()]
+    [Alias("File-Copy")]
+    [CmdletBinding()]
     param (
         [Parameter(Mandatory,
-			ValueFromPipeline)]
+            ValueFromPipeline)]
         [string]$Path,
-		[Parameter(Mandatory)]
-		[string]$Destination
-	)	
-	copy-item -path $Path -destination $Destination -recurse
+        [Parameter(Mandatory)]
+        [string]$Destination
+    )    
+    copy-item -path $Path -destination $Destination -recurse
 }
 
 function Copy-RegistryKey {
 <#
     .SYNOPSIS
-		Copies a registry key to another location
-			 
-	.DESCRIPTION
-		This function copies a registry key to another location.
-	
-	.PARAMETER Path
-		The path to the registry key
-		
-	.PARAMETER Destination
-		The path to copy the key to
-		
-	.EXAMPLE
-		Copy-RegistryKey 'Registry::HKEY_CURRENT_USER\Software\Adobe\Acrobat Reader\10.0\AdobeViewer' 'Registry::HKEY_CURRENT_USER\Software\Policies\Adobe\Acrobat Reader\10.0\AdobeViewer'
-		
-	.EXAMPLE
-		Copy-RegistryKey -path 'Registry::HKEY_CURRENT_USER\Software\Adobe\Acrobat Reader\10.0\AdobeViewer' -destination 'Registry::HKEY_CURRENT_USER\Software\Policies\Adobe\Acrobat Reader\10.0\AdobeViewer'
-	
-	.INPUTS
-		Path as String, Destination as String
+        Copies a registry key to another location
+         
+    .DESCRIPTION
+        This function copies a registry key to another location.
+    
+    .PARAMETER Path
+        The path to the registry key
+        
+    .PARAMETER Destination
+        The path to copy the key to
+    
+    .EXAMPLE
+        Copy-RegistryKey 'Registry::HKEY_CURRENT_USER\Software\Adobe\Acrobat Reader\10.0\AdobeViewer' 'Registry::HKEY_CURRENT_USER\Software\Policies\Adobe\Acrobat Reader\10.0\AdobeViewer'
+    
+    .EXAMPLE
+        Copy-RegistryKey -Path 'Registry::HKEY_CURRENT_USER\Software\Adobe\Acrobat Reader\10.0\AdobeViewer' -Destination 'Registry::HKEY_CURRENT_USER\Software\Policies\Adobe\Acrobat Reader\10.0\AdobeViewer'
+    
+    .INPUTS
+        System.String (Path), System.String (Destination)
 #>
-	[CmdletBinding()]
+    [CmdletBinding()]
     param (
-		[Parameter(Mandatory)]
-		[string]$Path,
-		[Parameter(Mandatory)]
-		[string]$Destination
-	)
-	Copy-Item -Path $Path -Destination $Destination
+        [Parameter(Mandatory)]
+        [string]$Path,
+        [Parameter(Mandatory)]
+        [string]$Destination
+    )
+    Copy-Item -Path $Path -Destination $Destination
 }
 
-function Expand-Window {
+function Set-WindowMaximized {
 <#
     .SYNOPSIS
-		Maximizes a window
+        Sets a window to its maximized state
 
-		ALIASES
-			Window-Maximize
-			 
-	.DESCRIPTION
-		This function maximizes a window
+    .ALIASES
+        Expand-Window
+        Window-Maximize
 
-	.PARAMETER Handle
-		The handle of the window
+    .DESCRIPTION
+        This function sets a window to its maximized state using its handle.
 
-	.EXAMPLE
-		Expand-Window (Get-WindowExists "Untitled - Notepad")
+    .PARAMETER Handle
+        The handle of the window
 
-	.EXAMPLE
-		Expand-Window -handle (Get-WindowExists "Untitled - Notepad")
-		
-	.EXAMPLE
-		(Get-WindowExists "Untitled - Notepad") | Expand-Window
-		
-	.INPUTS
-		Handle as Handle
+    .EXAMPLE
+        Set-WindowExpanded (Get-WindowExists "Untitled - Notepad")
+
+    .EXAMPLE
+        Set-WindowExpanded -Handle (Get-WindowExists "Untitled - Notepad")
+
+    .EXAMPLE
+        (Get-WindowExists "Untitled - Notepad") | Set-WindowExpanded
+
+    .INPUTS
+        System.IntPtr (Handle)
 #>
-	[Alias("Window-Maximize")]
-	[CmdletBinding()]
+    [Alias("Expand-Window", "Window-Maximize")]
+    [CmdletBinding()]
     param (
-        [Parameter(Mandatory,
-			ValueFromPipeline)]
+        [Parameter(Mandatory, ValueFromPipeline)]
         [System.IntPtr]$Handle
-	)
-	[vds]::ShowWindow($Handle, "SW_MAXIMIZE")
+    )
+    [vds]::ShowWindow($Handle, "SW_MAXIMIZE")
 }
 
 function Find-ListMatch {
 <#
     .SYNOPSIS
-		Finds and seeks the index of an item in a list
+        Finds and returns the index of an item in a list
 
-		ALIASES
-			Match
-			 
-	.DESCRIPTION
-		This function finds and seeks the index of an item in a list
+    .ALIASES
+        Match
 
-	.PARAMETER List
-		The list to seek
-	
-	.PARAMETER Text
-		The text to seek
-		
-	.PARAMETER Start
-		The start point (optional)
-	
-	.EXAMPLE
-		$index = FindListMatch $ListBox1 "Guitar" 
-		
-	.EXAMPLE 
-		$index = FindListMatch -list $ListBox1 -text "Guitar" -start ($index + 1)
+    .DESCRIPTION
+        This function searches for a string in a list control and returns its index.
+        It attempts to use FindString first, falling back to IndexOf if necessary.
 
-	.EXAMPLE
-		$index = $ListBox1 | FindListMatch -text "Guitar"
-		
-	.INPUTS
-		List as Object, Text as String, Start as Integer
-	
-	.OUTPUTS
-		Integer
+    .PARAMETER List
+        The list control to search (e.g., ListBox)
+
+    .PARAMETER Text
+        The text to find
+
+    .PARAMETER Start
+        The starting index (optional). Defaults to -1.
+
+    .EXAMPLE
+        $index = Find-ListMatch $ListBox1 "Guitar"
+
+    .EXAMPLE 
+        $index = Find-ListMatch -List $ListBox1 -Text "Guitar" -Start ($index + 1)
+
+    .EXAMPLE
+        $index = $ListBox1 | Find-ListMatch -Text "Guitar"
+
+    .INPUTS
+        System.Object (List), System.String (Text), System.Int32 (Start)
+
+    .OUTPUTS
+        System.Int32 (Index of matching item, or -1 if not found)
 #>
-	[Alias("Match")]
-	[CmdletBinding()]
+    [Alias("Match")]
+    [CmdletBinding()]
     param (
-		[Parameter(Mandatory,
-			ValueFromPipeline)]
-		[object]$List,
-		[Parameter(Mandatory)]
-		[string]$Text,
-		[int]$Start
-	)
-    if ($Start -eq $null){
-        $Start = -1
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [object]$List,
+
+        [Parameter(Mandatory)]
+        [string]$Text,
+
+        [int]$Start = -1
+    )
+
+    if (-not $List) {
+        throw "List parameter cannot be null."
     }
+
     try {
-		$return = $List.FindString($Text,$Start)
-	}
-    catch {
-		$return = $List.Items.IndexOf($Text)
-	}
+        $return = $List.FindString($Text, $Start)
+    } catch {
+        $return = $List.Items.IndexOf($Text)
+    }
+
     return $return
 }
 
@@ -10404,6 +10450,7 @@ function Write-InitializationFile {
 	}
 
 }
+
 
 
 
